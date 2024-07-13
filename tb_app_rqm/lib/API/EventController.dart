@@ -7,7 +7,7 @@ import '../Data/DistPersoData.dart';
 import '../Data/DistTotaleData.dart';
 import '../Data/DossardData.dart';
 import '../Utils/config.dart';
-import 'Result.dart';
+import '../Utils/Result.dart';
 
 class EventController {
 

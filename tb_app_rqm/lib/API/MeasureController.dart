@@ -2,7 +2,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import '../API/Result.dart';
+import '../Utils/Result.dart';
 import '../Data/NbPersonData.dart';
 
 import '../Data/DistPersoData.dart';

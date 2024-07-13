@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer';
 import 'package:http/http.dart' as http;
 import '../API/MeasureController.dart';
-import '../API/Result.dart';
+import '../Utils/Result.dart';
 import '../Data/DataUtils.dart';
 import '../Data/DistPersoData.dart';
 import '../Data/DossardData.dart';
