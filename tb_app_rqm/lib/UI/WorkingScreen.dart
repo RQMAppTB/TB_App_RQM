@@ -37,8 +37,9 @@ class _WorkingScreenState extends State<WorkingScreen>{
 
   @override
   void dispose() {
-    log("Dispose");
     super.dispose();
+    log("Dispose");
+    _streamController.close();
   }
 
   Future<void> _showMyDialog() async {

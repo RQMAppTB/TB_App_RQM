@@ -134,6 +134,8 @@ class MeasureController {
       log("Response: ${response.statusCode}");
       if (response.statusCode == 201 || response.statusCode == 202) {
         // Remove the uuid from the shared preferences
+        await DistToSendData.removeDistToSend();
+        await TimeData.removeTime();
         await UuidData.removeUuid();
         return Result<bool>(value: true);
       }else{

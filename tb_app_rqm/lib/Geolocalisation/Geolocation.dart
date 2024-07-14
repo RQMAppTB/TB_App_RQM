@@ -62,29 +62,23 @@ class Geolocation{
     log("Can start listening? ${!_positionStreamStarted}");
     if(!_positionStreamStarted) {
       log("Starting");
-      _positionStreamStarted = true;
-      geo.Geolocator.getCurrentPosition(/*).then((position1) =>
-        geo.Geolocator.getCurrentPosition()
-      ).then((position2) =>
-        geo.Geolocator.getCurrentPosition()
-      ).then((position3) =>
-        geo.Geolocator.getCurrentPosition()
-      ).then((position4) =>
-        geo.Geolocator.getCurrentPosition()*/
-      ).then((position) {
+
+      geo.Geolocator.getCurrentPosition()
+        .then((position) {
 
 
 
         log("Position: $position");
+        _positionStreamStarted = true;
 
         _oldPos = position;
-        _mesureToWait = 0;
+        _mesureToWait = 2;
         _distance = 0;
         _startTime = DateTime.now();
 
         _positionStream =
             geo.Geolocator.getPositionStream(locationSettings: _settings)
-                .listen((geo.Position position) {
+                .listen((geo.Position position) async {
 
               log("Entered position stream");
               var distSinceLast = geo.Geolocator.distanceBetween(
@@ -105,9 +99,9 @@ class Geolocation{
                 // Calculate the time diff between now and the start time
                 Duration diff = DateTime.now().difference(_startTime);
 
-                TimeData.saveTime(diff.inSeconds);
-                DistToSendData.saveDistToSend(_distance);
-                streamSink.add(_distance);
+                await TimeData.saveTime(diff.inSeconds);
+                await DistToSendData.saveDistToSend(_distance);
+
                 MeasureController.sendMesure().then((value) {
                   if (value.error != null) {
                     log("Error: ${value.error}");
