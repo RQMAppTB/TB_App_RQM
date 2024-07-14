@@ -2,6 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:tb_app_rqm/API/MeasureController.dart';
 
 import '../Data/NbPersonData.dart';
 import '../Utils/config.dart';
@@ -20,13 +21,13 @@ class _ConfigScreenState extends State<ConfigScreen>{
 
   final MobileScannerController controller = MobileScannerController(
     torchEnabled: false,
+    autoStart: true,
   );
+
 
   Barcode? _barcode;
 
   void _handleBarcode(BarcodeCapture barcodes) {
-    log('Barcode detected: ${barcodes.barcodes.firstOrNull}');
-
     if (mounted && barcodes.barcodes.isNotEmpty && barcodes.barcodes.first.displayValue == Config.QR_CODE_S_VALUE) {
 
       controller.stop();
@@ -52,10 +53,31 @@ class _ConfigScreenState extends State<ConfigScreen>{
             TextButton(
               child: const Text('Yes'),
               onPressed: () {
-                _nbPersonData.saveNbPerson(_nbParticipants);
-                Navigator.pushAndRemoveUntil(
-                    context, MaterialPageRoute(builder: (context) => const WorkingScreen()), (route) => false);
-
+                NbPersonData.saveNbPerson(_nbParticipants);
+                MeasureController.startMeasure(_nbParticipants)
+                    .then((result) {
+                      log("Result: $result");
+                      if(result.error != null){
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Vous ne pouvez pas commencer de mesure maintenant, réessayez plus tard"),
+                          ),
+                        );
+                        log("Error: ${result.error}");
+                        return;
+                      }
+                      controller.dispose();
+                      Navigator.pushAndRemoveUntil(
+                        context, MaterialPageRoute(builder: (context) => const WorkingScreen()), (route) => false);
+                    })
+                    .onError((error, stackTrace) {
+                      log("Error: $error");
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Error while starting the measure'),
+                        ),
+                      );
+                    });
               },
             ),
             TextButton(
@@ -94,77 +116,63 @@ class _ConfigScreenState extends State<ConfigScreen>{
   }
 
   @override
-  Widget build(BuildContext context){
-    return Scaffold(
-      appBar: AppBar(title: const Text('Config')),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            Expanded(
-              flex: 2,
-              child: MobileScanner(
-                onDetect: _handleBarcode,
-                controller: controller,
-                fit: BoxFit.contain,
-              ),
-            ),
-            Expanded(
-              child: Center(
-                child: Column(
-                  children: <Widget>[
-                    const Text('Welcome to the config page'),
-                    const Text('Please enter your config'),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: <Widget>[
-                        IconButton(
-                          onPressed: removeParticipant,
-                          icon: const Icon(Icons.remove),
-                        ),
-                        Text('$_nbParticipants'),
-                        IconButton(
-                          onPressed: addParticipant,
-                          icon: const Icon(Icons.add),
-                        ),
-                      ],
-                    ),
-                    ElevatedButton(
-                      onPressed: () async {
-                        Navigator.pop(context);
-                      },
-                      child: const Text('Save'),
-                    ),
-                  ]
-                ),
-              ),
-            ),
+  void dispose(){
+    super.dispose();
+    log("Dispose");
+    controller.dispose();
+  }
 
-            /*const Text('Welcome to the config page'),
-            const Text('Please enter your config'),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                IconButton(
-                  onPressed: removeParticipant,
-                  icon: const Icon(Icons.remove),
+  @override
+  Widget build(BuildContext context){
+    return PopScope(
+      canPop: true,
+      onPopInvoked: (bool didPop) async{
+        log("Trying to pop");
+        controller.dispose();
+      },
+      child: Scaffold(
+        appBar: AppBar(title: const Text('Config')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Expanded(
+                flex: 2,
+                child: MobileScanner(
+                  onDetect: _handleBarcode,
+                  controller: controller,
+                  fit: BoxFit.contain,
                 ),
-                Text('$_nbParticipants'),
-                IconButton(
-                  onPressed: addParticipant,
-                  icon: const Icon(Icons.add),
+              ),
+              Expanded(
+                child: Center(
+                  child: Column(
+                      children: <Widget>[
+                        const Text('Welcome to the config page'),
+                        const Text('Please enter your config'),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: <Widget>[
+                            IconButton(
+                              onPressed: removeParticipant,
+                              icon: const Icon(Icons.remove),
+                            ),
+                            Text('$_nbParticipants'),
+                            IconButton(
+                              onPressed: addParticipant,
+                              icon: const Icon(Icons.add),
+                            ),
+                          ],
+                        ),
+                      ]
+                  ),
                 ),
-              ],
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.pop(context);
-              },
-              child: const Text('Save'),
-            ),*/
-          ],
+              ),
+            ],
+          ),
         ),
-      ),
+      )
     );
+
   }
 }

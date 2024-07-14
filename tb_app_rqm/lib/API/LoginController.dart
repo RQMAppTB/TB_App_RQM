@@ -38,9 +38,9 @@ class LoginApi{
 
         var jsonResult = jsonDecode(response.body);
 
-        var isSaved = await DossardData().saveDossard(int.parse(jsonResult["dosNumber"]));
+        var isSaved = await DossardData.saveDossard(int.parse(jsonResult["dosNumber"]));
         log("Test 2");
-        isSaved = isSaved && await NameData().saveName(jsonResult["username"]);
+        isSaved = isSaved && await NameData.saveName(jsonResult["username"]);
         log("Test 3");
         isSaved = isSaved && await DistPersoData.saveDistPerso(jsonResult["distTraveled"] ?? 0);
 
@@ -64,9 +64,7 @@ class LoginApi{
 
   static Future<Result<bool>> logout() async {
 
-    var uuid = UuidData();
-
-    bool isMeasureRunning = await uuid.doesUuidExist();
+    bool isMeasureRunning = await UuidData.doesUuidExist();
 
     log("Is measure running: $isMeasureRunning");
 

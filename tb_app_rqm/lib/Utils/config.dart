@@ -10,7 +10,7 @@ class Config {
   static const String START_TIME = '2024-01-25 17:00:00';
   // ----------------- QR code -----------------
   static const String QR_CODE_S_VALUE = 'Ready';
-  static const String QR_CODE_F_VALUE = 'Not Ready';
+  static const String QR_CODE_F_VALUE = 'Stop';
   // ------------- Zone Evènement --------------
   static const double LAT1 = 46.81506769390172;
   static const double LON1 = 6.935914064535421;
@@ -23,6 +23,14 @@ class Config {
     mp.LatLng(LAT2, LON2),
     mp.LatLng(LAT1, LON2),
   ];
+
+  static List<mp.LatLng> POLYGON2 = [
+    mp.LatLng(46.74308195291572, 6.6776287039768),
+    mp.LatLng(46.732896423225036, 6.6776287039768),
+    mp.LatLng(46.732896423225036, 6.701948509720427),
+    mp.LatLng(46.74308195291572, 6.701948509720427)
+  ];
+
 }
 
 // Méthode de configuration

@@ -61,22 +61,45 @@ class _InfoScreenState extends State<InfoScreen>{
     });
   }
 
+  Future<int> _getValue(Future<Result<int>> Function() fetchVal, Future<int?> Function() getVal) {
+    return fetchVal()
+        .then((value) {
+          if(value.hasError){
+            throw Exception("Could not fetch value because : ${value.error}");
+          }else{
+            log("Value: ${value.value}");
+            return value.value!;
+          }
+        })
+        .onError((error, stackTrace) {
+          log('Error: $error');
+          return getVal()
+              .then((value){
+                if(value == null){
+                  log("No value");
+                  return -1;
+                }else{
+                  return value;
+                }
+              });
+        });
+  }
+
   @override
   void initState() {
     super.initState();
-    //compute((_){_timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());}, 0);
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
-        /*_distTotaleData.getDistTotale().then((value) => setState(() {
-      setState(() {
-        _distanceTotale = value ?? 0;
-      });
-    }));
-    _distPersoData.getDistPerso().then((value) => setState(() {
-      setState(() {
-        _distancePerso = value ?? 0;
-      });
-    }));*/
 
+    _getValue(EventController.getTotalDistance, DistTotaleData.getDistTotale)
+        .then((value) => setState(() {
+          _distanceTotale = value;
+        }));
+
+    _getValue(EventController.getPersonalDistance, DistPersoData.getDistPerso)
+        .then((value) => setState(() {
+      _distancePerso = value;
+    }));
+    /*
     EventController.getTotalDistance()
         .then((value) {
           if(value.hasError){
@@ -102,8 +125,9 @@ class _InfoScreenState extends State<InfoScreen>{
                   });
                 }
               });
-        });
+        });*/
 
+/*
     EventController.getPersonalDistance()
         .then((value) {
           if(value.hasError){
@@ -129,14 +153,14 @@ class _InfoScreenState extends State<InfoScreen>{
                   });
                 }
               });
-        });
+        });*/
 
-    _dossardData.getDossard().then((value) => setState(() {
+    DossardData.getDossard().then((value) => setState(() {
       setState(() {
         _dossard = value.toString().padLeft(4, '0');
       });
     }));
-    _nameData.getName().then((value) => setState(() {
+    NameData.getName().then((value) => setState(() {
       setState(() {
         _name = value;
       });
@@ -181,10 +205,10 @@ class _InfoScreenState extends State<InfoScreen>{
               const Text('Temps restant'),
               Text(_remainingTime),
               const Text('Distance totale'),
-              Text('$_distanceTotale'),
+              Text('${_distanceTotale ?? 0}'),
               const Padding(padding: EdgeInsets.all(10)),
               Text('$_dossard $_name'),
-              Text('Vous avez parcouru $_distancePerso'),
+              Text('Vous avez parcouru ${_distancePerso ?? 0} mètres'),
               ElevatedButton(
                 onPressed: () async{
                   bool canStartNewMeasure = true;
@@ -193,7 +217,7 @@ class _InfoScreenState extends State<InfoScreen>{
                     canStartNewMeasure = !result.hasError;
                   }
 
-                  if(await Geolocation().isLocationInZone()){
+                  if(await Geolocation().isInZone()){
                     if(canStartNewMeasure) {
                       Navigator.push(
                         context,
@@ -202,7 +226,6 @@ class _InfoScreenState extends State<InfoScreen>{
                       );
                     }
                   }else{
-                    // TODO show snackbar
                     showInSnackBar("Vous n'êtes pas dans la zone");
                     log("You are not in the zone");
 

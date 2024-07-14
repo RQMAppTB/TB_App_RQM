@@ -11,13 +11,13 @@ class DataUtils{
   static Future<bool> deleteAllData() async {
 
     return DistPersoData.removeDistPerso()
-        .then((value) => DistToSendData().removeDistToSend())
+        .then((value) => DistToSendData.removeDistToSend())
         .then((value) => DistTotaleData.removeDistTotale())
-        .then((value) => DossardData().removeDossard())
-        .then((value) => NameData().removeName())
-        .then((value) => NbPersonData().removeNbPerson())
-        .then((value) => TimeData().removeTime())
-        .then((value) => UuidData().removeUuid())
+        .then((value) => DossardData.removeDossard())
+        .then((value) => NameData.removeName())
+        .then((value) => NbPersonData.removeNbPerson())
+        .then((value) => TimeData.removeTime())
+        .then((value) => UuidData.removeUuid())
         .then((value) => true)
         .onError((error, stackTrace) => false);
   }

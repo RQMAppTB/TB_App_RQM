@@ -4,12 +4,18 @@ import 'dart:developer';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
+import 'package:tb_app_rqm/API/MeasureController.dart';
+import 'package:tb_app_rqm/Data/DistToSendData.dart';
+import 'package:tb_app_rqm/Data/TimeData.dart';
 import 'package:tb_app_rqm/Utils/config.dart';
 class Geolocation{
 
   late StreamSubscription<geo.Position> _positionStream;
   late geo.LocationSettings _settings;
   late geo.Position _oldPos;
+  int _distance = 0;
+  int _mesureToWait = 0;
+  DateTime _startTime = DateTime.now();
 
   bool _positionStreamStarted = false;
 
@@ -23,7 +29,7 @@ class Geolocation{
       return geo.AndroidSettings(
         accuracy: geo.LocationAccuracy.high,
         intervalDuration: const Duration(seconds: 5),
-        distanceFilter: 1,
+        //forceLocationManager: true,
         foregroundNotificationConfig: const geo.ForegroundNotificationConfig(
           notificationText:
           "Example app will continue to receive your location even when you aren't using it",
@@ -57,26 +63,60 @@ class Geolocation{
     if(!_positionStreamStarted) {
       log("Starting");
       _positionStreamStarted = true;
-      geo.Geolocator.getCurrentPosition().then((position) {
+      geo.Geolocator.getCurrentPosition(/*).then((position1) =>
+        geo.Geolocator.getCurrentPosition()
+      ).then((position2) =>
+        geo.Geolocator.getCurrentPosition()
+      ).then((position3) =>
+        geo.Geolocator.getCurrentPosition()
+      ).then((position4) =>
+        geo.Geolocator.getCurrentPosition()*/
+      ).then((position) {
+
+
+
         log("Position: $position");
+
         _oldPos = position;
+        _mesureToWait = 0;
+        _distance = 0;
+        _startTime = DateTime.now();
+
         _positionStream =
             geo.Geolocator.getPositionStream(locationSettings: _settings)
                 .listen((geo.Position position) {
-              //_counter++;
-              //streamSink.add(_counter);
 
               log("Entered position stream");
               var distSinceLast = geo.Geolocator.distanceBetween(
                   _oldPos.latitude, _oldPos.longitude, position.latitude,
                   position.longitude).truncate();
-              log("Distance: $distSinceLast");
-              _oldPos = position;
 
-              streamSink.add(distSinceLast);
+              // Attente pour éviter les première mesures un peu étranges
+              if(_mesureToWait > 0){
+                _mesureToWait--;
+              }else {
 
-              //Ecrire sur un stream
-              //stream.;
+                log("Distance: $distSinceLast");
+
+                _oldPos = position;
+
+                _distance += distSinceLast;
+
+                // Calculate the time diff between now and the start time
+                Duration diff = DateTime.now().difference(_startTime);
+
+                TimeData.saveTime(diff.inSeconds);
+                DistToSendData.saveDistToSend(_distance);
+                streamSink.add(_distance);
+                MeasureController.sendMesure().then((value) {
+                  if (value.error != null) {
+                    log("Error: ${value.error}");
+                  } else {
+                    log("Value: ${value.value}");
+                    streamSink.add(_distance);
+                  }
+                });
+              }
             });
       });
           /*.then((geo.Position position) {
@@ -122,21 +162,22 @@ class Geolocation{
     }
   }
 
-  Future<bool> isLocationInZone() async {
-    return await _isLocationInZone();
+  /// Check if [point] is in the zone defin in the [config.dart] file.
+  /// Returns true if the point is in the zone
+  /// Returns false if the point is not in the zone
+  bool isLocationInZone(geo.Position point) {
+    var tmp = mp.LatLng(point.latitude, point.longitude);
+    var test = mp.PolygonUtil.containsLocation(tmp, Config.POLYGON, false);
+    return test;
   }
 
   /// Check if the current location is in the zone
   /// Returns true if the current location is in the zone
   /// Returns false if the current location is not in the zone
-  /// TODO: Implement this function
-  Future<bool> _isLocationInZone() async {
-
+  Future<bool> isInZone() async {
     final tmp = await determinePosition();
-    final point = mp.LatLng(tmp.latitude, tmp.longitude);
-    var test = mp.PolygonUtil.containsLocation(point, Config.POLYGON, false);
-
-    return true;
+    var test = isLocationInZone(tmp);
+    return test;
   }
 
 

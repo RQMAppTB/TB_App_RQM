@@ -1,21 +1,21 @@
 import 'DataManagement.dart';
 
 class NameData{
-  final DataManagement _dataManagement = DataManagement();
+  static final DataManagement _dataManagement = DataManagement();
 
-  Future<bool> saveName(String name) async {
+  static Future<bool> saveName(String name) async {
     return _dataManagement.saveString('name', name);
   }
 
-  Future<String> getName() async {
+  static Future<String> getName() async {
     return _dataManagement.getString('name');
   }
 
-  Future<bool> removeName() async {
+  static Future<bool> removeName() async {
     return _dataManagement.removeData('name');
   }
 
-  Future<bool> doesNameExist() async {
+  static Future<bool> doesNameExist() async {
     return _dataManagement.doesDataExist('name');
   }
 }

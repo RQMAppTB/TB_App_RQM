@@ -13,7 +13,7 @@ class EventController {
 
   static final _distTotaleHandler = DistTotaleData();
 
-  static Future<Result<int>> getTotalDistance() {
+  static Future<Result<int>> getTotalDistance() async {
 
     log("Getting total distance");
 
@@ -47,7 +47,7 @@ class EventController {
 
   static Future<Result<int>> getPersonalDistance() async {
 
-    int? dosNumber = await DossardData().getDossard();
+    int? dosNumber = await DossardData.getDossard();
 
     //dosNumber = 9;
 

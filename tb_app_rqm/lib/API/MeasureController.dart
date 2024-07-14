@@ -2,6 +2,8 @@
 import 'dart:convert';
 import 'dart:developer';
 
+import 'package:tb_app_rqm/Data/DistToSendData.dart';
+
 import '../Utils/Result.dart';
 import '../Data/NbPersonData.dart';
 
@@ -19,8 +21,8 @@ class MeasureController {
 
   static Future<Result<bool>> startMeasure(int nbPersonnes) async {
 
-    int? dosNumber = await DossardData().getDossard();
-    String name = await NameData().getName();
+    int? dosNumber = await DossardData.getDossard();
+    String name = await NameData.getName();
 
     log("Starting measure with dosNumber: $dosNumber, name: $name, nbPersonnes: $nbPersonnes");
 
@@ -51,10 +53,10 @@ class MeasureController {
             log("Uuid: ${jsonResult["myUuid"]}");
 
             bool testIsSaved = await DistPersoData.saveDistPerso(0);
-            testIsSaved = testIsSaved && await TimeData().saveTime(0);
-            testIsSaved = testIsSaved && await UuidData().saveUuid(jsonResult["myUuid"]);
+            testIsSaved = testIsSaved && await TimeData.saveTime(0);
+            testIsSaved = testIsSaved && await UuidData.saveUuid(jsonResult["myUuid"]);
 
-            return await UuidData().saveUuid(jsonResult["myUuid"]);
+            return await UuidData.saveUuid(jsonResult["myUuid"]);
           } else {
             throw Exception(jsonResult["message"]);
             //return (false, response.body);
@@ -74,11 +76,11 @@ class MeasureController {
     TimeData _timeData = TimeData();
     UuidData _uuidData = UuidData();*/
 
-    int dist = 20;//await DistPersoData().getDistPerso() ?? 0;
-    int time = 10;//await TimeData().getTime() ?? 0;
-    int number = await NbPersonData().getNbPerson() ?? 1;
-    int? dossard = await DossardData().getDossard();
-    String uuid = await UuidData().getUuid();
+    int dist = await DistToSendData.getDistToSend() ?? 0;
+    int time = await TimeData.getTime() ?? 0;
+    int number = await NbPersonData.getNbPerson() ?? 1;
+    int? dossard = await DossardData.getDossard();
+    String uuid = await UuidData.getUuid();
 
     if (dossard == null || uuid.isEmpty) {
       return Result<bool>(error: "Dossard or uuid is null");
@@ -106,9 +108,9 @@ class MeasureController {
   }
 
   static Future<Result<bool>> stopMeasure() async {
-    int? dist = 20;//await DistPersoData().getDistPerso();
-    int? time = 10;//await TimeData().getTime();
-    String uuid = await UuidData().getUuid();
+    int? dist = await DistToSendData.getDistToSend();
+    int? time = await TimeData.getTime();
+    String uuid = await UuidData.getUuid();
 
     log("Stopping measure with dist: $dist, time: $time, uuid: $uuid");
 
@@ -124,7 +126,6 @@ class MeasureController {
     return http.post(
         uri,
         body: {
-          //"dosNumber": "3",
           "uuid":uuid,
           "dist":dist.toString(),
           "time":time.toString()
@@ -133,7 +134,7 @@ class MeasureController {
       log("Response: ${response.statusCode}");
       if (response.statusCode == 201 || response.statusCode == 202) {
         // Remove the uuid from the shared preferences
-        await UuidData().removeUuid();
+        await UuidData.removeUuid();
         return Result<bool>(value: true);
       }else{
         log("Error: ${jsonDecode(response.body)["message"]}");
@@ -159,6 +160,6 @@ class MeasureController {
   }
 
   static Future<bool> isThereAMeasure() async {
-    return UuidData().doesUuidExist();
+    return UuidData.doesUuidExist();
   }
 }

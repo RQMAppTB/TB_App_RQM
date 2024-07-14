@@ -21,9 +21,7 @@ Future<void> main() async {
     exit(0);
   }
 
-  NameData nameData = NameData();
-  DossardData dossardData = DossardData();
-  final bool _isLoggedIn = await nameData.doesNameExist() && await dossardData.doesDossardExist();
+  final bool _isLoggedIn = await NameData.doesNameExist() && await DossardData.doesDossardExist();
 
   runApp(MaterialApp(
     title: 'RQM application',
