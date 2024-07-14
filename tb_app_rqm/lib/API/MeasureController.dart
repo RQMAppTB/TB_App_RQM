@@ -114,9 +114,9 @@ class MeasureController {
 
     log("Stopping measure with dist: $dist, time: $time, uuid: $uuid");
 
-    if (uuid.isEmpty || dist == null || time == null) {
-      log("Uuid, dist or time is null");
-      return Result<bool>(error: "Uuid, dist or time is null");
+    if (uuid.isEmpty) {
+      log("No uuid found");
+      return Result<bool>(error: "Uuid, dist and time is null");
     }
 
     final uri = Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}stop');
@@ -127,8 +127,8 @@ class MeasureController {
         uri,
         body: {
           "uuid":uuid,
-          "dist":dist.toString(),
-          "time":time.toString()
+          "dist": (dist ?? 0).toString(),
+          "time":(time ?? 0).toString()
         }
     ).then((response) async{
       log("Response: ${response.statusCode}");

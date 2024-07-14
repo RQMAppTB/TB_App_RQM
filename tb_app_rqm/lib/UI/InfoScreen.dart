@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:tb_app_rqm/API/EventController.dart';
 
+import '../API/LoginController.dart';
 import '../API/MeasureController.dart';
 import '../Data/DistPersoData.dart';
 import '../Data/DistTotaleData.dart';
@@ -188,6 +189,7 @@ class _InfoScreenState extends State<InfoScreen>{
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
+                LoginController.logout();
                 Navigator.pushReplacement(
                   context,
                   MaterialPageRoute(builder: (context) => const Login()),
@@ -216,6 +218,8 @@ class _InfoScreenState extends State<InfoScreen>{
                     Result result = await MeasureController.stopMeasure();
                     canStartNewMeasure = !result.hasError;
                   }
+
+                  log("Can start new measure: $canStartNewMeasure");
 
                   if(await Geolocation().isInZone()){
                     if(canStartNewMeasure) {

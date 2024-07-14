@@ -12,7 +12,7 @@ import '../Utils/config.dart';
 
 import '../Data/DataManagement.dart';
 
-class LoginApi{
+class LoginController{
 
   final String _actionType = 'get_username';
   static final _dataManagement = DataManagement();
