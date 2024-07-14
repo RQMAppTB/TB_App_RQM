@@ -3,17 +3,17 @@ import 'dart:developer';
 
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart' as geo;
+import 'package:maps_toolkit/maps_toolkit.dart' as mp;
+import 'package:tb_app_rqm/Utils/config.dart';
 class Geolocation{
 
   late StreamSubscription<geo.Position> _positionStream;
   late geo.LocationSettings _settings;
-  int _counter = 0;
   late geo.Position _oldPos;
 
   bool _positionStreamStarted = false;
 
   Geolocation(){
-    //_oldPos = geo.Position(latitude: 0, longitude: 0, timestamp: DateTime.now(), accuracy: 0, altitude: 0, heading: 0, speed: 0, speedAccuracy: 0);
     _settings = _getSettings();
   }
 
@@ -45,6 +45,11 @@ class Geolocation{
         distanceFilter: 5,
       );
     }
+  }
+
+  Future<geo.Position> determinePosition() async {
+
+    return await geo.Geolocator.getCurrentPosition();
   }
 
   Future<void> startListening(StreamSink<int> streamSink) async {
@@ -117,14 +122,20 @@ class Geolocation{
     }
   }
 
-  /// Get the current location of the user
-  /// Returns the current location of the user
+  Future<bool> isLocationInZone() async {
+    return await _isLocationInZone();
+  }
 
-  /// Check if the location is in the zone
-  /// Returns true if the location is in the zone
-  /// Returns false if the location is not in the zone
+  /// Check if the current location is in the zone
+  /// Returns true if the current location is in the zone
+  /// Returns false if the current location is not in the zone
   /// TODO: Implement this function
-  static Future<bool> isLocationInZone() async {
+  Future<bool> _isLocationInZone() async {
+
+    final tmp = await determinePosition();
+    final point = mp.LatLng(tmp.latitude, tmp.longitude);
+    var test = mp.PolygonUtil.containsLocation(point, Config.POLYGON, false);
+
     return true;
   }
 

@@ -1,6 +1,8 @@
+import 'package:maps_toolkit/maps_toolkit.dart' as mp;
+
 class Config {
   // ------------------- API -------------------
-  static const String SERVER_API = '192.168.61.106:3000';//'rqm.iict-heig-vd.ch';
+  static const String SERVER_API = 'rqm.iict-heig-vd.ch';//'192.168.61.106:3000';//
   static const String API_URL = SERVER_API;//'http://192.168.61.106:3000/app/';//'https://www.larouequimarche.ch/wp-admin/admin-ajax.php';
   static const String API_COMMON_ADDRESS = '/app/measures/';
   // -------------- Début et fin ---------------
@@ -10,11 +12,17 @@ class Config {
   static const String QR_CODE_S_VALUE = 'Ready';
   static const String QR_CODE_F_VALUE = 'Not Ready';
   // ------------- Zone Evènement --------------
-  static const String LAT1 = '46.778';
-  static const String LON1 = '6.641';
-  static const String LAT2 = '46.778';
-  static const String LON2 = '6.641';
+  static const double LAT1 = 46.81506769390172;
+  static const double LON1 = 6.935914064535421;
+  static const double LAT2 = 46.81376575165063;
+  static const double LON2 = 6.937924842680419;
 
+  static List<mp.LatLng> POLYGON = [
+    mp.LatLng(LAT1, LON1),
+    mp.LatLng(LAT2, LON1),
+    mp.LatLng(LAT2, LON2),
+    mp.LatLng(LAT1, LON2),
+  ];
 }
 
 // Méthode de configuration

@@ -2,12 +2,17 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:tb_app_rqm/API/EventController.dart';
 
+import '../API/MeasureController.dart';
 import '../Data/DistPersoData.dart';
 import '../Data/DistTotaleData.dart';
 import '../Data/DossardData.dart';
 import '../Data/NameData.dart';
+import '../Geolocalisation/Geolocation.dart';
+import '../Utils/Result.dart';
 import '../Utils/config.dart';
+import 'ConfigScreen.dart';
 import 'LoginScreen.dart';
 
 class InfoScreen extends StatefulWidget{
@@ -24,13 +29,15 @@ class _InfoScreenState extends State<InfoScreen>{
   //final String _end = ;
   DateTime end = DateTime.parse(Config.END_TIME);
   String _remainingTime = "";
-  int _distanceTotale = 0;
-  int _distancePerso = 0;
+  int? _distanceTotale;
+  int? _distancePerso;
+  String _dossard = "";
+  String _name = "";
   //LoginApi _loginApi = LoginApi();
   DossardData _dossardData = DossardData();
   NameData _nameData = NameData();
-  DistTotaleData _distTotaleData = DistTotaleData();
-  DistPersoData _distPersoData = DistPersoData();
+  //DistTotaleData _distTotaleData = DistTotaleData();
+  //DistPersoData _distPersoData = DistPersoData();
 
   // API controllers
   //MeasureController _measureController = MeasureController();
@@ -38,6 +45,12 @@ class _InfoScreenState extends State<InfoScreen>{
 
   // Create a stream
 
+
+  void showInSnackBar(String value) {
+    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
+        content: new Text(value)
+    ));
+  }
 
   void countDown() {
     DateTime now = DateTime.now();
@@ -53,7 +66,7 @@ class _InfoScreenState extends State<InfoScreen>{
     super.initState();
     //compute((_){_timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());}, 0);
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
-    _distTotaleData.getDistTotale().then((value) => setState(() {
+        /*_distTotaleData.getDistTotale().then((value) => setState(() {
       setState(() {
         _distanceTotale = value ?? 0;
       });
@@ -61,6 +74,71 @@ class _InfoScreenState extends State<InfoScreen>{
     _distPersoData.getDistPerso().then((value) => setState(() {
       setState(() {
         _distancePerso = value ?? 0;
+      });
+    }));*/
+
+    EventController.getTotalDistance()
+        .then((value) {
+          if(value.hasError){
+            throw Exception("Could not retrieve total distance : ${value.error}");
+          }else{
+            setState(() {
+              _distanceTotale = value.value;
+            });
+          }
+        })
+        .onError((error, stackTrace) {
+          log('Error: $error');
+          DistTotaleData.getDistTotale()
+              .then((value){
+                if(value == null){
+                  log("No total distance saved");
+                  setState(() {
+                    _distanceTotale = -1;
+                  });
+                }else{
+                  setState(() {
+                    _distanceTotale = value;
+                  });
+                }
+              });
+        });
+
+    EventController.getPersonalDistance()
+        .then((value) {
+          if(value.hasError){
+            throw Exception("Could not retrieve personal distance : ${value.error}");
+          }else{
+            setState(() {
+              _distancePerso = value.value;
+            });
+          }
+        })
+        .onError((error, stackTrace) {
+          log('Error: $error');
+          DistPersoData.getDistPerso()
+              .then((value){
+                if(value == null){
+                  log("No personal distance saved");
+                  setState(() {
+                    _distancePerso = -1;
+                  });
+                }else{
+                  setState(() {
+                    _distancePerso = value;
+                  });
+                }
+              });
+        });
+
+    _dossardData.getDossard().then((value) => setState(() {
+      setState(() {
+        _dossard = value.toString().padLeft(4, '0');
+      });
+    }));
+    _nameData.getName().then((value) => setState(() {
+      setState(() {
+        _name = value;
       });
     }));
   }
@@ -104,17 +182,18 @@ class _InfoScreenState extends State<InfoScreen>{
               Text(_remainingTime),
               const Text('Distance totale'),
               Text('$_distanceTotale'),
-              const Text('Distance personnelle'),
-              Text('$_distancePerso'),
+              const Padding(padding: EdgeInsets.all(10)),
+              Text('$_dossard $_name'),
+              Text('Vous avez parcouru $_distancePerso'),
               ElevatedButton(
                 onPressed: () async{
-                  /*bool canStartNewMeasure = true;
+                  bool canStartNewMeasure = true;
                   if(await MeasureController.isThereAMeasure()){
                     Result result = await MeasureController.stopMeasure();
                     canStartNewMeasure = !result.hasError;
                   }
 
-                  if(await Geolocation.isLocationInZone()){
+                  if(await Geolocation().isLocationInZone()){
                     if(canStartNewMeasure) {
                       Navigator.push(
                         context,
@@ -123,10 +202,13 @@ class _InfoScreenState extends State<InfoScreen>{
                       );
                     }
                   }else{
+                    // TODO show snackbar
+                    showInSnackBar("Vous n'êtes pas dans la zone");
+                    log("You are not in the zone");
 
-                  }*/
+                  }
                 },
-                child: const Text('Start mesure'),
+                child: const Text('Start'),
               )
             ],
           ),

@@ -10,9 +10,9 @@ import 'UuidData.dart';
 class DataUtils{
   static Future<bool> deleteAllData() async {
 
-    return DistPersoData().removeDistPerso()
+    return DistPersoData.removeDistPerso()
         .then((value) => DistToSendData().removeDistToSend())
-        .then((value) => DistTotaleData().removeDistTotale())
+        .then((value) => DistTotaleData.removeDistTotale())
         .then((value) => DossardData().removeDossard())
         .then((value) => NameData().removeName())
         .then((value) => NbPersonData().removeNbPerson())

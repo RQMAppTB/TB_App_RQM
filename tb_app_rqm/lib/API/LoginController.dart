@@ -19,9 +19,6 @@ class LoginApi{
 
   static Future<Result<bool>> login(String name, int dosNum) async {
 
-    // TODO Call to the login endpoint
-    //final response = await http.get(Uri.parse('${Config.API_URL}?action
-
     log("Login: name :$name, dosnum: $dosNum");
 
     final uri =
@@ -45,7 +42,7 @@ class LoginApi{
         log("Test 2");
         isSaved = isSaved && await NameData().saveName(jsonResult["username"]);
         log("Test 3");
-        isSaved = isSaved && await DistPersoData().saveDistPerso(jsonResult["distTraveled"] ?? 0);
+        isSaved = isSaved && await DistPersoData.saveDistPerso(jsonResult["distTraveled"] ?? 0);
 
         if(isSaved) {
           return Result(value: true);
@@ -106,6 +103,8 @@ class LoginApi{
 
             return Result<String>(value: name);
 
+          } else if (response.statusCode == 404) {
+            return Result<String>(error: "Ce dossard n'existe pas dans cet univers, essayez de demander à Dr.Strange!");
           } else {
             throw Exception('Failed to get username');
           }
@@ -115,7 +114,7 @@ class LoginApi{
           if (error is http.ClientException) {
             return Result<String>(error: "No connection to the server");
           }
-          return Result<String>(error: error.toString());
+          return Result<String>(error: 'Failed to get username');
         });
   }
 

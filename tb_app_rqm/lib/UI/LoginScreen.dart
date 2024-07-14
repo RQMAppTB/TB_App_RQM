@@ -3,8 +3,11 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../API/LoginController.dart';
 import '../Data/DistPersoData.dart';
 import '../Data/DistTotaleData.dart';
+import '../Utils/Result.dart';
+import 'InfoScreen.dart';
 
 class Login extends StatefulWidget{
   const Login({super.key});
@@ -18,6 +21,7 @@ class _LoginState extends State<Login>{
   final TextEditingController _controller = TextEditingController();
   //LoginApi _loginApi = LoginApi();
   String _name = "";
+  int _dossard = -1;
   bool _visibility = false;
 
 
@@ -30,8 +34,8 @@ class _LoginState extends State<Login>{
   @override
   void initState() {
     super.initState();
-    _distTotaleData.saveDistTotale(20);
-    _distPersoData.saveDistPerso(10);
+    DistTotaleData.saveDistTotale(20);
+    DistPersoData.saveDistPerso(10);
   }
 
   void showInSnackBar(String value) {
@@ -60,18 +64,25 @@ class _LoginState extends State<Login>{
             ),
             ElevatedButton(
               onPressed: () async {
-                /*Result tmp = await LoginApi.getDossardName(int.parse(_controller.text));
+
+                log("Trying to login");
+
+                Result tmp = await LoginApi.getDossardName(int.parse(_controller.text));
 
                 if(tmp.error != null){
                   //show snackbar
                   showInSnackBar(tmp.error!);
+                  setState(() {
+                    _visibility = false;
+                  });
                   //throw Exception(tmp.error);
                 }else{
                   setState(() {
                     _name = tmp.value;
+                    _dossard = int.parse(_controller.text);
                     _visibility = true;
                   });
-                }*/
+                }
               },
               child: const Text('Login'),
             ),
@@ -87,11 +98,17 @@ class _LoginState extends State<Login>{
                       log("Name: $_name");
                       //log("Name: $_name");
                       log("Dossard: ${_controller.text}");
-                      /*var tmp = await LoginApi.login("a", 3);//int.parse(_controller.text));
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute (builder: (context) {return const InfoScreen();}),
-                      );*/
+                      var tmp = await LoginApi.login(_name, _dossard);//int.parse(_controller.text));
+                      if(!tmp.hasError) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(builder: (context) {
+                            return const InfoScreen();
+                          }),
+                        );
+                      }else{
+                        showInSnackBar(tmp.error!);
+                      }
                     },
                     child: const Text('Yes'),
                   ),
@@ -113,12 +130,3 @@ class _LoginState extends State<Login>{
     );
   }
 }
-
-
-
-/*
-Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute (builder: (context) {return FirstRoute();}),
-                    );
- */

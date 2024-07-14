@@ -31,7 +31,7 @@ class EventController {
 
             int dist = jsonDecode(response.body)["distTraveled"];
 
-            _distTotaleHandler.saveDistTotale(dist);
+            DistTotaleData.saveDistTotale(dist);
             return Result<int>(value: dist);
             //return dist;
           } else {
@@ -65,15 +65,23 @@ class EventController {
 
             var dist = jsonDecode(response.body)["distTraveled"];
 
-            bool isSaeved = await DistPersoData().saveDistPerso(dist);
+            bool isSaved = await DistPersoData.saveDistPerso(dist);
 
-            if(isSaeved){
+            if(isSaved){
               return Result<int>(value: dist);
             }else{
               throw Exception('Failed to save personal distance');
             }
-          } else {
-            throw Exception('Failed to get personal distance');
+          }else if(response.statusCode == 404){
+            bool isSaved = await DistPersoData.saveDistPerso(0);
+
+            if(isSaved){
+              return Result<int>(value: 0);
+            }else{
+              throw Exception('Failed to save personal distance');
+            }
+          }else {
+            throw Exception('Status code ${response.statusCode}: ${jsonDecode(response.body)["message"]}');
           }
         })
         .onError((error, stackTrace) {
