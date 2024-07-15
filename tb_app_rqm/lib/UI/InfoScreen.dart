@@ -186,8 +186,12 @@ class _InfoScreenState extends State<InfoScreen>{
       },
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: const Color(Config.COLOR_APP_BAR),
           centerTitle: true,
-          title: const Text('Info'),
+          title: const Text(
+              style: TextStyle(color: Color(Config.COLOR_TITRE)),
+              'Info'
+          ),
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
@@ -210,32 +214,92 @@ class _InfoScreenState extends State<InfoScreen>{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Text('La Roue Qui Marche'),
-              const Padding(padding: EdgeInsets.all(10)),
-              const Text('Temps restant'),
-              Text(_remainingTime),
-              const Text('Distance totale'),
-              Text('${_distanceTotale ?? 0}'),
-              const Padding(padding: EdgeInsets.all(10)),
-              Text('$_dossard $_name'),
-              Text('Vous avez parcouru ${_distancePerso ?? 0} mètres'),
-              ElevatedButton(
-                onPressed: () async{
-                  _enabledStart ? await _startMeasure() : null;
-                },
-                child: const Text('Start'),
+              Expanded(
+                  flex: 9,
+                  child: Center(
+                      child: Column(
+                        children: <Widget>[
+                          const Expanded(
+                            flex: 2,
+                            child: Image(image: AssetImage('assets/pictures/LogoText.png')),
+                          ),
+                          const Spacer(),
+                          Expanded(
+                            flex: 1,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text('Bonjour N°$_dossard : $_name'),
+                                Text('Vous avez parcouru ${_distancePerso ?? 0} mètres'),
+                              ]
+                            ),
+                          ),
+                          Expanded(
+                            flex: 5,
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      const Text('Temps restant'),
+                                      Text(_remainingTime),
+                                    ],
+                                  ),
+                                  Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: <Widget>[
+                                      const Text('Distance totale'),
+                                      Text('${_distanceTotale ?? 0}'),
+                                    ],
+                                  )
+                                ],
+                              )
+                            /*Column(
+                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                  children: <Widget>[
+
+                                    const Text('Temps restant'),
+                                    Text(_remainingTime),
+
+                                    const Text('Distance totale'),
+                                    Text('${_distanceTotale ?? 0}'),
+                                    const Padding(padding: EdgeInsets.all(10)),
+                                  ]
+                              )*/
+                          ),
+                          /*const Text('La Roue Qui Marche'),
+                          const Padding(padding: EdgeInsets.all(10)),
+                          const Text('Temps restant'),
+                          Text(_remainingTime),
+                          const Text('Distance totale'),
+                          Text('${_distanceTotale ?? 0}'),
+                          const Padding(padding: EdgeInsets.all(10)),
+                          Text('$_dossard $_name'),
+                          Text('Vous avez parcouru ${_distancePerso ?? 0} mètres'),*/
+                        ]
+                      )
+                  )
               ),
-              ElevatedButton(
-                  onPressed: () async {
-                    var tmp = await DistPersoData.getDistPerso();
-                    log("Test: $tmp");
-                    setState(() {
-                      _test = tmp ?? -100;
-                    });
-                  },
-                  child: const Text('test')
+
+              Expanded(
+                flex: 1,
+                child:SizedBox(
+                  width: double.infinity,
+                  child:ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(Config.COLOR_BUTTON),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(0),
+                      ),
+                    ),
+                    onPressed: () async{
+                      _enabledStart ? await _startMeasure() : null;
+                    },
+                    child: const Text('Start'),
+                  ),
+                ),
               ),
-              Text('$_test'),
             ],
           ),
         ),

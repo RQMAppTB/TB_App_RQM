@@ -62,6 +62,7 @@ class Geolocation{
           "Example app will continue to receive your location even when you aren't using it",
           notificationTitle: "Running in Background",
           enableWakeLock: true,
+          notificationIcon: geo.AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
         )
       );
     } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {

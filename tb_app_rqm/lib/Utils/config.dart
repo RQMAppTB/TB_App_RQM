@@ -31,6 +31,11 @@ class Config {
     mp.LatLng(46.74308195291572, 6.701948509720427)
   ];
 
+  // ----------------- Couleurs -----------------
+  static const int COLOR_APP_BAR = 0xFF403c74;
+  static const int COLOR_BUTTON = 0xFFFF9900;
+  static const int COLOR_TITRE = 0xFFFFFFFF;
+
 }
 
 // Méthode de configuration

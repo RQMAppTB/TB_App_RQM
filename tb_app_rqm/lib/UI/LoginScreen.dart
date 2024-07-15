@@ -7,6 +7,7 @@ import '../API/LoginController.dart';
 import '../Data/DistPersoData.dart';
 import '../Data/DistTotaleData.dart';
 import '../Utils/Result.dart';
+import '../Utils/config.dart';
 import 'InfoScreen.dart';
 
 class Login extends StatefulWidget{
@@ -53,9 +54,12 @@ class _LoginState extends State<Login>{
       },
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.blue,
+          backgroundColor: const Color(Config.COLOR_APP_BAR),
           centerTitle: true,
-          title: const Text('Login')
+          title: const Text(
+              style: TextStyle(color: Color(Config.COLOR_TITRE)),
+              'Login'
+          )
         ),
         body: Center(
           child: Column(
@@ -72,6 +76,9 @@ class _LoginState extends State<Login>{
                 decoration: const InputDecoration(hintText: 'XXXX'),
               ),
               ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(Config.COLOR_BUTTON)
+                ),
                 onPressed: () async {
 
                   log("Trying to login");
@@ -103,6 +110,9 @@ class _LoginState extends State<Login>{
                     const Text("Is this the correct name?"),
                     Text(_name),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(Config.COLOR_BUTTON)
+                      ),
                       onPressed: () async {
                         log("Name: $_name");
                         //log("Name: $_name");
@@ -122,6 +132,9 @@ class _LoginState extends State<Login>{
                       child: const Text('Yes'),
                     ),
                     ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(Config.COLOR_BUTTON)
+                      ),
                       onPressed: (){
                         setState(() {
                           _visibility = false;

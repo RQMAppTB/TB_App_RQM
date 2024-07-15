@@ -132,8 +132,12 @@ class _ConfigScreenState extends State<ConfigScreen>{
       },
       child: Scaffold(
         appBar: AppBar(
+            backgroundColor: const Color(Config.COLOR_APP_BAR),
             centerTitle: true,
-            title: const Text('Config')
+            title: const Text(
+                style: TextStyle(color: Color(Config.COLOR_TITRE)),
+                'Config'
+            )
         ),
         body: Center(
           child: Column(

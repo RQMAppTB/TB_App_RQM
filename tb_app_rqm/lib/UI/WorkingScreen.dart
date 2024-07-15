@@ -4,6 +4,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import 'package:tb_app_rqm/API/MeasureController.dart';
 import 'package:tb_app_rqm/UI/InfoScreen.dart';
+import 'package:tb_app_rqm/Utils/config.dart';
 
 import '../Geolocalisation/Geolocation.dart';
 
@@ -90,8 +91,12 @@ class _WorkingScreenState extends State<WorkingScreen>{
       },
       child: Scaffold(
         appBar: AppBar(
+          backgroundColor: const Color(Config.COLOR_APP_BAR),
           centerTitle: true,
-          title: const Text('Même un mètre de plus, ça compte'),
+          title: const Text(
+              style: TextStyle(color: Color(Config.COLOR_TITRE)),
+              'Même un mètre de plus, ça compte'
+          ),
         ),
         body: Center(
           child: Column(
@@ -113,19 +118,40 @@ class _WorkingScreenState extends State<WorkingScreen>{
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
-                            Text(
-                              style: const TextStyle(
-                                fontSize: 20,
-                              ),
-                              'Vous avez parcouru $_value mètres cette session'
+                            Expanded(
+                              flex: 1,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  const Text(
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                      'Vous avez parcouru'
+                                  ),
+                                  Text(
+                                      style: const TextStyle(
+                                        fontSize: 20,
+                                      ),
+                                      ' $_value mètres '
+                                  ),
+                                ],
+                              )
                             ),
-                            const Text(
-                              style: const TextStyle(
-                                fontSize: 20,
-                              ),
-                              'Courage, vous êtes bien parti!'),
+                            const Expanded(
+                              flex: 1,
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Text(
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                  ),
+                                  'Courage, vous êtes bien parti!'),
+                                ],
+                              )
+                            )
                           ],
-
                         )
                       )
                     ]
@@ -140,6 +166,7 @@ class _WorkingScreenState extends State<WorkingScreen>{
                   width: double.infinity,
                   child:ElevatedButton(
                     style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(Config.COLOR_BUTTON),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(0),
                       ),
