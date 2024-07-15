@@ -23,13 +23,39 @@ class Geolocation{
     _settings = _getSettings();
   }
 
+  static Future<bool> handlePermission() async {
+    final geo.GeolocatorPlatform _geolocatorPlatform = geo.GeolocatorPlatform.instance;
+    bool serviceEnabled;
+    geo.LocationPermission permission;
+
+    // Test if location services are enabled.
+    serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return false;
+    }
+
+    permission = await _geolocatorPlatform.checkPermission();
+    if (permission == geo.LocationPermission.denied) {
+      permission = await _geolocatorPlatform.requestPermission();
+      if (permission == geo.LocationPermission.denied) {
+        return false;
+      }
+    }
+
+    if (permission == geo.LocationPermission.deniedForever) {
+      return false;
+    }
+
+
+    return true;
+  }
+
   /// Get the location settings
   geo.LocationSettings _getSettings() {
     if (defaultTargetPlatform == TargetPlatform.android) {
       return geo.AndroidSettings(
         accuracy: geo.LocationAccuracy.high,
         intervalDuration: const Duration(seconds: 5),
-        //forceLocationManager: true,
         foregroundNotificationConfig: const geo.ForegroundNotificationConfig(
           notificationText:
           "Example app will continue to receive your location even when you aren't using it",
@@ -60,9 +86,8 @@ class Geolocation{
 
   Future<void> startListening(StreamSink<int> streamSink) async {
     log("Can start listening? ${!_positionStreamStarted}");
-    if(!_positionStreamStarted) {
+    if(!_positionStreamStarted && await handlePermission()) {
       log("Starting");
-
       geo.Geolocator.getCurrentPosition()
         .then((position) {
 

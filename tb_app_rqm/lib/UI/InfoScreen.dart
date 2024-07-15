@@ -36,6 +36,7 @@ class _InfoScreenState extends State<InfoScreen>{
   int? _distancePerso;
   String _dossard = "";
   String _name = "";
+  bool _enabledStart = true;
   //LoginApi _loginApi = LoginApi();
   DossardData _dossardData = DossardData();
   NameData _nameData = NameData();
@@ -92,7 +93,20 @@ class _InfoScreenState extends State<InfoScreen>{
   void initState() {
     super.initState();
 
-    Permission.location.request().isGranted
+    Geolocation.handlePermission()
+        .then((value) {
+          if(!value){
+            log('Location permission not granted');
+            exit(0);
+          }else{
+            log('Location permission granted');
+          }
+        }).onError((error, stackTrace) {
+          log('Error: $error');
+          exit(0);
+        });
+
+    /*Permission.location.request().isGranted
         .then((isGranted) {
       if(isGranted){
         Permission.locationAlways.request().isGranted
@@ -108,7 +122,7 @@ class _InfoScreenState extends State<InfoScreen>{
         log('Location permission not granted');
         exit(0);
       }
-    });
+    });*/
 
 
 
@@ -206,6 +220,43 @@ class _InfoScreenState extends State<InfoScreen>{
     super.dispose();
   }
 
+  Future<void> _startMeasure() async{
+    log("Start measure");
+    setState(() {
+      _enabledStart = false;
+    });
+    bool canStartNewMeasure = true;
+    if(await MeasureController.isThereAMeasure()){
+      Result result = await MeasureController.stopMeasure();
+      canStartNewMeasure = !result.hasError;
+    }
+
+    log("Can start new measure: $canStartNewMeasure");
+
+    if(await Geolocation.handlePermission()){
+      if(await Geolocation().isInZone()){
+        if(canStartNewMeasure) {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => const ConfigScreen()),
+          );
+        }
+      }else{
+        showInSnackBar("Vous n'êtes pas dans la zone");
+        log("You are not in the zone");
+      }
+    }else{
+      showInSnackBar("Vous n'avez pas autorisé la localisation");
+      log("You did not allow location");
+    }
+
+    setState(() {
+      _enabledStart = true;
+    });
+
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -244,27 +295,7 @@ class _InfoScreenState extends State<InfoScreen>{
               Text('Vous avez parcouru ${_distancePerso ?? 0} mètres'),
               ElevatedButton(
                 onPressed: () async{
-                  bool canStartNewMeasure = true;
-                  if(await MeasureController.isThereAMeasure()){
-                    Result result = await MeasureController.stopMeasure();
-                    canStartNewMeasure = !result.hasError;
-                  }
-
-                  log("Can start new measure: $canStartNewMeasure");
-
-                  if(await Geolocation().isInZone()){
-                    if(canStartNewMeasure) {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => const ConfigScreen()),
-                      );
-                    }
-                  }else{
-                    showInSnackBar("Vous n'êtes pas dans la zone");
-                    log("You are not in the zone");
-
-                  }
+                  _enabledStart ? await _startMeasure() : null;
                 },
                 child: const Text('Start'),
               )
