@@ -90,68 +90,62 @@ class Geolocation{
     log("Can start listening? ${!_positionStreamStarted}");
     if(!_positionStreamStarted && await handlePermission()) {
       log("Starting");
-      geo.Geolocator.getCurrentPosition()
-        .then((position) {
 
+      _positionStreamStarted = true;
 
-
-        log("Position: $position");
-        _positionStreamStarted = true;
-
-        _oldPos = position;
-        _mesureToWait = 2;
-        _distance = 0;
-        _startTime = DateTime.now();
-
-        _positionStream =
-            geo.Geolocator.getPositionStream(locationSettings: _settings)
-                .listen((geo.Position position) async {
-
+      _mesureToWait = 3;
+      _positionStream =
+          geo.Geolocator.getPositionStream(locationSettings: _settings)
+              .listen((geo.Position position) async {
+            // Attente pour éviter les première mesures un peu étranges
+            if(_mesureToWait > 0){
+              log("Position: $position");
+              _oldPos = position;
+              _distance = 0;
+              _startTime = DateTime.now();
+              _mesureToWait--;
+            }else {
+              log("Position: $position");
               log("Entered position stream");
               var distSinceLast = geo.Geolocator.distanceBetween(
                   _oldPos.latitude, _oldPos.longitude, position.latitude,
                   position.longitude).truncate();
 
-              // Attente pour éviter les première mesures un peu étranges
-              if(_mesureToWait > 0){
-                _mesureToWait--;
+              log("Distance: $distSinceLast");
+
+              // Update the old position
+              _oldPos = position;
+
+              // Update the distance
+              _distance += distSinceLast;
+
+              // Calculate the time diff between now and the start time
+              Duration diff = DateTime.now().difference(_startTime);
+
+              // Check if the current location is in the zone
+              if(!isLocationInZone(position)) {
+                log("Out zone");
+                if(_outsideCounter < 5){
+                  _outsideCounter++;
+                }else{
+                  _distance = -1;
+                  streamSink.add(_distance);
+                }
               }else {
-
-                log("Distance: $distSinceLast");
-
-                _oldPos = position;
-
-                _distance += distSinceLast;
-
-                // Calculate the time diff between now and the start time
-                Duration diff = DateTime.now().difference(_startTime);
-
                 await TimeData.saveTime(diff.inSeconds);
                 await DistToSendData.saveDistToSend(_distance);
-                if(!isLocationInZone(position)) {
-                  log("Out zone");
-                  if(_outsideCounter < 5){
-                    _outsideCounter++;
-                  }else{
-                    _distance = -1;
-                    streamSink.add(_distance);
+                _outsideCounter = 0;
+                MeasureController.sendMesure().then((value) {
+                  if (value.error != null) {
+                    log("Error: ${value.error}");
+                  } else {
+                    log("Value: ${value.value}");
                   }
-                }else {
-                  _outsideCounter = 0;
-                  MeasureController.sendMesure().then((value) {
-                    if (value.error != null) {
-                      log("Error: ${value.error}");
-                    } else {
-                      log("Value: ${value.value}");
-                    }
-
-                    streamSink.add(_distance);
-                  });
-                }
+                  streamSink.add(_distance);
+                });
               }
-            });
-      });
-
+            }
+          });
       log("Entered current position");
     }else{
       log("Position stream already started");

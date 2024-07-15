@@ -115,7 +115,6 @@ class _LoginState extends State<Login>{
                       ),
                       onPressed: () async {
                         log("Name: $_name");
-                        //log("Name: $_name");
                         log("Dossard: ${_controller.text}");
                         var tmp = await LoginController.login(_name, _dossard);//int.parse(_controller.text));
                         if(!tmp.hasError) {

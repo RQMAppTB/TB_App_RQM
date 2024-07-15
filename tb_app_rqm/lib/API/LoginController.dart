@@ -14,9 +14,6 @@ import '../Data/DataManagement.dart';
 
 class LoginController{
 
-  final String _actionType = 'get_username';
-  static final _dataManagement = DataManagement();
-
   static Future<Result<bool>> login(String name, int dosNum) async {
 
     log("Login: name :$name, dosnum: $dosNum");
@@ -34,15 +31,20 @@ class LoginController{
         }
     ).then((response) async {
       if (response.statusCode == 200 || response.statusCode == 201) {
+        log("Status code: ${response.statusCode}");
         log("Response body: ${response.body}");
 
         var jsonResult = jsonDecode(response.body);
 
+
         log("Json result: dosNumber: ${jsonResult["dosNumber"]}, username: ${jsonResult["username"]}, distTraveled: ${jsonResult["distTraveled"]}");
 
-        var isSaved = await DossardData.saveDossard(int.parse(jsonResult["dosNumber"]));
+        var isSaved = await DossardData.saveDossard(jsonResult["dosNumber"]);
+        log("Is saved: $isSaved");
         isSaved = isSaved && await NameData.saveName(jsonResult["username"]);
+        log("Is saved2: $isSaved");
         isSaved = isSaved && await DistPersoData.saveDistPerso(jsonResult["distTraveled"]);
+        log("Is saved3: $isSaved");
 
         if(isSaved) {
           return Result(value: true);
