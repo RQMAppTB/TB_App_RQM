@@ -10,13 +10,7 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
 /*
-  if(await Permission.location.request().isGranted &&
-      await Permission.locationAlways.request().isGranted){
-    log('Location permission granted');
-  } else {
-    log('Location permission not granted');
-    exit(0);
-  }*/
+  */
 
   final bool _isLoggedIn = await NameData.doesNameExist() && await DossardData.doesDossardExist();
 

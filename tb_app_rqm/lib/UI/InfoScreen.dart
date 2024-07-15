@@ -1,7 +1,9 @@
 import 'dart:async';
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:permission_handler/permission_handler.dart';
 import 'package:tb_app_rqm/API/EventController.dart';
 
 import '../API/LoginController.dart';
@@ -89,6 +91,35 @@ class _InfoScreenState extends State<InfoScreen>{
   @override
   void initState() {
     super.initState();
+
+    Permission.location.request().isGranted
+        .then((isGranted) {
+      if(isGranted){
+        Permission.locationAlways.request().isGranted
+            .then((isGranted) {
+          if(isGranted){
+            log('Location permission granted');
+          } else {
+            log('Location permission not granted');
+            exit(0);
+          }
+        });
+      } else {
+        log('Location permission not granted');
+        exit(0);
+      }
+    });
+
+
+
+    /*if(await Permission.location.request().isGranted &&
+      await Permission.locationAlways.request().isGranted){
+      log('Location permission granted');
+    } else {
+      log('Location permission not granted');
+      exit(0);
+    }*/
+
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
 
     _getValue(EventController.getTotalDistance, DistTotaleData.getDistTotale)
