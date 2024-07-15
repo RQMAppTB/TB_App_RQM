@@ -12,16 +12,23 @@ class Config {
   static const String QR_CODE_S_VALUE = 'Ready';
   static const String QR_CODE_F_VALUE = 'Stop';
   // ------------- Zone Evènement --------------
-  static const double LAT1 = 46.81506769390172;
-  static const double LON1 = 6.935914064535421;
-  static const double LAT2 = 46.81376575165063;
-  static const double LON2 = 6.937924842680419;
+  static const double LAT1 = 46.62094732231268;
+  static const double LON1 = 6.71095185969227;
+  static const double LAT2 = 46.60796048493062;
+  static const double LON2 = 6.7304699219465105;
 
   static List<mp.LatLng> POLYGON = [
     mp.LatLng(LAT1, LON1),
     mp.LatLng(LAT2, LON1),
     mp.LatLng(LAT2, LON2),
     mp.LatLng(LAT1, LON2),
+  ];
+
+  static List<mp.LatLng> MY_HOME = [
+    mp.LatLng(46.81506769390172, 6.935914064535421),
+    mp.LatLng(46.81376575165063, 6.935914064535421),
+    mp.LatLng(46.81376575165063, 6.937924842680419),
+    mp.LatLng(46.81506769390172, 6.937924842680419)
   ];
 
   static List<mp.LatLng> POLYGON2 = [
