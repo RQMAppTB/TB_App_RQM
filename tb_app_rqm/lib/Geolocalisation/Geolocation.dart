@@ -16,6 +16,7 @@ class Geolocation{
   int _distance = 0;
   int _mesureToWait = 0;
   DateTime _startTime = DateTime.now();
+  int _outsideCounter = 0;
 
   bool _positionStreamStarted = false;
 
@@ -126,48 +127,31 @@ class Geolocation{
 
                 await TimeData.saveTime(diff.inSeconds);
                 await DistToSendData.saveDistToSend(_distance);
-
-                MeasureController.sendMesure().then((value) {
-                  if (value.error != null) {
-                    log("Error: ${value.error}");
-                  } else {
-                    log("Value: ${value.value}");
+                if(!isLocationInZone(position)) {
+                  log("Out zone");
+                  if(_outsideCounter < 5){
+                    _outsideCounter++;
+                  }else{
+                    _distance = -1;
                     streamSink.add(_distance);
                   }
-                });
+                }else {
+                  _outsideCounter = 0;
+                  MeasureController.sendMesure().then((value) {
+                    if (value.error != null) {
+                      log("Error: ${value.error}");
+                    } else {
+                      log("Value: ${value.value}");
+                    }
+
+                    streamSink.add(_distance);
+                  });
+                }
               }
             });
       });
-          /*.then((geo.Position position) {
-
-
-      }).onError((error, stackTrace) {
-        log("Error: $error");
-        _positionStreamStarted = false;
-      });*/
-
-      //log("Entered current position: $position");
 
       log("Entered current position");
-      /*_oldPos = position;
-      _positionStream =
-          geo.Geolocator.getPositionStream(locationSettings: _settings)
-              .listen((geo.Position position) {
-            //_counter++;
-            //streamSink.add(_counter);
-
-            log("Entered position stream");
-            var distSinceLast = geo.Geolocator.distanceBetween(
-                _oldPos.latitude, _oldPos.longitude, position.latitude,
-                position.longitude).truncate();
-            log("Distance: $distSinceLast");
-            _oldPos = position;
-
-            streamSink.add(distSinceLast);
-
-            //Ecrire sur un stream
-            //stream.;
-          });*/
     }else{
       log("Position stream already started");
     }
@@ -189,6 +173,7 @@ class Geolocation{
     var test = mp.PolygonUtil.containsLocation(tmp, Config.POLYGON, false);
     return test;
   }
+
 
   /// Check if the current location is in the zone
   /// Returns true if the current location is in the zone

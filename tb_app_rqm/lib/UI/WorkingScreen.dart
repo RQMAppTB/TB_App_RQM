@@ -19,20 +19,26 @@ class _WorkingScreenState extends State<WorkingScreen>{
   Geolocation _geolocation = Geolocation();
   StreamController<int> _streamController = StreamController<int>();
   int _value = 0;
-  //var status = await Permission.location.status;
 
   @override
   void initState() {
     super.initState();
     _streamController.stream.listen((event) {
       log("Stream event: $event");
-      setState(() {
-        _value = event;
-      });
+      if(event == -1){
+        log("Stream event: $event");
+        _geolocation.stopListening();
+        MeasureController.stopMeasure();
+        _streamController.close();
+        Navigator.pushAndRemoveUntil(
+            context, MaterialPageRoute(builder: (context) => const InfoScreen()), (route) => false);
+      }else{
+        setState(() {
+          _value = event;
+        });
+      }
     });
-
     _geolocation.startListening(_streamController.sink);
-
   }
 
   @override
@@ -85,7 +91,7 @@ class _WorkingScreenState extends State<WorkingScreen>{
       child: Scaffold(
         appBar: AppBar(
           centerTitle: true,
-          title: const Text('Un mêtre de plus ça compte'),
+          title: const Text('Même un mètre de plus, ça compte'),
         ),
         body: Center(
           child: Column(
@@ -112,17 +118,16 @@ class _WorkingScreenState extends State<WorkingScreen>{
                                 fontSize: 20,
                               ),
                               'Vous avez parcouru $_value mètres cette session'
-
                             ),
-                            const Text('Courage, vous êtes bien parti!'),
+                            const Text(
+                              style: const TextStyle(
+                                fontSize: 20,
+                              ),
+                              'Courage, vous êtes bien parti!'),
                           ],
 
                         )
                       )
-                      //const Image(image: AssetImage('assets/pictures/LogoText.png')),
-                      /*const Padding(padding: EdgeInsets.all(10)),
-                      Text('Vous avez parcouru $_value mètres cette session'),
-                      const Text('Courage, vous êtes bien parti!'),*/
                     ]
                   ),
                 ),
@@ -142,24 +147,10 @@ class _WorkingScreenState extends State<WorkingScreen>{
                     onPressed: () async {
                       log("Result: starting?");
                       _showMyDialog();
-                      //await _geolocation.startListening(_streamController.sink);
                     },
                     child: const Text('Stop'),
                   ),
                 ),
-
-
-
-                /*Row(
-                  children: <Widget>[
-                    Expanded(
-                      flex: 1,
-                      child:
-                      ),
-                    )
-                  ],
-
-                ),*/
               ),
 
             ],
