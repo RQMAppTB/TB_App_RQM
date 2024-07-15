@@ -52,7 +52,11 @@ class _LoginState extends State<Login>{
         log("Trying to pop");
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Login')),
+        appBar: AppBar(
+          backgroundColor: Colors.blue,
+          centerTitle: true,
+          title: const Text('Login')
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

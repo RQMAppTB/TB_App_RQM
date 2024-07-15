@@ -60,6 +60,7 @@
     <string>This app needs access to location.</string>
     <key>UIBackgroundModes</key>
     <array>
+        <string>processing</string>
     	<string>fetch</string>
     	<string>location</string>
     </array>

@@ -76,7 +76,7 @@ class _InfoScreenState extends State<InfoScreen>{
           }
         })
         .onError((error, stackTrace) {
-          log('Error: $error');
+          log('Error here: $error');
           return getVal()
               .then((value){
                 if(value == null){
@@ -106,34 +106,6 @@ class _InfoScreenState extends State<InfoScreen>{
           exit(0);
         });
 
-    /*Permission.location.request().isGranted
-        .then((isGranted) {
-      if(isGranted){
-        Permission.locationAlways.request().isGranted
-            .then((isGranted) {
-          if(isGranted){
-            log('Location permission granted');
-          } else {
-            log('Location permission not granted');
-            exit(0);
-          }
-        });
-      } else {
-        log('Location permission not granted');
-        exit(0);
-      }
-    });*/
-
-
-
-    /*if(await Permission.location.request().isGranted &&
-      await Permission.locationAlways.request().isGranted){
-      log('Location permission granted');
-    } else {
-      log('Location permission not granted');
-      exit(0);
-    }*/
-
     _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
 
     _getValue(EventController.getTotalDistance, DistTotaleData.getDistTotale)
@@ -145,61 +117,6 @@ class _InfoScreenState extends State<InfoScreen>{
         .then((value) => setState(() {
       _distancePerso = value;
     }));
-    /*
-    EventController.getTotalDistance()
-        .then((value) {
-          if(value.hasError){
-            throw Exception("Could not retrieve total distance : ${value.error}");
-          }else{
-            setState(() {
-              _distanceTotale = value.value;
-            });
-          }
-        })
-        .onError((error, stackTrace) {
-          log('Error: $error');
-          DistTotaleData.getDistTotale()
-              .then((value){
-                if(value == null){
-                  log("No total distance saved");
-                  setState(() {
-                    _distanceTotale = -1;
-                  });
-                }else{
-                  setState(() {
-                    _distanceTotale = value;
-                  });
-                }
-              });
-        });*/
-
-/*
-    EventController.getPersonalDistance()
-        .then((value) {
-          if(value.hasError){
-            throw Exception("Could not retrieve personal distance : ${value.error}");
-          }else{
-            setState(() {
-              _distancePerso = value.value;
-            });
-          }
-        })
-        .onError((error, stackTrace) {
-          log('Error: $error');
-          DistPersoData.getDistPerso()
-              .then((value){
-                if(value == null){
-                  log("No personal distance saved");
-                  setState(() {
-                    _distancePerso = -1;
-                  });
-                }else{
-                  setState(() {
-                    _distancePerso = value;
-                  });
-                }
-              });
-        });*/
 
     DossardData.getDossard().then((value) => setState(() {
       setState(() {
@@ -257,6 +174,9 @@ class _InfoScreenState extends State<InfoScreen>{
 
   }
 
+
+  int _test = -1;
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -266,16 +186,22 @@ class _InfoScreenState extends State<InfoScreen>{
       },
       child: Scaffold(
         appBar: AppBar(
+          centerTitle: true,
           title: const Text('Info'),
           actions: [
             IconButton(
               icon: const Icon(Icons.logout),
               onPressed: () {
-                LoginController.logout();
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const Login()),
-                );
+                LoginController.logout().then((result){
+                  if(result.hasError){
+                    showInSnackBar("Please try again later");
+                  }else{
+                    Navigator.pushReplacement(
+                      context,
+                      MaterialPageRoute(builder: (context) => const Login()),
+                    );
+                  }
+                });
               },
             ),
           ],
@@ -298,7 +224,18 @@ class _InfoScreenState extends State<InfoScreen>{
                   _enabledStart ? await _startMeasure() : null;
                 },
                 child: const Text('Start'),
-              )
+              ),
+              ElevatedButton(
+                  onPressed: () async {
+                    var tmp = await DistPersoData.getDistPerso();
+                    log("Test: $tmp");
+                    setState(() {
+                      _test = tmp ?? -100;
+                    });
+                  },
+                  child: const Text('test')
+              ),
+              Text('$_test'),
             ],
           ),
         ),

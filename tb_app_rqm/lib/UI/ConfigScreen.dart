@@ -131,7 +131,10 @@ class _ConfigScreenState extends State<ConfigScreen>{
         controller.dispose();
       },
       child: Scaffold(
-        appBar: AppBar(title: const Text('Config')),
+        appBar: AppBar(
+            centerTitle: true,
+            title: const Text('Config')
+        ),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,

@@ -52,7 +52,7 @@ class MeasureController {
 
             log("Uuid: ${jsonResult["myUuid"]}");
 
-            bool testIsSaved = await DistPersoData.saveDistPerso(0);
+            bool testIsSaved = await DistToSendData.saveDistToSend(0); // TODO
             testIsSaved = testIsSaved && await TimeData.saveTime(0);
             testIsSaved = testIsSaved && await UuidData.saveUuid(jsonResult["myUuid"]);
 

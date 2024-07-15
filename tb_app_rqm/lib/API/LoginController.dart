@@ -38,11 +38,11 @@ class LoginController{
 
         var jsonResult = jsonDecode(response.body);
 
+        log("Json result: dosNumber: ${jsonResult["dosNumber"]}, username: ${jsonResult["username"]}, distTraveled: ${jsonResult["distTraveled"]}");
+
         var isSaved = await DossardData.saveDossard(int.parse(jsonResult["dosNumber"]));
-        log("Test 2");
         isSaved = isSaved && await NameData.saveName(jsonResult["username"]);
-        log("Test 3");
-        isSaved = isSaved && await DistPersoData.saveDistPerso(jsonResult["distTraveled"] ?? 0);
+        isSaved = isSaved && await DistPersoData.saveDistPerso(jsonResult["distTraveled"]);
 
         if(isSaved) {
           return Result(value: true);

@@ -11,8 +11,6 @@ import '../Utils/Result.dart';
 
 class EventController {
 
-  static final _distTotaleHandler = DistTotaleData();
-
   static Future<Result<int>> getTotalDistance() async {
 
     log("Getting total distance");
@@ -49,8 +47,6 @@ class EventController {
 
     int? dosNumber = await DossardData.getDossard();
 
-    //dosNumber = 9;
-
     if(dosNumber == null){
       return Result<int>(error: "Dossard number is null");
     }
@@ -61,6 +57,7 @@ class EventController {
     return http.get(uri)
         .then((response) async {
           if (response.statusCode == 200) {
+            log("Status code: ${response.statusCode}");
             log("Response body: ${response.body}");
 
             var dist = jsonDecode(response.body)["distTraveled"];
