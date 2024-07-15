@@ -62,7 +62,7 @@ class EventController {
 
             var dist = jsonDecode(response.body)["distTraveled"];
 
-            bool isSaved = await DistPersoData.saveDistPerso(dist);
+            bool isSaved = await DistPersoData.saveDistPerso(int.parse(dist.toString()));
 
             if(isSaved){
               return Result<int>(value: dist);

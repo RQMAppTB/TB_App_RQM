@@ -71,11 +71,6 @@ class MeasureController {
   }
 
   static Future<Result<bool>> sendMesure() async {
-    /*DossardData _dossardData = DossardData();
-    DistPersoData _distPersoData = DistPersoData();
-    TimeData _timeData = TimeData();
-    UuidData _uuidData = UuidData();*/
-
     int dist = await DistToSendData.getDistToSend() ?? 0;
     int time = await TimeData.getTime() ?? 0;
     int number = await NbPersonData.getNbPerson() ?? 1;
@@ -149,16 +144,6 @@ class MeasureController {
       }
       return Result<bool>(error: error.toString());
     });
-/*
-    log("Response: ${response.statusCode}");
-
-    if (response.statusCode == 200) {
-      // Remove the uuid from the shared preferences
-      await UuidData().removeUuid();
-      return Result<bool>(value: true);
-    }else{
-      return Result<bool>(error: jsonDecode(response.body)["message"]);
-    }*/
   }
 
   static Future<bool> isThereAMeasure() async {
