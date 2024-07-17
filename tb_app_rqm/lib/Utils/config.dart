@@ -6,7 +6,7 @@ class Config {
   static const String API_URL = SERVER_API;//'http://192.168.61.106:3000/app/';//'https://www.larouequimarche.ch/wp-admin/admin-ajax.php';
   static const String API_COMMON_ADDRESS = '/app/measures/';
   // -------------- Début et fin ---------------
-  static const String END_TIME = '2024-07-17 11:50:00';
+  static const String END_TIME = '2024-07-10 17:00:00';
   static const String START_TIME = '2024-01-25 17:00:00';
   // ----------------- QR code -----------------
   static const String QR_CODE_S_VALUE = 'Ready';
