@@ -29,7 +29,7 @@ class _InfoScreenState extends State<InfoScreen>{
 
   // ----------------- Variables -----------------
   Timer? _timer;
-  //final String _end = ;
+  DateTime start = DateTime.parse(Config.START_TIME);
   DateTime end = DateTime.parse(Config.END_TIME);
   String _remainingTime = "";
   int? _distanceTotale;
@@ -37,17 +37,6 @@ class _InfoScreenState extends State<InfoScreen>{
   String _dossard = "";
   String _name = "";
   bool _enabledStart = true;
-  //LoginApi _loginApi = LoginApi();
-  DossardData _dossardData = DossardData();
-  NameData _nameData = NameData();
-  //DistTotaleData _distTotaleData = DistTotaleData();
-  //DistPersoData _distPersoData = DistPersoData();
-
-  // API controllers
-  //MeasureController _measureController = MeasureController();
-
-
-  // Create a stream
 
 
   void showInSnackBar(String value) {
@@ -59,6 +48,14 @@ class _InfoScreenState extends State<InfoScreen>{
   void countDown() {
     DateTime now = DateTime.now();
     Duration remaining = end.difference(now);
+    if(remaining.isNegative){
+      _timer?.cancel();
+      setState(() {
+        _enabledStart = false;
+        _remainingTime = "L'évènement est terminé !";
+      });
+      return;
+    }
 
     setState(() {
       _remainingTime = '${remaining.inHours}:${(remaining.inMinutes)%60}:${(remaining.inSeconds)%60}';
@@ -93,20 +90,26 @@ class _InfoScreenState extends State<InfoScreen>{
   void initState() {
     super.initState();
 
-    Geolocation.handlePermission()
-        .then((value) {
-          if(!value){
-            log('Location permission not granted');
-            exit(0);
-          }else{
-            log('Location permission granted');
-          }
-        }).onError((error, stackTrace) {
-          log('Error: $error');
+    if(DateTime.now().isAfter(end) || DateTime.now().isBefore(start)){
+      _enabledStart = false;
+      _remainingTime = "L'évènement ${DateTime.now().isAfter(end) ? "est terminé" : "n'a pas encore commencé"} !";
+    }else{
+      Geolocation.handlePermission()
+          .then((value) {
+        if(!value){
+          log('Location permission not granted');
           exit(0);
-        });
+        }else{
+          log('Location permission granted');
+        }
+      }).onError((error, stackTrace) {
+        log('Error: $error');
+        exit(0);
+      });
 
-    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
+      _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
+    }
+
 
     _getValue(EventController.getTotalDistance, DistTotaleData.getDistTotale)
         .then((value) => setState(() {

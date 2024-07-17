@@ -65,85 +65,126 @@ class _LoginState extends State<Login>{
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: <Widget>[
-              const Text('Welcome to the login page'),
-              const Text('Please enter your dossard number'),
-              TextField(
-                controller: _controller,
-                keyboardType: TextInputType.number,
-                inputFormatters: [
-                  LengthLimitingTextInputFormatter(4),
-                ],
-                decoration: const InputDecoration(hintText: 'XXXX'),
+              const Expanded(
+                flex: 2,
+                child: Image(image: AssetImage('assets/pictures/LogoText.png')),
               ),
-              ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(Config.COLOR_BUTTON)
-                ),
-                onPressed: () async {
-
-                  log("Trying to login");
-
-                  Result tmp = await LoginController.getDossardName(int.parse(_controller.text));
-
-                  if(tmp.error != null){
-                    //show snackbar
-                    showInSnackBar(tmp.error!);
-                    setState(() {
-                      _visibility = false;
-                    });
-                    //throw Exception(tmp.error);
-                  }else{
-                    setState(() {
-                      _name = tmp.value;
-                      _dossard = int.parse(_controller.text);
-                      _visibility = true;
-                    });
-                  }
-                },
-                child: const Text('Login'),
-              ),
-
-              Visibility(
-                visible: _visibility,
-                child: Column(
-                  children: <Widget>[
-                    const Text("Is this the correct name?"),
-                    Text(_name),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(Config.COLOR_BUTTON)
+              Expanded(
+                  flex: 8,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      const Text(
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                          'Bienvenue'
+                          ),
+                      const Text(
+                          style: TextStyle(
+                            fontSize: 20,
+                          ),
+                          'Veuillez entrer votre dossard'
                       ),
-                      onPressed: () async {
-                        log("Name: $_name");
-                        log("Dossard: ${_controller.text}");
-                        var tmp = await LoginController.login(_name, _dossard);//int.parse(_controller.text));
-                        if(!tmp.hasError) {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) {
-                              return const InfoScreen();
-                            }),
-                          );
-                        }else{
-                          showInSnackBar(tmp.error!);
-                        }
-                      },
-                      child: const Text('Yes'),
-                    ),
-                    ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(Config.COLOR_BUTTON)
+                      TextField(
+                        controller: _controller,
+                        keyboardType: TextInputType.number,
+                        inputFormatters: [
+                          LengthLimitingTextInputFormatter(4),
+                        ],
+                        decoration: const InputDecoration(hintText: 'XXXX'),
                       ),
-                      onPressed: (){
-                        setState(() {
-                          _visibility = false;
-                        });
-                      },
-                      child: const Text('No'),
-                    ),
-                  ],
-                ),
-              ),
+                      ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(Config.COLOR_BUTTON)
+                        ),
+                        onPressed: () async {
+
+                          log("Trying to login");
+
+                          Result tmp = await LoginController.getDossardName(int.parse(_controller.text));
+
+                          if(tmp.error != null){
+                            //show snackbar
+                            showInSnackBar(tmp.error!);
+                            setState(() {
+                              _visibility = false;
+                            });
+                            //throw Exception(tmp.error);
+                          }else{
+                            setState(() {
+                              _name = tmp.value;
+                              _dossard = int.parse(_controller.text);
+                              _visibility = true;
+                            });
+                          }
+                        },
+                        child: const Text('Login'),
+                      ),
+
+                      Visibility(
+                        visible: _visibility,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                          children: <Widget>[
+                            const Text(
+                                style: TextStyle(
+                                  fontSize: 20,
+                                ),
+                                "Est-ce le bon nom?"
+                            ),
+                            Text(
+                                style: const TextStyle(
+                                  fontSize: 20,
+                                ),
+                                _name
+                            ),
+                            const Padding(padding: EdgeInsets.all(20)),
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(Config.COLOR_BUTTON)
+                                  ),
+                                  onPressed: () async {
+                                    log("Name: $_name");
+                                    log("Dossard: ${_controller.text}");
+                                    var tmp = await LoginController.login(_name, _dossard);//int.parse(_controller.text));
+                                    if(!tmp.hasError) {
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(builder: (context) {
+                                          return const InfoScreen();
+                                        }),
+                                      );
+                                    }else{
+                                      showInSnackBar(tmp.error!);
+                                    }
+                                  },
+                                  child: const Text('Oui'),
+                                ),
+                                ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(Config.COLOR_BUTTON)
+                                  ),
+                                  onPressed: (){
+                                    setState(() {
+                                      _visibility = false;
+                                    });
+                                  },
+                                  child: const Text('Non'),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  )
+              )
+
+
 
             ],
           ),

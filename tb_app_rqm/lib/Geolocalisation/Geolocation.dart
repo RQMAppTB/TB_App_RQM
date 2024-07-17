@@ -166,7 +166,7 @@ class Geolocation{
   bool isLocationInZone(geo.Position point) {
     var tmp = mp.LatLng(point.latitude, point.longitude);
     var test = mp.PolygonUtil.containsLocation(tmp, Config.POLYGON, false);
-    return test;
+    return true;
   }
 
 

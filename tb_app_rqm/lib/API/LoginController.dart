@@ -43,12 +43,13 @@ class LoginController{
         log("Is saved: $isSaved");
         isSaved = isSaved && await NameData.saveName(jsonResult["username"]);
         log("Is saved2: $isSaved");
-        isSaved = isSaved && await DistPersoData.saveDistPerso(int.parse(jsonResult["distTraveled"].toString()));
+        isSaved = isSaved && await DistPersoData.saveDistPerso(int.parse((jsonResult["distTraveled"]).toString()));
         log("Is saved3: $isSaved");
 
         if(isSaved) {
           return Result(value: true);
         } else {
+          DataUtils.deleteAllData();
           throw Exception('Failed to save dossard or username');
         }
 
