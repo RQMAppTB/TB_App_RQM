@@ -9,8 +9,15 @@ import '../Data/DossardData.dart';
 import '../Utils/config.dart';
 import '../Utils/Result.dart';
 
+/// Class containing methods to interact with the API
+/// to get data about the event.
+/// Allow to get the total distance traveled by all participants
+/// and the distance traveled by the current participant.
 class EventController {
 
+  /// Retrieve the total distance traveled by all participants from the API.
+  /// Return a Result object containing the distance if the request was successful
+  /// or an error message if the request failed.
   static Future<Result<int>> getTotalDistance() async {
 
     log("Getting total distance");
@@ -18,9 +25,9 @@ class EventController {
     final uri =
     Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}getAllDist');
 
-
     log("URI: $uri");
 
+    /// Send a GET request to the API to get the total distance traveled by all participants.
     return http.get(uri)
         .then((response) {
           if (response.statusCode == 200) {
@@ -29,6 +36,7 @@ class EventController {
 
             int dist = jsonDecode(response.body)["distTraveled"];
 
+            /// Save the total distance in the local database.
             DistTotaleData.saveDistTotale(dist);
             return Result<int>(value: dist);
             //return dist;

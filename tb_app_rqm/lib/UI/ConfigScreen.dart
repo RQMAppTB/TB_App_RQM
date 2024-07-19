@@ -180,6 +180,5 @@ class _ConfigScreenState extends State<ConfigScreen>{
         ),
       )
     );
-
   }
 }

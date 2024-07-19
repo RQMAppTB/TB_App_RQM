@@ -239,47 +239,26 @@ class _InfoScreenState extends State<InfoScreen>{
                           ),
                           Expanded(
                             flex: 5,
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      const Text('Temps restant'),
-                                      Text(_remainingTime),
-                                    ],
-                                  ),
-                                  Column(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: <Widget>[
-                                      const Text('Distance totale'),
-                                      Text('${_distanceTotale ?? 0}'),
-                                    ],
-                                  )
-                                ],
-                              )
-                            /*Column(
-                                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: <Widget>[
-
                                     const Text('Temps restant'),
                                     Text(_remainingTime),
-
+                                  ],
+                                ),
+                                Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: <Widget>[
                                     const Text('Distance totale'),
                                     Text('${_distanceTotale ?? 0}'),
-                                    const Padding(padding: EdgeInsets.all(10)),
-                                  ]
-                              )*/
+                                  ],
+                                )
+                              ],
+                            )
                           ),
-                          /*const Text('La Roue Qui Marche'),
-                          const Padding(padding: EdgeInsets.all(10)),
-                          const Text('Temps restant'),
-                          Text(_remainingTime),
-                          const Text('Distance totale'),
-                          Text('${_distanceTotale ?? 0}'),
-                          const Padding(padding: EdgeInsets.all(10)),
-                          Text('$_dossard $_name'),
-                          Text('Vous avez parcouru ${_distancePerso ?? 0} mètres'),*/
                         ]
                       )
                   )
