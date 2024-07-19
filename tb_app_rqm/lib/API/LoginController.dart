@@ -12,12 +12,19 @@ import '../Utils/config.dart';
 
 import '../Data/DataManagement.dart';
 
+/// Class containing methods to interact with the API to manage all
+/// data about login and logout.
 class LoginController{
 
+  /// Register the user [name] and [dosNum] in the API.
+  /// Return a [Future] object resolving to a [Result] object
+  /// containing a boolean value if the request was successful or an error message
+  /// if the request failed.
   static Future<Result<bool>> login(String name, int dosNum) async {
 
     log("Login: name :$name, dosnum: $dosNum");
 
+    /// URI to send the POST request to the API to register the user.
     final uri =
     Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}login');
 
@@ -39,12 +46,15 @@ class LoginController{
 
         log("Json result: dosNumber: ${jsonResult["dosNumber"]}, username: ${jsonResult["username"]}, distTraveled: ${jsonResult["distTraveled"]}");
 
+        // Save the dossard number, the name and the distance traveled by the user in the shared preferences
+        // Convert the dosNumber and distTraveled to a string before converting
+        // them to an integer to be able to take both integer and integer as string from the json.
         var isSaved = await DossardData.saveDossard(int.parse(jsonResult["dosNumber"].toString()));
-        log("Is saved: $isSaved");
+        log("Is saved after dosNumber: $isSaved");
         isSaved = isSaved && await NameData.saveName(jsonResult["username"]);
-        log("Is saved2: $isSaved");
+        log("Is saved after username: $isSaved");
         isSaved = isSaved && await DistPersoData.saveDistPerso(int.parse((jsonResult["distTraveled"]).toString()));
-        log("Is saved3: $isSaved");
+        log("Is saved after distTraveled: $isSaved");
 
         if(isSaved) {
           return Result(value: true);
@@ -65,12 +75,18 @@ class LoginController{
     });
   }
 
+  /// Logout the user by deleting all data stored in the device.
+  /// Return a [Future] object resolving to a [Result] object
+  /// containing a boolean value if the request was successful or an error message
+  /// if the request failed.
   static Future<Result<bool>> logout() async {
 
+    /// Boolean value indicating if a measure is running
     bool isMeasureRunning = await UuidData.doesUuidExist();
 
     log("Is measure running: $isMeasureRunning");
 
+    // Stop the measure if it is running
     if(isMeasureRunning){
       Result result = await MeasureController.stopMeasure();
       isMeasureRunning = result.hasError;
@@ -87,6 +103,10 @@ class LoginController{
     }
   }
 
+  /// Retrieve the name of the user with the dossard number [dosNumber] from the API.
+  /// Return a [Future] object resolving to a [Result] object
+  /// containing the name corresponding to the [dosNumber]
+  /// if the request was successful or an error message if the request failed.
   static Future<Result<String>> getDossardName(int dosNumber) async {
 
     final uri =

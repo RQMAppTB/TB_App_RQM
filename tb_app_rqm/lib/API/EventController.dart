@@ -9,8 +9,7 @@ import '../Data/DossardData.dart';
 import '../Utils/config.dart';
 import '../Utils/Result.dart';
 
-/// Class containing methods to interact with the API
-/// to get data about the event.
+/// Class containing methods to interact with the API to get data about the event.
 /// Allow to get the total distance traveled by all participants
 /// and the distance traveled by the current participant.
 class EventController {
@@ -36,7 +35,7 @@ class EventController {
 
             int dist = jsonDecode(response.body)["distTraveled"];
 
-            /// Save the total distance in the local database.
+            /// Save the total distance in the shared preferences.
             DistTotaleData.saveDistTotale(dist);
             return Result<int>(value: dist);
             //return dist;
@@ -51,6 +50,9 @@ class EventController {
         });
   }
 
+  /// Retrieve the distance traveled by the current participant from the API.
+  /// Return a Result object containing the distance if the request was successful
+  /// or an error message if the request failed.
   static Future<Result<int>> getPersonalDistance() async {
 
     int? dosNumber = await DossardData.getDossard();
@@ -59,9 +61,12 @@ class EventController {
       return Result<int>(error: "Dossard number is null");
     }
 
+    /// Create the URI to send the request to the API.
+    /// The URI contains the dossard number of the current participant.
     final uri =
     Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}getUserDist', {"dosNumber": dosNumber.toString()});
 
+    /// Send a GET request to the API to get the distance traveled by the current participant.
     return http.get(uri)
         .then((response) async {
           if (response.statusCode == 200) {
@@ -93,7 +98,5 @@ class EventController {
           log("Error: $error");
           return Result<int>(error: error.toString());
         });
-
-    return Result<int>(error: "Error");
   }
 }

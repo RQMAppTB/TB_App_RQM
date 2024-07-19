@@ -109,7 +109,7 @@ class Geolocation{
               log("Entered position stream");
               var distSinceLast = geo.Geolocator.distanceBetween(
                   _oldPos.latitude, _oldPos.longitude, position.latitude,
-                  position.longitude).truncate();
+                  position.longitude).round();//truncate();
 
               log("Distance: $distSinceLast");
 
