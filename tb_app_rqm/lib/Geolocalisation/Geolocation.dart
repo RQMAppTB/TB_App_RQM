@@ -17,12 +17,15 @@ class Geolocation{
   int _mesureToWait = 0;
   DateTime _startTime = DateTime.now();
   int _outsideCounter = 0;
+  StreamController<int> _streamController = StreamController<int>();
 
   bool _positionStreamStarted = false;
 
   Geolocation(){
     _settings = _getSettings();
   }
+
+  Stream<int> get stream => _streamController.stream;
 
   static Future<bool> handlePermission() async {
     final geo.GeolocatorPlatform _geolocatorPlatform = geo.GeolocatorPlatform.instance;
@@ -82,11 +85,10 @@ class Geolocation{
   }
 
   Future<geo.Position> determinePosition() async {
-
     return await geo.Geolocator.getCurrentPosition();
   }
 
-  Future<void> startListening(StreamSink<int> streamSink) async {
+  Future<void> startListening() async {
     log("Can start listening? ${!_positionStreamStarted}");
     if(!_positionStreamStarted && await handlePermission()) {
       log("Starting");
@@ -109,7 +111,7 @@ class Geolocation{
               log("Entered position stream");
               var distSinceLast = geo.Geolocator.distanceBetween(
                   _oldPos.latitude, _oldPos.longitude, position.latitude,
-                  position.longitude).round();//truncate();
+                  position.longitude).truncate();
 
               log("Distance: $distSinceLast");
 
@@ -129,7 +131,7 @@ class Geolocation{
                   _outsideCounter++;
                 }else{
                   _distance = -1;
-                  streamSink.add(_distance);
+                  _streamController.sink.add(_distance);
                 }
               }else {
                 await TimeData.saveTime(diff.inSeconds);
@@ -141,7 +143,7 @@ class Geolocation{
                   } else {
                     log("Value: ${value.value}");
                   }
-                  streamSink.add(_distance);
+                  _streamController.sink.add(_distance);
                 });
               }
             }

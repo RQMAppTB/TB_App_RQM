@@ -18,19 +18,18 @@ class WorkingScreen extends StatefulWidget{
 class _WorkingScreenState extends State<WorkingScreen>{
   // Create a stream
   Geolocation _geolocation = Geolocation();
-  StreamController<int> _streamController = StreamController<int>();
+
   int _value = 0;
 
   @override
   void initState() {
     super.initState();
-    _streamController.stream.listen((event) {
+    _geolocation.stream.listen((event) {
       log("Stream event: $event");
       if(event == -1){
         log("Stream event: $event");
         _geolocation.stopListening();
         MeasureController.stopMeasure();
-        _streamController.close();
         Navigator.pushAndRemoveUntil(
             context, MaterialPageRoute(builder: (context) => const InfoScreen()), (route) => false);
       }else{
@@ -39,14 +38,14 @@ class _WorkingScreenState extends State<WorkingScreen>{
         });
       }
     });
-    _geolocation.startListening(_streamController.sink);
+    _geolocation.startListening();
   }
 
   @override
   void dispose() {
     super.dispose();
     log("Dispose");
-    _streamController.close();
+    _geolocation.stopListening();
   }
 
   Future<void> _showMyDialog() async {
