@@ -41,17 +41,17 @@ class _ConfigScreenState extends State<ConfigScreen>{
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('AlertDialog Title'),
-          content: SingleChildScrollView(
+          title: Text('Vous êtes $_nbParticipants participants'),
+          content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text('You\'re going to start with $_nbParticipants participants, is that correct?'),
+                Text('Êtes-vous sûr de vouloir commencer la mesure ?'),
               ],
             ),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Yes'),
+              child: const Text('Oui'),
               onPressed: () {
                 NbPersonData.saveNbPerson(_nbParticipants);
                 MeasureController.startMeasure(_nbParticipants)
@@ -81,7 +81,7 @@ class _ConfigScreenState extends State<ConfigScreen>{
               },
             ),
             TextButton(
-              child: const Text('No'),
+              child: const Text('Non'),
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop('dialog');
                 controller.start();
@@ -158,8 +158,8 @@ class _ConfigScreenState extends State<ConfigScreen>{
                 child: Center(
                   child: Column(
                       children: <Widget>[
-                        const Text('Welcome to the config page'),
-                        const Text('Please enter your config'),
+                        const Padding(padding: EdgeInsets.all(10.0)),
+                        const Text('Combien de personnes participent ?'),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: <Widget>[

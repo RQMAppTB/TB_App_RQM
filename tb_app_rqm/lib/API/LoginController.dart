@@ -79,29 +79,29 @@ class LoginController{
   /// Return a [Future] object resolving to a [Result] object
   /// containing a boolean value if the request was successful or an error message
   /// if the request failed.
-  static Future<Result<bool>> logout() async {
+static Future<Result<bool>> logout() async {
 
-    /// Boolean value indicating if a measure is running
-    bool isMeasureRunning = await UuidData.doesUuidExist();
+  /// Boolean value indicating if a measure is running
+  bool isMeasureRunning = await UuidData.doesUuidExist();
 
-    log("Is measure running: $isMeasureRunning");
+  log("Is measure running: $isMeasureRunning");
 
-    // Stop the measure if it is running
-    if(isMeasureRunning){
-      Result result = await MeasureController.stopMeasure();
-      isMeasureRunning = result.hasError;
-    }
-
-    log("Is measure running: $isMeasureRunning");
-
-    if(!isMeasureRunning){
-      bool deletionDone = await DataUtils.deleteAllData();
-
-      return Result(value: deletionDone);
-    } else {
-      return Result(error: "Failed to logout");
-    }
+  // Stop the measure if it is running
+  if(isMeasureRunning){
+    Result result = await MeasureController.stopMeasure();
+    isMeasureRunning = result.hasError;
   }
+
+  log("Is measure running: $isMeasureRunning");
+
+  if(!isMeasureRunning){
+    bool deletionDone = await DataUtils.deleteAllData();
+
+    return Result(value: deletionDone);
+  } else {
+    return Result(error: "Failed to logout");
+  }
+}
 
   /// Retrieve the name of the user with the dossard number [dosNumber] from the API.
   /// Return a [Future] object resolving to a [Result] object

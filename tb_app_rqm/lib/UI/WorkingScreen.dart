@@ -54,13 +54,13 @@ class _WorkingScreenState extends State<WorkingScreen>{
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: const Text('AlertDialog Title'),
+          title: const Text('Fin de la session'),
           content: const SingleChildScrollView(
-            child: Text('Voulez-vous arrêter la session?'),
+            child: Text('Voulez-vous vraiment vous arrêter?'),
           ),
           actions: <Widget>[
             TextButton(
-              child: const Text('Yes'),
+              child: const Text('Oui'),
               onPressed: () {
                 _geolocation.stopListening();
                 MeasureController.stopMeasure();
@@ -69,7 +69,7 @@ class _WorkingScreenState extends State<WorkingScreen>{
               },
             ),
             TextButton(
-              child: const Text('No'),
+              child: const Text('Non'),
               onPressed: () {
                 Navigator.of(context, rootNavigator: true).pop('dialog');
               },
