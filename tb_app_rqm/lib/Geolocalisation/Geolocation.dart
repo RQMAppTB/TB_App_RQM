@@ -54,6 +54,8 @@ class Geolocation{
     return true;
   }
 
+
+
   /// Get the location settings
   geo.LocationSettings _getSettings() {
     if (defaultTargetPlatform == TargetPlatform.android) {
@@ -62,18 +64,18 @@ class Geolocation{
         intervalDuration: const Duration(seconds: 5),
         foregroundNotificationConfig: const geo.ForegroundNotificationConfig(
           notificationText:
-          "Example app will continue to receive your location even when you aren't using it",
+          "Pas de panique, c'est la RQM qui vous suit!",
           notificationTitle: "Running in Background",
           enableWakeLock: true,
           notificationIcon: geo.AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
         )
       );
-    } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+    }
+    else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
       return geo.AppleSettings(
         accuracy: geo.LocationAccuracy.high,
         activityType: geo.ActivityType.fitness,
         pauseLocationUpdatesAutomatically: false,
-        // Only set to true if our app will be started up in the background.
         showBackgroundLocationIndicator: true,
       );
     } else {
@@ -134,6 +136,7 @@ class Geolocation{
                   _streamController.sink.add(_distance);
                 }
               }else {
+                log("In zone");
                 await TimeData.saveTime(diff.inSeconds);
                 await DistToSendData.saveDistToSend(_distance);
                 _outsideCounter = 0;
@@ -150,13 +153,14 @@ class Geolocation{
           });
       log("Entered current position");
     }else{
-      log("Position stream already started");
+      log("Position stream already started or no rights");
     }
   }
 
   void stopListening() {
     if(_positionStreamStarted){
       _positionStream.cancel().then((value) {
+        _streamController.close();
         _positionStreamStarted = false;
       });
     }
@@ -167,8 +171,8 @@ class Geolocation{
   /// Returns false if the point is not in the zone
   bool isLocationInZone(geo.Position point) {
     var tmp = mp.LatLng(point.latitude, point.longitude);
-    var test = mp.PolygonUtil.containsLocation(tmp, Config.POLYGON, false);
-    return true;
+    var test = mp.PolygonUtil.containsLocation(tmp, Config.TEST, false);
+    return test;
   }
 
 

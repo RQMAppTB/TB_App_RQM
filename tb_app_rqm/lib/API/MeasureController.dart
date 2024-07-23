@@ -59,7 +59,6 @@ class MeasureController {
             return await UuidData.saveUuid(jsonResult["myUuid"]);
           } else {
             throw Exception(jsonResult["message"]);
-            //return (false, response.body);
           }
         })
         .then((value) {

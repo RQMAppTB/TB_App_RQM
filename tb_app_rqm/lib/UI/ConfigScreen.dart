@@ -132,6 +132,9 @@ class _ConfigScreenState extends State<ConfigScreen>{
       },
       child: Scaffold(
         appBar: AppBar(
+            iconTheme: const IconThemeData(
+                color: Color(Config.COLOR_TITRE)
+            ),
             backgroundColor: const Color(Config.COLOR_APP_BAR),
             centerTitle: true,
             title: const Text(

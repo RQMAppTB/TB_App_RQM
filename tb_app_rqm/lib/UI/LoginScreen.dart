@@ -45,6 +45,28 @@ class _LoginState extends State<Login>{
     ));
   }
 
+  void _getUserame() async {
+
+    log("Trying to login");
+
+    Result dosNumResult = await LoginController.getDossardName(int.parse(_controller.text));
+
+    if(dosNumResult.error != null){
+      //show snackbar
+      showInSnackBar(dosNumResult.error!);
+      setState(() {
+        _visibility = false;
+      });
+      //throw Exception(tmp.error);
+    }else{
+      setState(() {
+        _name = dosNumResult.value;
+        _dossard = int.parse(_controller.text);
+        _visibility = true;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context){
     return PopScope(
@@ -98,27 +120,31 @@ class _LoginState extends State<Login>{
                         style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(Config.COLOR_BUTTON)
                         ),
-                        onPressed: () async {
+                        onPressed: _getUserame/*
+
+                        () async {
 
                           log("Trying to login");
 
-                          Result tmp = await LoginController.getDossardName(int.parse(_controller.text));
+                          Result dosNumResult = await LoginController.getDossardName(int.parse(_controller.text));
 
-                          if(tmp.error != null){
+                          if(dosNumResult.error != null){
                             //show snackbar
-                            showInSnackBar(tmp.error!);
+                            showInSnackBar(dosNumResult.error!);
                             setState(() {
                               _visibility = false;
                             });
                             //throw Exception(tmp.error);
                           }else{
                             setState(() {
-                              _name = tmp.value;
+                              _name = dosNumResult.value;
                               _dossard = int.parse(_controller.text);
                               _visibility = true;
                             });
                           }
-                        },
+                        }
+
+                        */,
                         child: const Text('Login'),
                       ),
 

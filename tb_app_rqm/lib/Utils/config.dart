@@ -17,7 +17,7 @@ class Config {
   static const double LAT2 = 46.60796048493062;
   static const double LON2 = 6.7304699219465105;
 
-  static List<mp.LatLng> POLYGON = [
+  static List<mp.LatLng> ZONE_EVENT = [
     mp.LatLng(LAT1, LON1),
     mp.LatLng(LAT2, LON1),
     mp.LatLng(LAT2, LON2),
@@ -37,6 +37,14 @@ class Config {
     mp.LatLng(46.732896423225036, 6.701948509720427),
     mp.LatLng(46.74308195291572, 6.701948509720427)
   ];
+
+  static List<mp.LatLng> TEST = [
+    mp.LatLng(46.80812186092273, 6.6665647441029465),
+    mp.LatLng(46.78497084714715, 6.6665647441029465),
+    mp.LatLng(46.78497084714715, 6.7527387525255875),
+    mp.LatLng(46.80812186092273, 6.7527387525255875)
+  ];
+
 
   // ----------------- Couleurs -----------------
   static const int COLOR_APP_BAR = 0xFF403c74;

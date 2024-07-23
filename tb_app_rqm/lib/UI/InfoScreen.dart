@@ -3,8 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:permission_handler/permission_handler.dart';
-import 'package:tb_app_rqm/API/EventController.dart';
+import 'package:tb_app_rqm/API/DistanceController.dart';
 
 import '../API/LoginController.dart';
 import '../API/MeasureController.dart';
@@ -27,7 +26,7 @@ class InfoScreen extends StatefulWidget{
 
 class _InfoScreenState extends State<InfoScreen>{
 
-  // ----------------- Variables -----------------
+  // ----------------- Attributes -----------------
   Timer? _timer;
   DateTime start = DateTime.parse(Config.START_TIME);
   DateTime end = DateTime.parse(Config.END_TIME);
@@ -111,12 +110,12 @@ class _InfoScreenState extends State<InfoScreen>{
     }
 
 
-    _getValue(EventController.getTotalDistance, DistTotaleData.getDistTotale)
+    _getValue(DistanceController.getTotalDistance, DistTotaleData.getDistTotale)
         .then((value) => setState(() {
           _distanceTotale = value;
         }));
 
-    _getValue(EventController.getPersonalDistance, DistPersoData.getDistPerso)
+    _getValue(DistanceController.getPersonalDistance, DistPersoData.getDistPerso)
         .then((value) => setState(() {
       _distancePerso = value;
     }));
@@ -154,8 +153,11 @@ class _InfoScreenState extends State<InfoScreen>{
     log("Can start new measure: $canStartNewMeasure");
 
     if(await Geolocation.handlePermission()){
+      log("1");
       if(await Geolocation().isInZone()){
+        log("2");
         if(canStartNewMeasure) {
+          log("3");
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -171,6 +173,7 @@ class _InfoScreenState extends State<InfoScreen>{
       log("You did not allow location");
     }
 
+    log("4");
     setState(() {
       _enabledStart = true;
     });
@@ -197,7 +200,10 @@ class _InfoScreenState extends State<InfoScreen>{
           ),
           actions: [
             IconButton(
-              icon: const Icon(Icons.logout),
+              icon: const Icon(
+                  color: Color(Config.COLOR_TITRE),
+                  Icons.logout
+              ),
               onPressed: () {
                 LoginController.logout().then((result){
                   if(result.hasError){

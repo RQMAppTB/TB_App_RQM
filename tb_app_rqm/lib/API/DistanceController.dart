@@ -12,7 +12,7 @@ import '../Utils/Result.dart';
 /// Class containing methods to interact with the API to get data about the event.
 /// Allow to get the total distance traveled by all participants
 /// and the distance traveled by the current participant.
-class EventController {
+class DistanceController {
 
   /// Retrieve the total distance traveled by all participants from the API.
   /// Return a Result object containing the distance if the request was successful
@@ -63,40 +63,39 @@ class EventController {
 
     /// Create the URI to send the request to the API.
     /// The URI contains the dossard number of the current participant.
-    final uri =
-    Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}getUserDist', {"dosNumber": dosNumber.toString()});
+final uri = Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}getUserDist', {"dosNumber": dosNumber.toString()});
 
     /// Send a GET request to the API to get the distance traveled by the current participant.
-    return http.get(uri)
-        .then((response) async {
-          if (response.statusCode == 200) {
-            log("Status code: ${response.statusCode}");
-            log("Response body: ${response.body}");
+return http.get(uri)
+    .then((response) async {
+      if (response.statusCode == 200) {
+        log("Status code: ${response.statusCode}");
+        log("Response body: ${response.body}");
 
-            var dist = jsonDecode(response.body)["distTraveled"];
+        var dist = jsonDecode(response.body)["distTraveled"];
 
-            bool isSaved = await DistPersoData.saveDistPerso(int.parse(dist.toString()));
+        bool isSaved = await DistPersoData.saveDistPerso(int.parse(dist.toString()));
 
-            if(isSaved){
-              return Result<int>(value: dist);
-            }else{
-              throw Exception('Failed to save personal distance');
-            }
-          }else if(response.statusCode == 404){
-            bool isSaved = await DistPersoData.saveDistPerso(0);
+        if(isSaved){
+          return Result<int>(value: dist);
+        }else{
+          throw Exception('Failed to save personal distance');
+        }
+      }else if(response.statusCode == 404){
+        bool isSaved = await DistPersoData.saveDistPerso(0);
 
-            if(isSaved){
-              return Result<int>(value: 0);
-            }else{
-              throw Exception('Failed to save personal distance');
-            }
-          }else {
-            throw Exception('Status code ${response.statusCode}: ${jsonDecode(response.body)["message"]}');
-          }
-        })
-        .onError((error, stackTrace) {
-          log("Error: $error");
-          return Result<int>(error: error.toString());
-        });
+        if(isSaved){
+          return Result<int>(value: 0);
+        }else{
+          throw Exception('Failed to save personal distance');
+        }
+      }else {
+        throw Exception('Status code ${response.statusCode}: ${jsonDecode(response.body)["message"]}');
+      }
+    })
+    .onError((error, stackTrace) {
+      log("Error: $error");
+      return Result<int>(error: error.toString());
+    });
   }
 }
