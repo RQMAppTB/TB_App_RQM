@@ -10,15 +10,23 @@ import 'package:tb_app_rqm/Data/TimeData.dart';
 import 'package:tb_app_rqm/Utils/config.dart';
 class Geolocation{
 
+  /// StreamSubscription to save the position stream and manipulate it
   late StreamSubscription<geo.Position> _positionStream;
+  /// Location settings to define the accuracy of the location
   late geo.LocationSettings _settings;
+  /// last position to calculate the distance between two points
   late geo.Position _oldPos;
+  /// distance traveled by the user
   int _distance = 0;
+  /// Number of measures to wait before starting to calculate the distance
   int _mesureToWait = 0;
+  /// Start time of the measure
   DateTime _startTime = DateTime.now();
+  /// Counter to check if the user is outside the zone
   int _outsideCounter = 0;
+  /// StreamController to listen to the distance traveled updates
   StreamController<int> _streamController = StreamController<int>();
-
+  /// Boolean to check if the measure stream is started
   bool _positionStreamStarted = false;
 
   Geolocation(){
@@ -27,6 +35,7 @@ class Geolocation{
 
   Stream<int> get stream => _streamController.stream;
 
+  /// Handle the permission to access the location
   static Future<bool> handlePermission() async {
     final geo.GeolocatorPlatform _geolocatorPlatform = geo.GeolocatorPlatform.instance;
     bool serviceEnabled;
@@ -38,6 +47,7 @@ class Geolocation{
       return false;
     }
 
+    // Request permission if not granted
     permission = await _geolocatorPlatform.checkPermission();
     if (permission == geo.LocationPermission.denied) {
       permission = await _geolocatorPlatform.requestPermission();
@@ -46,17 +56,16 @@ class Geolocation{
       }
     }
 
+    // Check if the permission is denied forever
     if (permission == geo.LocationPermission.deniedForever) {
       return false;
     }
 
-
+    // All is good
     return true;
   }
 
-
-
-  /// Get the location settings
+  /// Get the settings for the location stream depending on the platform
   geo.LocationSettings _getSettings() {
     if (defaultTargetPlatform == TargetPlatform.android) {
       return geo.AndroidSettings(
@@ -86,10 +95,18 @@ class Geolocation{
     }
   }
 
+  /// Determine the current position of the user and return it
+  /// Returns the current position of the user
   Future<geo.Position> determinePosition() async {
     return await geo.Geolocator.getCurrentPosition();
   }
 
+  /// Start measuring the distance traveled by the user and send the data to the server
+  /// If the measure is already started or the location rights are not granted,
+  /// the function will return while notifying the stream with -1.
+  /// If the current location is not in the zone for 5 consecutive measures,
+  /// the function will return while notifying the stream with -1.
+  ///
   Future<void> startListening() async {
     log("Can start listening? ${!_positionStreamStarted}");
     if(!_positionStreamStarted && await handlePermission()) {
@@ -101,7 +118,7 @@ class Geolocation{
       _positionStream =
           geo.Geolocator.getPositionStream(locationSettings: _settings)
               .listen((geo.Position position) async {
-            // Attente pour éviter les première mesures un peu étranges
+            // Wait for the first measures to avoid strange values
             if(_mesureToWait > 0){
               log("Position: $position");
               _oldPos = position;
@@ -154,9 +171,12 @@ class Geolocation{
       log("Entered current position");
     }else{
       log("Position stream already started or no rights");
+      _streamController.sink.add(-1);
     }
   }
 
+  /// Stop measuring the distance traveled by the user
+  /// If the measure is not started, the function will return without doing anything.
   void stopListening() {
     if(_positionStreamStarted){
       _positionStream.cancel().then((value) {

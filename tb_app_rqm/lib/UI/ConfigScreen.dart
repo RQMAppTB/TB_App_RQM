@@ -7,6 +7,10 @@ import 'package:tb_app_rqm/API/MeasureController.dart';
 import '../Data/NbPersonData.dart';
 import '../Utils/config.dart';
 import 'WorkingScreen.dart';
+
+/// Class to display the configuration screen.
+/// This screen allows the user to configure the number of participants
+/// and start the measure by scanning a QR code.
 class ConfigScreen extends StatefulWidget{
   const ConfigScreen({super.key});
 
@@ -14,27 +18,35 @@ class ConfigScreen extends StatefulWidget{
   State<ConfigScreen> createState() => _ConfigScreenState();
 }
 
+/// State of the ConfigScreen class.
 class _ConfigScreenState extends State<ConfigScreen>{
 
+  /// Number of participants
   int _nbParticipants = 1;
-  NbPersonData _nbPersonData = NbPersonData();
 
+  /// Instance of the MobileScannerController class
   final MobileScannerController controller = MobileScannerController(
     torchEnabled: false,
     autoStart: true,
   );
 
-
-  Barcode? _barcode;
-
+  /// Function to handle the barcode detection
+  /// This function stops the scanner when the QR code is detected
+  /// and shows a dialog to confirm the start of the measure.
+  /// [barcodes] : List of detected barcodes
   void _handleBarcode(BarcodeCapture barcodes) {
-    if (mounted && barcodes.barcodes.isNotEmpty && barcodes.barcodes.first.displayValue == Config.QR_CODE_S_VALUE) {
-
+    if (mounted
+        && barcodes.barcodes.isNotEmpty
+        && barcodes.barcodes.first.displayValue == Config.QR_CODE_S_VALUE) {
       controller.stop();
       _showMyDialog();
     }
   }
 
+  /// This function shows a dialog to confirm the start of the measure
+  /// and starts the measure if the user confirms.
+  /// The number of participants is saved in the shared preferences.
+  /// The user is redirected to the WorkingScreen if the measure starts successfully.
   Future<void> _showMyDialog() async {
     return showDialog<void>(
       context: context,
@@ -114,6 +126,7 @@ class _ConfigScreenState extends State<ConfigScreen>{
       });
     }
   }
+
 
   @override
   void dispose(){

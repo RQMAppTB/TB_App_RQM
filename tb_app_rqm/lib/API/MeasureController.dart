@@ -7,7 +7,6 @@ import 'package:tb_app_rqm/Data/DistToSendData.dart';
 import '../Utils/Result.dart';
 import '../Data/NbPersonData.dart';
 
-import '../Data/DistPersoData.dart';
 import '../Data/DossardData.dart';
 import '../Data/NameData.dart';
 import '../Data/TimeData.dart';
@@ -15,10 +14,14 @@ import '../Data/UuidData.dart';
 import '../Utils/config.dart';
 import 'package:http/http.dart' as http;
 
+/// Class containing methods to interact with the API to manage measures.
+/// Allow to start, send and stop a measure.
 class MeasureController {
-  // ----------------- Variables -----------------
-  // ------------------ Methods ------------------
 
+  /// Start a measure with the number of people [nbPersonnes].
+  /// Return a [Future] object resolving to a [Result] object
+  /// containing a boolean value if the request was successful
+  /// or an error message if the request failed.
   static Future<Result<bool>> startMeasure(int nbPersonnes) async {
 
     int? dosNumber = await DossardData.getDossard();
@@ -69,6 +72,10 @@ class MeasureController {
         });
   }
 
+  /// Send the measure to the API. If there is no measure in progress, return an error.
+  /// Return a [Future] object resolving to a [Result] object
+  /// containing a boolean value if the request was successful
+  /// or an error message if the request failed.
   static Future<Result<bool>> sendMesure() async {
     int dist = await DistToSendData.getDistToSend() ?? 0;
     int time = await TimeData.getTime() ?? 0;
@@ -101,6 +108,11 @@ class MeasureController {
         });
   }
 
+  /// Stop the measure in progress. If there is no measure in progress, return an error.
+  /// Return a [Future] object resolving to a [Result] object
+  /// containing a boolean value if the request was successful
+  /// or an error message if the measure could not be stopped.
+  /// If the measure is stopped, remove the uuid, distance and time from the shared preferences.
   static Future<Result<bool>> stopMeasure() async {
     int? dist = await DistToSendData.getDistToSend();
     int? time = await TimeData.getTime();
@@ -145,6 +157,7 @@ class MeasureController {
     });
   }
 
+  /// Check if there is a measure in progress.
   static Future<bool> isThereAMeasure() async {
     return UuidData.doesUuidExist();
   }

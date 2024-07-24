@@ -8,6 +8,10 @@ import 'package:tb_app_rqm/Utils/config.dart';
 
 import '../Geolocalisation/Geolocation.dart';
 
+/// Class to display the working screen.
+/// This screen displays the distance traveled by the user.
+/// The user can stop the measure by clicking on the stop button
+/// and is redirected to the information screen.
 class WorkingScreen extends StatefulWidget{
   const WorkingScreen({super.key});
 
@@ -15,15 +19,18 @@ class WorkingScreen extends StatefulWidget{
   State<WorkingScreen> createState() => _WorkingScreenState();
 }
 
+/// State of the WorkingScreen class.
 class _WorkingScreenState extends State<WorkingScreen>{
-  // Create a stream
+  /// Instance of the Geolocation class
   Geolocation _geolocation = Geolocation();
 
+  /// Value of the distance traveled by the user
   int _value = 0;
 
   @override
   void initState() {
     super.initState();
+    // Start listening to the distance stream
     _geolocation.stream.listen((event) {
       log("Stream event: $event");
       if(event == -1){
@@ -48,6 +55,9 @@ class _WorkingScreenState extends State<WorkingScreen>{
     _geolocation.stopListening();
   }
 
+  /// Function to show a dialog to confirm the end of the measure.
+  /// The user is redirected to the information screen if he confirms.
+  /// The measure the measure is only stopped if the user confirms.
   Future<void> _showMyDialog() async {
     return showDialog<void>(
       context: context,

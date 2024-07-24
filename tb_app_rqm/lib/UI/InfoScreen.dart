@@ -17,6 +17,11 @@ import '../Utils/config.dart';
 import 'ConfigScreen.dart';
 import 'LoginScreen.dart';
 
+/// Class to display the information screen.
+/// This screen displays the remaining time before the end of the event,
+/// the total distance traveled by all participants,
+/// the distance traveled by the current participant,
+/// the dossard number and the name of the user.
 class InfoScreen extends StatefulWidget{
   const InfoScreen({super.key});
 
@@ -24,26 +29,36 @@ class InfoScreen extends StatefulWidget{
   State<InfoScreen> createState() => _InfoScreenState();
 }
 
+/// State of the InfoScreen class.
 class _InfoScreenState extends State<InfoScreen>{
 
-  // ----------------- Attributes -----------------
+  /// Timer to update the remaining time every second
   Timer? _timer;
+  /// Start time of the event
   DateTime start = DateTime.parse(Config.START_TIME);
+  /// End time of the event
   DateTime end = DateTime.parse(Config.END_TIME);
+  /// Remaining time before the end of the event
   String _remainingTime = "";
+  /// Total distance traveled by all participants
   int? _distanceTotale;
+  /// Distance traveled by the current participant
   int? _distancePerso;
+  /// Dossard number of the user
   String _dossard = "";
+  /// Name of the user
   String _name = "";
+  /// Boolean to check if the start button is enabled
   bool _enabledStart = true;
 
-
+  /// Function to show a snackbar with the message [value]
   void showInSnackBar(String value) {
     ScaffoldMessenger.of(context).showSnackBar(new SnackBar(
         content: new Text(value)
     ));
   }
 
+  /// Function to update the remaining time every second
   void countDown() {
     DateTime now = DateTime.now();
     Duration remaining = end.difference(now);
@@ -61,6 +76,10 @@ class _InfoScreenState extends State<InfoScreen>{
     });
   }
 
+  /// Function to get the value from the API [fetchVal]
+  /// and if it fails, get the value from the shared preferences [getVal]
+  /// Returns the value
+  /// If the value is not found, returns -1
   Future<int> _getValue(Future<Result<int>> Function() fetchVal, Future<int?> Function() getVal) {
     return fetchVal()
         .then((value) {
@@ -89,6 +108,7 @@ class _InfoScreenState extends State<InfoScreen>{
   void initState() {
     super.initState();
 
+    // Check if the event has started or ended
     if(DateTime.now().isAfter(end) || DateTime.now().isBefore(start)){
       _enabledStart = false;
       _remainingTime = "L'évènement ${DateTime.now().isAfter(end) ? "est terminé" : "n'a pas encore commencé"} !";
@@ -109,22 +129,26 @@ class _InfoScreenState extends State<InfoScreen>{
       _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
     }
 
-
+    // Get the total distance
     _getValue(DistanceController.getTotalDistance, DistTotaleData.getDistTotale)
         .then((value) => setState(() {
           _distanceTotale = value;
         }));
 
+    // Get the personal distance
     _getValue(DistanceController.getPersonalDistance, DistPersoData.getDistPerso)
         .then((value) => setState(() {
       _distancePerso = value;
     }));
 
+    // Get the dossard number
     DossardData.getDossard().then((value) => setState(() {
       setState(() {
         _dossard = value.toString().padLeft(4, '0');
       });
     }));
+
+    // Get the name of the user
     NameData.getName().then((value) => setState(() {
       setState(() {
         _name = value;
@@ -139,6 +163,7 @@ class _InfoScreenState extends State<InfoScreen>{
     super.dispose();
   }
 
+  /// Function to go to the configuration screen
   Future<void> _startMeasure() async{
     log("Start measure");
     setState(() {
@@ -180,9 +205,6 @@ class _InfoScreenState extends State<InfoScreen>{
 
   }
 
-
-  int _test = -1;
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -199,6 +221,7 @@ class _InfoScreenState extends State<InfoScreen>{
               'Info'
           ),
           actions: [
+            // Logout button
             IconButton(
               icon: const Icon(
                   color: Color(Config.COLOR_TITRE),
@@ -274,6 +297,7 @@ class _InfoScreenState extends State<InfoScreen>{
                 flex: 1,
                 child:SizedBox(
                   width: double.infinity,
+                  // Start button
                   child:ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(Config.COLOR_BUTTON),

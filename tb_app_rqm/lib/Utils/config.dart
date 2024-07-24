@@ -1,9 +1,10 @@
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 
+/// Class to manage the configuration of the application.
 class Config {
   // ------------------- API -------------------
-  static const String SERVER_API ='rqm.iict-heig-vd.ch';//'192.168.61.106:3000';//
-  static const String API_URL = SERVER_API;//'http://192.168.61.106:3000/app/';//'https://www.larouequimarche.ch/wp-admin/admin-ajax.php';
+  static const String SERVER_API ='rqm.iict-heig-vd.ch';
+  static const String API_URL = SERVER_API;
   static const String API_COMMON_ADDRESS = '/app/measures/';
   // -------------- Début et fin ---------------
   static const String END_TIME = '2024-07-25 17:00:00';
@@ -52,7 +53,3 @@ class Config {
   static const int COLOR_TITRE = 0xFFFFFFFF;
 
 }
-
-// Méthode de configuration
-// scan de QR
-// Firebase pour des shared preferences en lignes
