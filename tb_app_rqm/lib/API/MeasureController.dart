@@ -100,7 +100,7 @@ class MeasureController {
           if (response.statusCode == 200) {
             return Result<bool>(value: true);
           } else {
-            throw Exception(jsonDecode(response.body)["message"]);
+            throw Exception(response.statusCode.toString() + jsonDecode(response.body)["message"]);
           }
         })
         .onError((error, stackTrace) {

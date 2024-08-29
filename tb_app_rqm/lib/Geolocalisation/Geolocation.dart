@@ -130,7 +130,7 @@ class Geolocation{
               log("Entered position stream");
               var distSinceLast = geo.Geolocator.distanceBetween(
                   _oldPos.latitude, _oldPos.longitude, position.latitude,
-                  position.longitude).truncate();
+                  position.longitude).round();
 
               log("Distance: $distSinceLast");
 
@@ -191,7 +191,7 @@ class Geolocation{
   /// Returns false if the point is not in the zone
   bool isLocationInZone(geo.Position point) {
     var tmp = mp.LatLng(point.latitude, point.longitude);
-    var test = mp.PolygonUtil.containsLocation(tmp, Config.TEST, false);
+    var test = mp.PolygonUtil.containsLocation(tmp, Config.ZONE_DEFENSE, false);
     return test;
   }
 
