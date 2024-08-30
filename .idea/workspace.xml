@@ -10,10 +10,8 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="42b39df1-9d19-4d25-9902-dc94db151ec0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/tb_app_rqm/lib/API/MeasureController.dart" beforeDir="false" afterPath="$PROJECT_DIR$/tb_app_rqm/lib/API/MeasureController.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tb_app_rqm/lib/Data/DataManagement.dart" beforeDir="false" afterPath="$PROJECT_DIR$/tb_app_rqm/lib/Data/DataManagement.dart" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tb_app_rqm/lib/Geolocalisation/Geolocation.dart" beforeDir="false" afterPath="$PROJECT_DIR$/tb_app_rqm/lib/Geolocalisation/Geolocation.dart" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tb_app_rqm/lib/UI/InfoScreen.dart" beforeDir="false" afterPath="$PROJECT_DIR$/tb_app_rqm/lib/UI/InfoScreen.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tb_app_rqm/lib/Utils/config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/tb_app_rqm/lib/Utils/config.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
@@ -50,8 +48,10 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "RunOnceActivity.cidr.known.project.marker": "true",
+    "ToolWindowRunning Devices.ShowToolbar": "false",
     "cf.first.check.clang-format": "false",
     "cidr.known.project.marker": "true",
+    "com.android.tools.idea.streaming.zoom.toolbar.visible": "false",
     "dart.analysis.tool.window.visible": "false",
     "git-widget-placeholder": "pres__work",
     "io.flutter.reload.alreadyRun": "true",

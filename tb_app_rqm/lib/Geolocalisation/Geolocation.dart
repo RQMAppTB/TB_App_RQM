@@ -191,7 +191,7 @@ class Geolocation{
   /// Returns false if the point is not in the zone
   bool isLocationInZone(geo.Position point) {
     var tmp = mp.LatLng(point.latitude, point.longitude);
-    var test = mp.PolygonUtil.containsLocation(tmp, Config.ZONE_DEFENSE, false);
+    var test = mp.PolygonUtil.containsLocation(tmp, Config.ZONE_EVENT, false);
     return test;
   }
 
