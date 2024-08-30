@@ -10,8 +10,6 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="42b39df1-9d19-4d25-9902-dc94db151ec0" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/tb_app_rqm/lib/Geolocalisation/Geolocation.dart" beforeDir="false" afterPath="$PROJECT_DIR$/tb_app_rqm/lib/Geolocalisation/Geolocation.dart" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/tb_app_rqm/lib/Utils/config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/tb_app_rqm/lib/Utils/config.dart" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
