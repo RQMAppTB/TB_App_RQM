@@ -69,6 +69,12 @@ class _InfoScreenState extends State<InfoScreen>{
         _remainingTime = "L'évènement est terminé !";
       });
       return;
+    }else if(now.isBefore(start)){
+      setState(() {
+        _enabledStart = false;
+        _remainingTime = "L'évènement n'a pas encore commencé !";
+      });
+      return;
     }
 
     setState(() {

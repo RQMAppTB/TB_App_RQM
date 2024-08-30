@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AndroidLayouts">
+    <shared>
+      <config />
+    </shared>
+  </component>
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="NONE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="42b39df1-9d19-4d25-9902-dc94db151ec0" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/tb_app_rqm/lib/Utils/config.dart" beforeDir="false" afterPath="$PROJECT_DIR$/tb_app_rqm/lib/Utils/config.dart" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="ClangdSettings">
+    <option name="formatViaClangd" value="false" />
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator_android-4.6.0/lib/src/types/android_settings.dart" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/AppData/Local/Pub/Cache/hosted/pub.dev/geolocator_platform_interface-4.2.4/lib/src/enums/location_accuracy.dart" root0="SKIP_INSPECTION" />
+  </component>
+  <component name="MarkdownSettingsMigration">
+    <option name="stateVersion" value="1" />
+  </component>
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="ProjectErrors" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 1
+}</component>
+  <component name="ProjectId" id="2jBn6fdATzsZPlkwoHrId0GYP9c" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "RunOnceActivity.OpenProjectViewOnStart": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.cidr.known.project.marker": "true",
+    "ToolWindowRunning Devices.ShowToolbar": "false",
+    "cf.first.check.clang-format": "false",
+    "cidr.known.project.marker": "true",
+    "com.android.tools.idea.streaming.zoom.toolbar.visible": "false",
+    "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "pres__work",
+    "io.flutter.reload.alreadyRun": "true",
+    "last_opened_file_path": "C:/Users/seemt/HEIG-VD/TB/TB_App_Test/tb_app_test",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "device.mirroring",
+    "show.migrate.to.gradle.popup": "false"
+  }
+}]]></component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\seemt\HEIG-VD\TB\TB_App_RQM\tb_app_rqm\assets\pictures" />
+      <recent name="C:\Users\seemt\HEIG-VD\TB\TB_App_RQM\tb_app_rqm\lib" />
+      <recent name="C:\Users\seemt\HEIG-VD\TB\TB_App_RQM\tb_app_rqm\lib\UI" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\seemt\HEIG-VD\TB\TB_App_RQM\tb_app_rqm\lib\Utils" />
+      <recent name="C:\Users\seemt\HEIG-VD\TB\TB_App_RQM\tb_app_rqm\lib" />
+    </key>
+  </component>
+  <component name="RunManager">
+    <configuration name="main.dart" type="FlutterRunConfigurationType" factoryName="Flutter">
+      <option name="filePath" value="$PROJECT_DIR$/tb_app_rqm/lib/main.dart" />
+      <method v="2" />
+    </configuration>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="42b39df1-9d19-4d25-9902-dc94db151ec0" name="Changes" comment="" />
+      <created>1720869172357</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1720869172357</updated>
+    </task>
+    <servers />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="Dart">
+          <url>file://$PROJECT_DIR$/tb_app_rqm/lib/Data/DataManagement.dart</url>
+          <option name="timeStamp" value="4" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+</project>

@@ -40,6 +40,27 @@ class DataManagement{
     return test;
   }
 
+  /// Save a double [value] with the name [name] in the shared preferences.
+  /// Return a [Future] object resolving to a boolean value indicating if the data was saved.
+  Future<bool> saveDouble(String name, double value) async {
+    // Save the data in the shared preferences
+    final SharedPreferences prefs = await _prefs;
+
+    var test = prefs.setDouble(name, value);
+    return test;
+  }
+
+  /// Get a double with the name [name] from the shared preferences.
+  /// Return a [Future] object resolving to a double value if the data was found.
+  /// Return null if the data was not found.
+  Future<double?> getDouble(String name) async {
+    // Get the data from the shared preferences
+    final SharedPreferences prefs = await _prefs;
+
+    var test = prefs.getDouble(name);
+    return test;
+  }
+
   /// Save a string [value] with the name [name] in the shared preferences.
   /// Return a [Future] object resolving to a boolean value indicating if the data was saved.
   Future<bool> saveString(String name, String value) async {

@@ -4,11 +4,11 @@ import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 class Config {
   // ------------------- API -------------------
   static const String SERVER_API ='rqm.iict-heig-vd.ch';
-  static const String API_URL = SERVER_API;
+  static const String API_URL = 'rqm.iict-heig-vd.ch';
   static const String API_COMMON_ADDRESS = '/app/measures/';
   // -------------- Début et fin ---------------
-  static const String END_TIME = '2024-07-25 17:00:00';
   static const String START_TIME = '2024-01-25 17:00:00';
+  static const String END_TIME = '2025-06-22 17:00:00';
   // ----------------- QR code -----------------
   static const String QR_CODE_S_VALUE = 'Ready';
   static const String QR_CODE_F_VALUE = 'Stop';
@@ -24,28 +24,24 @@ class Config {
     mp.LatLng(LAT2, LON2),
     mp.LatLng(LAT1, LON2),
   ];
+  // ------------- Zone Défense ----------------
+  static const double LON11 = 6.657316176588863;
+  static const double LAT11 = 46.77812438877805;
+  static const double LON22 = 6.657231266655643;
+  static const double LAT22 = 46.782611095302414;
+  static const double LON33 = 6.666675613572716;
+  static const double LAT33 = 46.78271611345879;
+  static const double LON44 = 6.666769701835051;
+  static const double LAT44 = 46.778222689217166;
+  static const double LON55 = 6.653030810529115;
+  static const double LAT55 = 46.78007498916433;
 
-  static List<mp.LatLng> MY_HOME = [
-    mp.LatLng(46.81506769390172, 6.935914064535421),
-    mp.LatLng(46.81376575165063, 6.935914064535421),
-    mp.LatLng(46.81376575165063, 6.937924842680419),
-    mp.LatLng(46.81506769390172, 6.937924842680419)
+  static List<mp.LatLng> ZONE_DEFENSE = [
+    mp.LatLng(LAT11, LON11),
+    mp.LatLng(LAT22, LON22),
+    mp.LatLng(LAT33, LON33),
+    mp.LatLng(LAT44, LON44),
   ];
-
-  static List<mp.LatLng> POLYGON2 = [
-    mp.LatLng(46.74308195291572, 6.6776287039768),
-    mp.LatLng(46.732896423225036, 6.6776287039768),
-    mp.LatLng(46.732896423225036, 6.701948509720427),
-    mp.LatLng(46.74308195291572, 6.701948509720427)
-  ];
-
-  static List<mp.LatLng> TEST = [
-    mp.LatLng(46.80812186092273, 6.6665647441029465),
-    mp.LatLng(46.78497084714715, 6.6665647441029465),
-    mp.LatLng(46.78497084714715, 6.7527387525255875),
-    mp.LatLng(46.80812186092273, 6.7527387525255875)
-  ];
-
 
   // ----------------- Couleurs -----------------
   static const int COLOR_APP_BAR = 0xFF403c74;
