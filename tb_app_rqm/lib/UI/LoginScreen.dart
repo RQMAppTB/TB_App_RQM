@@ -104,6 +104,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom != 0;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5), // Set background color to light grey
       body: Stack(
@@ -115,14 +116,18 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
-                  const SizedBox(height: 100), // Add margin at the top
-                  Flexible(
-                    flex: 3,
-                    child: Center(
-                      child: Image(image: AssetImage('assets/pictures/LogoTextAnimated.gif')),
+                  SizedBox(height: isKeyboardVisible ? 20 : 100), // Adjust margin based on keyboard visibility
+                  Visibility(
+                    visible: !isKeyboardVisible,
+                    maintainSize: false,
+                    child: Flexible(
+                      flex: 3,
+                      child: Center(
+                        child: Image(image: AssetImage('assets/pictures/LogoTextAnimated.gif')),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 80), // Add margin after the logo
+                  SizedBox(height: isKeyboardVisible ? 16 : 80), // Adjust margin based on keyboard visibility
                   Expanded(
                     flex: 12,
                     child: Column(
