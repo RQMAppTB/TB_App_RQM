@@ -142,7 +142,15 @@ class _ConfigScreenState extends State<ConfigScreen> {
               iconTheme: const IconThemeData(color: Color(Config.COLOR_TITRE)),
               backgroundColor: const Color(Config.COLOR_APP_BAR),
               centerTitle: true,
-              title: const Text(style: TextStyle(color: Color(Config.COLOR_TITRE)), 'Config')),
+              title: GestureDetector(
+                onDoubleTap: () {
+                  _handleBarcode(BarcodeCapture(barcodes: [Barcode(displayValue: Config.QR_CODE_S_VALUE)]));
+                },
+                child: const Text(
+                  'Config',
+                  style: TextStyle(color: Color(Config.COLOR_TITRE)),
+                ),
+              )),
           body: Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
