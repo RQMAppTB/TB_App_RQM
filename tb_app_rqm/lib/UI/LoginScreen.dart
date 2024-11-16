@@ -117,7 +117,7 @@ class _LoginState extends State<Login> {
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
                   Flexible(
-                    flex: isKeyboardVisible ? 2 : 3,
+                    flex: 2,
                     child: SizedBox(height: isKeyboardVisible ? 100 : 100),
                   ),
                   Visibility(
@@ -131,7 +131,7 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   Flexible(
-                    flex: isKeyboardVisible ? 2 : 3,
+                    flex: 2,
                     child: SizedBox(height: isKeyboardVisible ? 60 : 80),
                   ),
                   Expanded(
@@ -189,60 +189,47 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16), // Add small margin
-                        Visibility(
-                          visible: _visibility,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
-                            children: <Widget>[
-                              // Remove the following lines
-                              // const Text(
-                              //   "Est-ce le bon nom?",
-                              //   style: TextStyle(fontSize: 20),
-                              // ),
-                              // const SizedBox(height: 8), // Add small margin
-                              // Text(
-                              //   _name,
-                              //   style: const TextStyle(fontSize: 20),
-                              // ),
-                            ],
-                          ),
-                        ),
                         Spacer(), // Add spacer to push the button and version text to the bottom
-                        Container(
-                          width: double.infinity, // Full width
-                          decoration: BoxDecoration(
-                            color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
+                        Expanded(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                width: double.infinity, // Full width
+                                decoration: BoxDecoration(
+                                  color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  onPressed: _getUserame,
+                                  child: const Text(
+                                    'Se connecter',
+                                    style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
+                                  ),
+                                ),
                               ),
-                            ),
-                            onPressed: _getUserame,
-                            child: const Text(
-                              'Se connecter',
-                              style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20), // Add margin below the button
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 10.0, bottom: 10.0), // Add margin
-                            child: Text(
-                              'v${Config.APP_VERSION}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
+                              const SizedBox(height: 20), // Add margin below the button
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 10.0, bottom: 10.0), // Add margin
+                                  child: Text(
+                                    'v${Config.APP_VERSION}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
                               ),
-                            ),
+                            ],
                           ),
                         ),
                       ],
