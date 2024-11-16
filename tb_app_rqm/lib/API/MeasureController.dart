@@ -1,4 +1,3 @@
-
 import 'dart:convert';
 import 'dart:developer';
 
@@ -17,59 +16,48 @@ import 'package:http/http.dart' as http;
 /// Class containing methods to interact with the API to manage measures.
 /// Allow to start, send and stop a measure.
 class MeasureController {
-
   /// Start a measure with the number of people [nbPersonnes].
   /// Return a [Future] object resolving to a [Result] object
   /// containing a boolean value if the request was successful
   /// or an error message if the request failed.
   static Future<Result<bool>> startMeasure(int nbPersonnes) async {
-
     int? dosNumber = await DossardData.getDossard();
     String name = await NameData.getName();
 
     log("Starting measure with dosNumber: $dosNumber, name: $name, nbPersonnes: $nbPersonnes");
 
-    if(name.isEmpty || dosNumber == null){
+    if (name.isEmpty || dosNumber == null) {
       log("Name is empty");
       return Result<bool>(error: "Missing name or dossard number");
     }
 
-    final uri = Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}start');
+    final uri = Uri.https(Config.API_URL, '${Config.API_COMMON_ADDRESS}start');
 
     if (await isThereAMeasure()) {
       return Result<bool>(error: "There is already a measure in progress");
     }
 
-    return http.post(
-        uri,
-        body: {
-          'dosNumber': dosNumber.toString(),
-          'name': name,
-          'number': nbPersonnes.toString()
-        })
-        .then((response) async {
+    return http
+        .post(uri, body: {'dosNumber': dosNumber.toString(), 'name': name, 'number': nbPersonnes.toString()}).then(
+            (response) async {
+      log("Response: ${response.statusCode}");
+      var jsonResult = jsonDecode(response.body);
+      if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+        log("Uuid: ${jsonResult["myUuid"]}");
 
-          log("Response: ${response.statusCode}");
-          var jsonResult = jsonDecode(response.body);
-          if (response.statusCode == 200 || response.statusCode == 201 || response.statusCode == 202) {
+        bool testIsSaved = await DistToSendData.saveDistToSend(0); // TODO
+        testIsSaved = testIsSaved && await TimeData.saveTime(0);
+        testIsSaved = testIsSaved && await UuidData.saveUuid(jsonResult["myUuid"]);
 
-            log("Uuid: ${jsonResult["myUuid"]}");
-
-            bool testIsSaved = await DistToSendData.saveDistToSend(0); // TODO
-            testIsSaved = testIsSaved && await TimeData.saveTime(0);
-            testIsSaved = testIsSaved && await UuidData.saveUuid(jsonResult["myUuid"]);
-
-            return await UuidData.saveUuid(jsonResult["myUuid"]);
-          } else {
-            throw Exception(jsonResult["message"]);
-          }
-        })
-        .then((value) {
-          return Result<bool>(value: value);
-        })
-        .onError((error, stackTrace) {
-          return Result<bool>(error: "Error ${error.toString()}");
-        });
+        return await UuidData.saveUuid(jsonResult["myUuid"]);
+      } else {
+        throw Exception(jsonResult["message"]);
+      }
+    }).then((value) {
+      return Result<bool>(value: value);
+    }).onError((error, stackTrace) {
+      return Result<bool>(error: "Error ${error.toString()}");
+    });
   }
 
   /// Send the measure to the API. If there is no measure in progress, return an error.
@@ -87,25 +75,18 @@ class MeasureController {
       return Result<bool>(error: "Dossard or uuid is null");
     }
 
-    final uri = Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}update-dist');
+    final uri = Uri.https(Config.API_URL, '${Config.API_COMMON_ADDRESS}update-dist');
 
-    return http.post(
-        uri,
-        body: {
-          'uuid': uuid,
-          'dist': (dist * number).toString(),
-          'time': (time * number).toString()
-        })
-        .then((response) {
-          if (response.statusCode == 200) {
-            return Result<bool>(value: true);
-          } else {
-            throw Exception(response.statusCode.toString() + jsonDecode(response.body)["message"]);
-          }
-        })
-        .onError((error, stackTrace) {
-          return Result<bool>(error: error.toString());
-        });
+    return http.post(uri,
+        body: {'uuid': uuid, 'dist': (dist * number).toString(), 'time': (time * number).toString()}).then((response) {
+      if (response.statusCode == 200) {
+        return Result<bool>(value: true);
+      } else {
+        throw Exception(response.statusCode.toString() + jsonDecode(response.body)["message"]);
+      }
+    }).onError((error, stackTrace) {
+      return Result<bool>(error: error.toString());
+    });
   }
 
   /// Stop the measure in progress. If there is no measure in progress, return an error.
@@ -125,18 +106,12 @@ class MeasureController {
       return Result<bool>(error: "Uuid, dist and time is null");
     }
 
-    final uri = Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}stop');
+    final uri = Uri.https(Config.API_URL, '${Config.API_COMMON_ADDRESS}stop');
 
     log("Uri : $uri");
 
-    return http.post(
-        uri,
-        body: {
-          "uuid":uuid,
-          "dist": (dist ?? 0).toString(),
-          "time":(time ?? 0).toString()
-        }
-    ).then((response) async{
+    return http.post(uri, body: {"uuid": uuid, "dist": (dist ?? 0).toString(), "time": (time ?? 0).toString()}).then(
+        (response) async {
       log("Response: ${response.statusCode}");
       if (response.statusCode == 201 || response.statusCode == 202) {
         // Remove the uuid from the shared preferences
@@ -144,11 +119,11 @@ class MeasureController {
         await TimeData.removeTime();
         await UuidData.removeUuid();
         return Result<bool>(value: true);
-      }else{
+      } else {
         log("Error: ${jsonDecode(response.body)["message"]}");
         throw Exception(jsonDecode(response.body)["message"]);
       }
-    }).onError((error, stackTrace){
+    }).onError((error, stackTrace) {
       log("Error: $error");
       if (error is http.ClientException) {
         return Result<bool>(error: "No connection to the server");

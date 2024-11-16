@@ -1,8 +1,7 @@
 import 'DataManagement.dart';
 
 /// Class to manage the name of the user.
-class NameData{
-
+class NameData {
   /// Singleton instance of the DataManagement class.
   static final DataManagement _dataManagement = DataManagement();
 

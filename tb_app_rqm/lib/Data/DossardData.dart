@@ -1,8 +1,7 @@
 import 'DataManagement.dart';
 
 /// Class to manage the dossard number.
-class DossardData{
-
+class DossardData {
   /// Singleton instance of the DataManagement class.
   static final DataManagement _dataManagement = DataManagement();
 

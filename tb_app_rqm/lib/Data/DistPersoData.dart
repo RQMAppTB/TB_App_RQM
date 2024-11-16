@@ -1,8 +1,7 @@
 import 'DataManagement.dart';
 
 /// Class to manage the distance traveled by the user.
-class DistPersoData{
-
+class DistPersoData {
   /// Singleton instance of the DataManagement class.
   static final DataManagement _dataManagement = DataManagement();
 

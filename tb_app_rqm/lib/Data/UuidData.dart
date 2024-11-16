@@ -1,8 +1,7 @@
 import 'DataManagement.dart';
 
 /// Class to manage the UUID of the user.
-class UuidData{
-
+class UuidData {
   /// Singleton instance of the DataManagement class.
   static final DataManagement _dataManagement = DataManagement();
 

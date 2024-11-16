@@ -1,8 +1,7 @@
 import 'DataManagement.dart';
 
 /// Class to manage the total distance all the participants.
-class DistTotaleData{
-
+class DistTotaleData {
   /// Singleton instance of the DataManagement class.
   static final DataManagement _dataManagement = DataManagement();
 

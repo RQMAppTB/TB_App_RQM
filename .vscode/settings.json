@@ -1,0 +1,10 @@
+{
+    "editor.formatOnSave": true,
+    "editor.formatOnType": true,
+    "[dart]": {
+        "editor.tabSize": 2,
+        "editor.insertSpaces": true
+    },
+    "dart.lineLength": 120, // Adjust the maximum line length
+    "dart.formatter.pageWidth": 120 // Adjust the page width for line breaks
+}
