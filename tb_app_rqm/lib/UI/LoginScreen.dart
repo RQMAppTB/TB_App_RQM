@@ -116,9 +116,9 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
-                  SizedBox(height: isKeyboardVisible ? 20 : 100), // Adjust margin based on keyboard visibility
+                  SizedBox(height: isKeyboardVisible ? 60 : 100), // Adjust margin based on keyboard visibility
                   Visibility(
-                    visible: !isKeyboardVisible,
+                    //visible: !isKeyboardVisible,
                     maintainSize: false,
                     child: Flexible(
                       flex: 3,
@@ -127,7 +127,7 @@ class _LoginState extends State<Login> {
                       ),
                     ),
                   ),
-                  SizedBox(height: isKeyboardVisible ? 16 : 80), // Adjust margin based on keyboard visibility
+                  SizedBox(height: isKeyboardVisible ? 40 : 80), // Adjust margin based on keyboard visibility
                   Expanded(
                     flex: 12,
                     child: Column(
@@ -203,47 +203,46 @@ class _LoginState extends State<Login> {
                             ],
                           ),
                         ),
+                        Spacer(), // Add spacer to push the button and version text to the bottom
+                        Container(
+                          width: double.infinity, // Full width
+                          decoration: BoxDecoration(
+                            color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            onPressed: _getUserame,
+                            child: const Text(
+                              'Se connecter',
+                              style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20), // Add margin below the button
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10.0, bottom: 10.0), // Add margin
+                            child: Text(
+                              'v${Config.APP_VERSION}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ],
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: Text(
-              'v${Config.APP_VERSION}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 50,
-            left: 50,
-            right: 50,
-            child: Container(
-              width: double.infinity, // Full width
-              decoration: BoxDecoration(
-                color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                onPressed: _getUserame,
-                child: const Text(
-                  'Se connecter',
-                  style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
-                ),
               ),
             ),
           ),
