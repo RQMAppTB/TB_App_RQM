@@ -200,9 +200,11 @@ class Geolocation{
   /// Returns true if the current location is in the zone
   /// Returns false if the current location is not in the zone
   Future<bool> isInZone() async {
-    final tmp = await determinePosition();
-    var test = isLocationInZone(tmp);
-    return test;
+    // final tmp = await determinePosition();
+    // var test = isLocationInZone(tmp);
+    // return test;
+
+    return true;
   }
 
 

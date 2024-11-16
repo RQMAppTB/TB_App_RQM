@@ -67,7 +67,6 @@ class _LoginState extends State<Login>{
       });
     }
   }
-
   @override
   Widget build(BuildContext context){
     return PopScope(
@@ -79,9 +78,9 @@ class _LoginState extends State<Login>{
         appBar: AppBar(
           backgroundColor: const Color(Config.COLOR_APP_BAR),
           centerTitle: true,
-          title: const Text(
-              style: TextStyle(color: Color(Config.COLOR_TITRE)),
-              'Login'
+          title: Text(
+              style: const TextStyle(color: Color(Config.COLOR_TITRE)),
+              'Login v${Config.APP_VERSION}'
           )
         ),
         body: Center(
