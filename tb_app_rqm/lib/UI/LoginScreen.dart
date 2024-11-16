@@ -104,6 +104,7 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
+    bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom != 0;
     return Scaffold(
       backgroundColor: const Color(0xFFF5F5F5), // Set background color to light grey
       body: Stack(
@@ -115,14 +116,24 @@ class _LoginState extends State<Login> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
-                  const SizedBox(height: 100), // Add margin at the top
                   Flexible(
-                    flex: 3,
-                    child: Center(
-                      child: Image(image: AssetImage('assets/pictures/LogoTextAnimated.gif')),
+                    flex: 2,
+                    child: SizedBox(height: isKeyboardVisible ? 100 : 100),
+                  ),
+                  Visibility(
+                    //visible: !isKeyboardVisible,
+                    maintainSize: false,
+                    child: Flexible(
+                      flex: 3,
+                      child: Center(
+                        child: Image(image: AssetImage('assets/pictures/LogoTextAnimated.gif')),
+                      ),
                     ),
                   ),
-                  const SizedBox(height: 80), // Add margin after the logo
+                  Flexible(
+                    flex: 2,
+                    child: SizedBox(height: isKeyboardVisible ? 60 : 80),
+                  ),
                   Expanded(
                     flex: 12,
                     child: Column(
@@ -178,23 +189,46 @@ class _LoginState extends State<Login> {
                             ),
                           ),
                         ),
-                        const SizedBox(height: 16), // Add small margin
-                        Visibility(
-                          visible: _visibility,
+                        Spacer(), // Add spacer to push the button and version text to the bottom
+                        Expanded(
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
-                            children: <Widget>[
-                              // Remove the following lines
-                              // const Text(
-                              //   "Est-ce le bon nom?",
-                              //   style: TextStyle(fontSize: 20),
-                              // ),
-                              // const SizedBox(height: 8), // Add small margin
-                              // Text(
-                              //   _name,
-                              //   style: const TextStyle(fontSize: 20),
-                              // ),
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              Container(
+                                width: double.infinity, // Full width
+                                decoration: BoxDecoration(
+                                  color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                child: ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.transparent,
+                                    shadowColor: Colors.transparent,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8.0),
+                                    ),
+                                  ),
+                                  onPressed: _getUserame,
+                                  child: const Text(
+                                    'Se connecter',
+                                    style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 20), // Add margin below the button
+                              Align(
+                                alignment: Alignment.bottomRight,
+                                child: Padding(
+                                  padding: const EdgeInsets.only(right: 10.0, bottom: 10.0), // Add margin
+                                  child: Text(
+                                    'v${Config.APP_VERSION}',
+                                    style: const TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ],
                           ),
                         ),
@@ -202,43 +236,6 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                 ],
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: Text(
-              'v${Config.APP_VERSION}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 50,
-            left: 50,
-            right: 50,
-            child: Container(
-              width: double.infinity, // Full width
-              decoration: BoxDecoration(
-                color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
-                borderRadius: BorderRadius.circular(8.0),
-              ),
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.transparent,
-                  shadowColor: Colors.transparent,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                onPressed: _getUserame,
-                child: const Text(
-                  'Se connecter',
-                  style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
-                ),
               ),
             ),
           ),

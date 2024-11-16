@@ -66,90 +66,85 @@ class ConfirmScreen extends StatelessWidget {
                             ],
                           ),
                         ),
+                        Spacer(), // Add spacer to push the buttons to the bottom
+                        Container(
+                          width: double.infinity, // Full width
+                          decoration: BoxDecoration(
+                            color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            onPressed: () async {
+                              log("Name: $name");
+                              log("Dossard: $dossard");
+                              var tmp = await LoginController.login(name, dossard);
+                              if (!tmp.hasError) {
+                                Navigator.pushReplacement(
+                                  context,
+                                  MaterialPageRoute(builder: (context) {
+                                    return const InfoScreen();
+                                  }),
+                                );
+                              } else {
+                                showInSnackBar(context, tmp.error!);
+                              }
+                            },
+                            child: const Text(
+                              'Oui',
+                              style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 10), // Add space between buttons
+                        Container(
+                          width: double.infinity, // Full width
+                          decoration: BoxDecoration(
+                            color: Color(Config.COLOR_APP_BAR).withOpacity(1), // 100% opacity
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                            child: const Text(
+                              'Non',
+                              style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 20), // Add margin below the buttons
+                        Align(
+                          alignment: Alignment.bottomRight,
+                          child: Padding(
+                            padding: const EdgeInsets.only(right: 10.0, bottom: 10.0), // Add margin
+                            child: Text(
+                              'v${Config.APP_VERSION}',
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                   ),
                 ],
               ),
-            ),
-          ),
-          Positioned(
-            bottom: 10,
-            right: 10,
-            child: Text(
-              'v${Config.APP_VERSION}',
-              style: const TextStyle(
-                fontSize: 12,
-                color: Colors.grey,
-              ),
-            ),
-          ),
-          Positioned(
-            bottom: 50,
-            left: 50,
-            right: 50,
-            child: Column(
-              children: [
-                Container(
-                  width: double.infinity, // Full width
-                  decoration: BoxDecoration(
-                    color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                    onPressed: () async {
-                      log("Name: $name");
-                      log("Dossard: $dossard");
-                      var tmp = await LoginController.login(name, dossard);
-                      if (!tmp.hasError) {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(builder: (context) {
-                            return const InfoScreen();
-                          }),
-                        );
-                      } else {
-                        showInSnackBar(context, tmp.error!);
-                      }
-                    },
-                    child: const Text(
-                      'Oui',
-                      style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
-                    ),
-                  ),
-                ),
-                const SizedBox(height: 10), // Add space between buttons
-                Container(
-                  width: double.infinity, // Full width
-                  decoration: BoxDecoration(
-                    color: Color(Config.COLOR_APP_BAR).withOpacity(1), // 100% opacity
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                    ),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                    child: const Text(
-                      'Non',
-                      style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
-                    ),
-                  ),
-                ),
-              ],
             ),
           ),
         ],
