@@ -9,6 +9,8 @@ import '../Data/DistTotaleData.dart';
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
 import 'InfoScreen.dart';
+import 'ConfirmScreen.dart';
+import 'LoadingPage.dart'; // Import the LoadingPage
 
 /// Class to display the login screen.
 /// This screen allows the user to enter his dossard number
@@ -35,6 +37,9 @@ class _LoginState extends State<Login> {
   /// Boolean to check if the name is correct.
   bool _visibility = false;
 
+  /// Boolean to check if the app is loading.
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +56,18 @@ class _LoginState extends State<Login> {
   void _getUserame() async {
     log("Trying to login");
 
+    // Hide the keyboard
+    FocusScope.of(context).unfocus();
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LoadingPage()), // Ensure LoadingPage is correctly referenced
+    );
+
     try {
       int dossardNumber = int.parse(_controller.text);
       Result dosNumResult = await LoginController.getDossardName(dossardNumber);
@@ -60,131 +77,173 @@ class _LoginState extends State<Login> {
         showInSnackBar(dosNumResult.error!);
         setState(() {
           _visibility = false;
+          _isLoading = false;
         });
+        Navigator.pop(context); // Close the loading page
       } else {
         setState(() {
           _name = dosNumResult.value;
           _dossard = dossardNumber;
           _visibility = true;
+          _isLoading = false;
         });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ConfirmScreen(name: _name, dossard: _dossard)),
+        );
       }
     } catch (e) {
       showInSnackBar("Invalid dossard number");
       setState(() {
         _visibility = false;
+        _isLoading = false;
       });
+      Navigator.pop(context); // Close the loading page
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-        canPop: false,
-        onPopInvoked: (bool didPop) async {
-          log("Trying to pop");
-        },
-        child: Scaffold(
-          appBar: AppBar(
-              backgroundColor: const Color(Config.COLOR_APP_BAR),
-              centerTitle: true,
-              title: Text(style: const TextStyle(color: Color(Config.COLOR_TITRE)), 'Login v${Config.APP_VERSION}')),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Expanded(
-                  flex: 2,
-                  child: Image(image: AssetImage('assets/pictures/LogoText.png')),
-                ),
-                Expanded(
-                    flex: 8,
+    return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5), // Set background color to light grey
+      body: Stack(
+        children: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50.0), // Add margin
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                children: <Widget>[
+                  const SizedBox(height: 100), // Add margin at the top
+                  Flexible(
+                    flex: 3,
+                    child: Center(
+                      child: Image(image: AssetImage('assets/pictures/LogoTextAnimated.gif')),
+                    ),
+                  ),
+                  const SizedBox(height: 80), // Add margin after the logo
+                  Expanded(
+                    flex: 12,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.start, // Reduce margin
+                      crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                       children: [
                         const Text(
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                            'Bienvenue'),
-                        const Text(
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                            'Veuillez entrer votre dossard'),
-                        TextField(
-                          controller: _controller,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(4),
-                          ],
-                          decoration: const InputDecoration(hintText: 'XXXX'),
+                          'Bienvenue,',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Color(Config.COLOR_APP_BAR), // Blue color
+                            fontWeight: FontWeight.bold, // Bold
+                          ),
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(Config.COLOR_BUTTON)),
-                          onPressed: _getUserame,
-                          child: const Text('Login'),
-                        ),
-
-                        // Visibility widget to display the name of the user
-                        // and ask if it is the correct name.
-                        Visibility(
-                          visible: _visibility,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: <Widget>[
-                              const Text(
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                  "Est-ce le bon nom?"),
-                              Text(
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                  _name),
-                              const Padding(padding: EdgeInsets.all(20)),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(backgroundColor: const Color(Config.COLOR_BUTTON)),
-                                    onPressed: () async {
-                                      log("Name: $_name");
-                                      log("Dossard: ${_controller.text}");
-                                      var tmp =
-                                          await LoginController.login(_name, _dossard); //int.parse(_controller.text));
-                                      if (!tmp.hasError) {
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(builder: (context) {
-                                            return const InfoScreen();
-                                          }),
-                                        );
-                                      } else {
-                                        showInSnackBar(tmp.error!);
-                                      }
-                                    },
-                                    child: const Text('Oui'),
-                                  ),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(backgroundColor: const Color(Config.COLOR_BUTTON)),
-                                    onPressed: () {
-                                      setState(() {
-                                        _visibility = false;
-                                      });
-                                    },
-                                    child: const Text('Non'),
-                                  ),
-                                ],
+                        const SizedBox(height: 23), // Add small margin
+                        RichText(
+                          text: TextSpan(
+                            text: 'Entre ton ',
+                            style: const TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: 'numéro de dossard',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(Config.COLOR_APP_BAR), // Blue color
+                                  fontWeight: FontWeight.bold, // Bold
+                                ),
+                              ),
+                              const TextSpan(
+                                text: ' pour te connecter.',
+                                style: TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
                               ),
                             ],
                           ),
                         ),
+                        const SizedBox(height: 20), // Add small margin
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Color(Config.COLOR_BUTTON).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: TextField(
+                            controller: _controller,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(4),
+                            ],
+                            decoration: InputDecoration(
+                              hintText: 'N° de dossard (1 à 9999)',
+                              hintStyle: TextStyle(color: Color(Config.COLOR_BUTTON)), // Set placeholder color
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.all(16.0),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16), // Add small margin
+                        Visibility(
+                          visible: _visibility,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                            children: <Widget>[
+                              // Remove the following lines
+                              // const Text(
+                              //   "Est-ce le bon nom?",
+                              //   style: TextStyle(fontSize: 20),
+                              // ),
+                              // const SizedBox(height: 8), // Add small margin
+                              // Text(
+                              //   _name,
+                              //   style: const TextStyle(fontSize: 20),
+                              // ),
+                            ],
+                          ),
+                        ),
                       ],
-                    ))
-              ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ));
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: Text(
+              'v${Config.APP_VERSION}',
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 50,
+            left: 50,
+            right: 50,
+            child: Container(
+              width: double.infinity, // Full width
+              decoration: BoxDecoration(
+                color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                onPressed: _getUserame,
+                child: const Text(
+                  'Se connecter',
+                  style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }

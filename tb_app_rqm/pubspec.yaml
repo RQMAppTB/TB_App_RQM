@@ -71,6 +71,9 @@ flutter:
   assets:
     - assets/pictures/LogoSimple.png
     - assets/pictures/LogoText.png
+    - assets/pictures/LogoTextAnimated.gif
+    - assets/pictures/LogoSimpleAnimated.gif
+    - assets/pictures/question.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
