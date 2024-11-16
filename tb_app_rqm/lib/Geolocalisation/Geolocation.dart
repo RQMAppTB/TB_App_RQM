@@ -196,6 +196,7 @@ class Geolocation {
   bool isLocationInZone(geo.Position point) {
     var tmp = mp.LatLng(point.latitude, point.longitude);
     var test = mp.PolygonUtil.containsLocation(tmp, Config.ZONE_EVENT, false);
+    return true;
     return test;
   }
 
@@ -203,10 +204,8 @@ class Geolocation {
   /// Returns true if the current location is in the zone
   /// Returns false if the current location is not in the zone
   Future<bool> isInZone() async {
-    // final tmp = await determinePosition();
-    // var test = isLocationInZone(tmp);
-    // return test;
-
-    return true;
+    final tmp = await determinePosition();
+    var test = isLocationInZone(tmp);
+    return test;
   }
 }

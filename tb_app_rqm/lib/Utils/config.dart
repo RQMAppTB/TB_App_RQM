@@ -3,7 +3,7 @@ import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 /// Class to manage the configuration of the application.
 class Config {
   // ------------------- Version----------------
-  static const String APP_VERSION = '1.0.0-beta.2';
+  static const String APP_VERSION = '1.0.0-beta.3';
   // ------------------- API -------------------
   static const String API_URL = 'api.rqm.duckdns.org';
   static const String API_COMMON_ADDRESS = '/app/measures/';
