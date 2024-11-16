@@ -2,9 +2,11 @@ import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 
 /// Class to manage the configuration of the application.
 class Config {
+  // ------------------- Version----------------
+  static const String APP_VERSION = '1.0.0-beta.1';
   // ------------------- API -------------------
-  static const String SERVER_API ='rqm.iict-heig-vd.ch';
-  static const String API_URL = 'rqm.iict-heig-vd.ch';
+  static const String SERVER_API ='api.rqm.duckdns.org';
+  static const String API_URL = 'api.rqm.duckdns.org';
   static const String API_COMMON_ADDRESS = '/app/measures/';
   // -------------- Début et fin ---------------
   static const String START_TIME = '2024-01-25 17:00:00';
