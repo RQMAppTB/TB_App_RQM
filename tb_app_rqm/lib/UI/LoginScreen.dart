@@ -78,81 +78,107 @@ class _LoginState extends State<Login> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-        canPop: false,
-        onPopInvoked: (bool didPop) async {
-          log("Trying to pop");
-        },
-        child: Scaffold(
-          appBar: AppBar(
-              backgroundColor: const Color(Config.COLOR_APP_BAR),
-              centerTitle: true,
-              title: Text(style: const TextStyle(color: Color(Config.COLOR_TITRE)), 'Login v${Config.APP_VERSION}')),
-          body: Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                const Expanded(
-                  flex: 2,
-                  child: Image(image: AssetImage('assets/pictures/LogoText.png')),
-                ),
-                Expanded(
-                    flex: 8,
+    return Scaffold(
+      body: Stack(
+        children: [
+          Center(
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 50.0), // Add margin
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                children: <Widget>[
+                  const SizedBox(height: 100), // Add margin at the top
+                  Flexible(
+                    flex: 3,
+                    child: Center(
+                      child: Image(image: AssetImage('assets/pictures/LogoTextAnimated.gif')),
+                    ),
+                  ),
+                  const SizedBox(height: 80), // Add margin after the logo
+                  Expanded(
+                    flex: 12,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                      mainAxisAlignment: MainAxisAlignment.start, // Reduce margin
+                      crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                       children: [
                         const Text(
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                            'Bienvenue'),
-                        const Text(
-                            style: TextStyle(
-                              fontSize: 20,
-                            ),
-                            'Veuillez entrer votre dossard'),
-                        TextField(
-                          controller: _controller,
-                          keyboardType: TextInputType.number,
-                          inputFormatters: [
-                            LengthLimitingTextInputFormatter(4),
-                          ],
-                          decoration: const InputDecoration(hintText: 'XXXX'),
+                          'Bienvenue,',
+                          style: TextStyle(
+                            fontSize: 20,
+                            color: Color(Config.COLOR_APP_BAR), // Blue color
+                            fontWeight: FontWeight.bold, // Bold
+                          ),
                         ),
-                        ElevatedButton(
-                          style: ElevatedButton.styleFrom(backgroundColor: const Color(Config.COLOR_BUTTON)),
-                          onPressed: _getUserame,
-                          child: const Text('Login'),
+                        const SizedBox(height: 23), // Add small margin
+                        RichText(
+                          text: TextSpan(
+                            text: 'Entre ton ',
+                            style: const TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
+                            children: <TextSpan>[
+                              TextSpan(
+                                text: 'numéro de dossard',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Color(Config.COLOR_APP_BAR), // Blue color
+                                  fontWeight: FontWeight.bold, // Bold
+                                ),
+                              ),
+                              const TextSpan(
+                                text: ' pour te connecter.',
+                                style: TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
+                              ),
+                            ],
+                          ),
                         ),
-
-                        // Visibility widget to display the name of the user
-                        // and ask if it is the correct name.
+                        const SizedBox(height: 20), // Add small margin
+                        Container(
+                          decoration: BoxDecoration(
+                            color: Color(Config.COLOR_BUTTON).withOpacity(0.2),
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: TextField(
+                            controller: _controller,
+                            keyboardType: TextInputType.number,
+                            inputFormatters: [
+                              LengthLimitingTextInputFormatter(4),
+                            ],
+                            decoration: InputDecoration(
+                              hintText: 'N° de dossard (1 à 9999)',
+                              hintStyle: TextStyle(color: Color(Config.COLOR_BUTTON)), // Set placeholder color
+                              border: InputBorder.none,
+                              contentPadding: const EdgeInsets.all(16.0),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(height: 16), // Add small margin
                         Visibility(
                           visible: _visibility,
                           child: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            mainAxisAlignment: MainAxisAlignment.start,
+                            crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                             children: <Widget>[
                               const Text(
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                  "Est-ce le bon nom?"),
+                                "Est-ce le bon nom?",
+                                style: TextStyle(fontSize: 20),
+                              ),
+                              const SizedBox(height: 8), // Add small margin
                               Text(
-                                  style: const TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                  _name),
-                              const Padding(padding: EdgeInsets.all(20)),
+                                _name,
+                                style: const TextStyle(fontSize: 20),
+                              ),
+                              const SizedBox(height: 20), // Add small margin
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                 children: [
                                   ElevatedButton(
-                                    style: ElevatedButton.styleFrom(backgroundColor: const Color(Config.COLOR_BUTTON)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(Config.COLOR_BUTTON),
+                                    ),
                                     onPressed: () async {
                                       log("Name: $_name");
                                       log("Dossard: ${_controller.text}");
-                                      var tmp =
-                                          await LoginController.login(_name, _dossard); //int.parse(_controller.text));
+                                      var tmp = await LoginController.login(_name, _dossard);
                                       if (!tmp.hasError) {
                                         Navigator.pushReplacement(
                                           context,
@@ -167,7 +193,9 @@ class _LoginState extends State<Login> {
                                     child: const Text('Oui'),
                                   ),
                                   ElevatedButton(
-                                    style: ElevatedButton.styleFrom(backgroundColor: const Color(Config.COLOR_BUTTON)),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(Config.COLOR_BUTTON),
+                                    ),
                                     onPressed: () {
                                       setState(() {
                                         _visibility = false;
@@ -181,10 +209,51 @@ class _LoginState extends State<Login> {
                           ),
                         ),
                       ],
-                    ))
-              ],
+                    ),
+                  ),
+                ],
+              ),
             ),
           ),
-        ));
+          Positioned(
+            bottom: 10,
+            right: 10,
+            child: Text(
+              'v${Config.APP_VERSION}',
+              style: const TextStyle(
+                fontSize: 12,
+                color: Colors.grey,
+              ),
+            ),
+          ),
+          Positioned(
+            bottom: 50,
+            left: 50,
+            right: 50,
+            child: Container(
+              width: double.infinity, // Full width
+              decoration: BoxDecoration(
+                color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
+                borderRadius: BorderRadius.circular(8.0),
+              ),
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.transparent,
+                  shadowColor: Colors.transparent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(8.0),
+                  ),
+                ),
+                onPressed: _getUserame,
+                child: const Text(
+                  'Se connecter',
+                  style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
   }
 }
