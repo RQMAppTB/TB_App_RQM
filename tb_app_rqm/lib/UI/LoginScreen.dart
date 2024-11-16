@@ -9,6 +9,8 @@ import '../Data/DistTotaleData.dart';
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
 import 'InfoScreen.dart';
+import 'ConfirmScreen.dart';
+import 'LoadingPage.dart'; // Import the LoadingPage
 
 /// Class to display the login screen.
 /// This screen allows the user to enter his dossard number
@@ -35,6 +37,9 @@ class _LoginState extends State<Login> {
   /// Boolean to check if the name is correct.
   bool _visibility = false;
 
+  /// Boolean to check if the app is loading.
+  bool _isLoading = false;
+
   @override
   void initState() {
     super.initState();
@@ -51,6 +56,18 @@ class _LoginState extends State<Login> {
   void _getUserame() async {
     log("Trying to login");
 
+    // Hide the keyboard
+    FocusScope.of(context).unfocus();
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => const LoadingPage()), // Ensure LoadingPage is correctly referenced
+    );
+
     try {
       int dossardNumber = int.parse(_controller.text);
       Result dosNumResult = await LoginController.getDossardName(dossardNumber);
@@ -60,25 +77,35 @@ class _LoginState extends State<Login> {
         showInSnackBar(dosNumResult.error!);
         setState(() {
           _visibility = false;
+          _isLoading = false;
         });
+        Navigator.pop(context); // Close the loading page
       } else {
         setState(() {
           _name = dosNumResult.value;
           _dossard = dossardNumber;
           _visibility = true;
+          _isLoading = false;
         });
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ConfirmScreen(name: _name, dossard: _dossard)),
+        );
       }
     } catch (e) {
       showInSnackBar("Invalid dossard number");
       setState(() {
         _visibility = false;
+        _isLoading = false;
       });
+      Navigator.pop(context); // Close the loading page
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: const Color(0xFFF5F5F5), // Set background color to light grey
       body: Stack(
         children: [
           Center(
@@ -158,53 +185,16 @@ class _LoginState extends State<Login> {
                             mainAxisAlignment: MainAxisAlignment.start,
                             crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                             children: <Widget>[
-                              const Text(
-                                "Est-ce le bon nom?",
-                                style: TextStyle(fontSize: 20),
-                              ),
-                              const SizedBox(height: 8), // Add small margin
-                              Text(
-                                _name,
-                                style: const TextStyle(fontSize: 20),
-                              ),
-                              const SizedBox(height: 20), // Add small margin
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                children: [
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(Config.COLOR_BUTTON),
-                                    ),
-                                    onPressed: () async {
-                                      log("Name: $_name");
-                                      log("Dossard: ${_controller.text}");
-                                      var tmp = await LoginController.login(_name, _dossard);
-                                      if (!tmp.hasError) {
-                                        Navigator.pushReplacement(
-                                          context,
-                                          MaterialPageRoute(builder: (context) {
-                                            return const InfoScreen();
-                                          }),
-                                        );
-                                      } else {
-                                        showInSnackBar(tmp.error!);
-                                      }
-                                    },
-                                    child: const Text('Oui'),
-                                  ),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(Config.COLOR_BUTTON),
-                                    ),
-                                    onPressed: () {
-                                      setState(() {
-                                        _visibility = false;
-                                      });
-                                    },
-                                    child: const Text('Non'),
-                                  ),
-                                ],
-                              ),
+                              // Remove the following lines
+                              // const Text(
+                              //   "Est-ce le bon nom?",
+                              //   style: TextStyle(fontSize: 20),
+                              // ),
+                              // const SizedBox(height: 8), // Add small margin
+                              // Text(
+                              //   _name,
+                              //   style: const TextStyle(fontSize: 20),
+                              // ),
                             ],
                           ),
                         ),
