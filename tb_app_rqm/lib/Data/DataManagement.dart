@@ -5,9 +5,10 @@ import 'package:shared_preferences/shared_preferences.dart';
 /// Class to manage the data in the shared preferences.
 /// Allow to save, get, remove and check if the data exists in the shared preferences.
 /// Those methods are implemented for int and string data.
-class DataManagement{
+class DataManagement {
   /// Singleton instance of the class.
   static final DataManagement _singleton = DataManagement._internal();
+
   /// Future to get the shared preferences.
   final Future<SharedPreferences> _prefs = SharedPreferences.getInstance();
 

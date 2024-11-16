@@ -1,11 +1,8 @@
-
-
 import 'DataManagement.dart';
 
 /// Class to manage the distance traveled by the user during the measure.
 /// This distance is the one sent to the API.
-class DistToSendData{
-
+class DistToSendData {
   /// Singleton instance of the DataManagement class.
   static final DataManagement _dataManagement = DataManagement();
 

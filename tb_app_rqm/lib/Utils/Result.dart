@@ -5,6 +5,7 @@
 class Result<T> {
   /// The value to be returned by the function.
   final T? value;
+
   /// The error message to be returned by the function.
   final String? error;
 
@@ -14,4 +15,3 @@ class Result<T> {
   /// Check if the result has a value.
   bool get hasError => error != null;
 }
-

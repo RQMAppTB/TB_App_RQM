@@ -8,8 +8,7 @@ import 'TimeData.dart';
 import 'UuidData.dart';
 
 /// Class containing utility methods to interact with the data.
-class DataUtils{
-
+class DataUtils {
   /// Delete all data stored in the shared preferences.
   /// Return a [Future] object resolving to a boolean value indicating if the data was deleted.
   static Future<bool> deleteAllData() async {

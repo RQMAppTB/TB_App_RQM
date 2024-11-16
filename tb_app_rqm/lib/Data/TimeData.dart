@@ -1,8 +1,7 @@
 import 'DataManagement.dart';
 
 /// Class to manage the time spent on the track.
-class TimeData{
-
+class TimeData {
   /// Singleton instance of the DataManagement class.
   static final DataManagement _dataManagement = DataManagement();
 
@@ -25,5 +24,4 @@ class TimeData{
   Future<bool> doesTimeExist() async {
     return _dataManagement.doesDataExist('time');
   }
-
 }

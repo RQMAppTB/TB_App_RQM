@@ -12,7 +12,7 @@ import '../Geolocalisation/Geolocation.dart';
 /// This screen displays the distance traveled by the user.
 /// The user can stop the measure by clicking on the stop button
 /// and is redirected to the information screen.
-class WorkingScreen extends StatefulWidget{
+class WorkingScreen extends StatefulWidget {
   const WorkingScreen({super.key});
 
   @override
@@ -20,7 +20,7 @@ class WorkingScreen extends StatefulWidget{
 }
 
 /// State of the WorkingScreen class.
-class _WorkingScreenState extends State<WorkingScreen>{
+class _WorkingScreenState extends State<WorkingScreen> {
   /// Instance of the Geolocation class
   Geolocation _geolocation = Geolocation();
 
@@ -33,13 +33,13 @@ class _WorkingScreenState extends State<WorkingScreen>{
     // Start listening to the distance stream
     _geolocation.stream.listen((event) {
       log("Stream event: $event");
-      if(event == -1){
+      if (event == -1) {
         log("Stream event: $event");
         _geolocation.stopListening();
         MeasureController.stopMeasure();
         Navigator.pushAndRemoveUntil(
             context, MaterialPageRoute(builder: (context) => const InfoScreen()), (route) => false);
-      }else{
+      } else {
         setState(() {
           _value = event;
         });
@@ -90,22 +90,18 @@ class _WorkingScreenState extends State<WorkingScreen>{
     );
   }
 
-
   @override
   Widget build(BuildContext context) {
     return PopScope(
       canPop: false,
-      onPopInvoked: (bool didPop) async{
+      onPopInvoked: (bool didPop) async {
         log("Trying to pop");
       },
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: const Color(Config.COLOR_APP_BAR),
           centerTitle: true,
-          title: const Text(
-              style: TextStyle(color: Color(Config.COLOR_TITRE)),
-              'Même un mètre de plus, ça compte'
-          ),
+          title: const Text(style: TextStyle(color: Color(Config.COLOR_TITRE)), 'Même un mètre de plus, ça compte'),
         ),
         body: Center(
           child: Column(
@@ -114,66 +110,58 @@ class _WorkingScreenState extends State<WorkingScreen>{
               Expanded(
                 flex: 9,
                 child: Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                    children: <Widget>[
-                      const Spacer(),
-                      const Expanded(
-                        flex: 2,
-                        child: Image(image: AssetImage('assets/pictures/LogoText.png')),
-                      ),
-                      Expanded(
+                  child: Column(mainAxisAlignment: MainAxisAlignment.spaceEvenly, children: <Widget>[
+                    const Spacer(),
+                    const Expanded(
+                      flex: 2,
+                      child: Image(image: AssetImage('assets/pictures/LogoText.png')),
+                    ),
+                    Expanded(
                         flex: 7,
                         child: Column(
                           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                           children: <Widget>[
                             Expanded(
-                              flex: 1,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  const Text(
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                      ),
-                                      'Vous avez parcouru'
-                                  ),
-                                  Text(
-                                      style: const TextStyle(
-                                        fontSize: 20,
-                                      ),
-                                      ' $_value mètres '
-                                  ),
-                                ],
-                              )
-                            ),
+                                flex: 1,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    const Text(
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                        'Vous avez parcouru'),
+                                    Text(
+                                        style: const TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                        ' $_value mètres '),
+                                  ],
+                                )),
                             const Expanded(
-                              flex: 1,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                  style: TextStyle(
-                                    fontSize: 20,
-                                  ),
-                                  'Courage, vous êtes bien parti!'),
-                                ],
-                              )
-                            )
+                                flex: 1,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Text(
+                                        style: TextStyle(
+                                          fontSize: 20,
+                                        ),
+                                        'Courage, vous êtes bien parti!'),
+                                  ],
+                                ))
                           ],
-                        )
-                      )
-                    ]
-                  ),
+                        ))
+                  ]),
                 ),
               ),
 
               //Create a clickable expanded
               Expanded(
                 flex: 1,
-                child:SizedBox(
+                child: SizedBox(
                   width: double.infinity,
-                  child:ElevatedButton(
+                  child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(Config.COLOR_BUTTON),
                       shape: RoundedRectangleBorder(
@@ -188,7 +176,6 @@ class _WorkingScreenState extends State<WorkingScreen>{
                   ),
                 ),
               ),
-
             ],
           ),
         ),

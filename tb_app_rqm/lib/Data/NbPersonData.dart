@@ -2,7 +2,6 @@ import 'DataManagement.dart';
 
 /// Class to manage the number of participants.
 class NbPersonData {
-
   /// Singleton instance of the DataManagement class.
   static final DataManagement _dataManagement = DataManagement();
 

@@ -14,35 +14,25 @@ import '../Data/DataManagement.dart';
 
 /// Class containing methods to interact with the API to manage all
 /// data about login and logout.
-class LoginController{
-
+class LoginController {
   /// Register the user [name] and [dosNum] in the API.
   /// Return a [Future] object resolving to a [Result] object
   /// containing a boolean value if the request was successful or an error message
   /// if the request failed.
   static Future<Result<bool>> login(String name, int dosNum) async {
-
     log("Login: name :$name, dosnum: $dosNum");
 
     /// URI to send the POST request to the API to register the user.
-    final uri =
-    Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}login');
+    final uri = Uri.https(Config.API_URL, '${Config.API_COMMON_ADDRESS}login');
 
     log('URI: $uri');
 
-    return http.post(
-        uri,
-        body: {
-          'dosNumber': dosNum.toString(),
-          'username': name
-        }
-    ).then((response) async {
+    return http.post(uri, body: {'dosNumber': dosNum.toString(), 'username': name}).then((response) async {
       if (response.statusCode == 200 || response.statusCode == 201) {
         log("Status code: ${response.statusCode}");
         log("Response body: ${response.body}");
 
         var jsonResult = jsonDecode(response.body);
-
 
         log("Json result: dosNumber: ${jsonResult["dosNumber"]}, username: ${jsonResult["username"]}, distTraveled: ${jsonResult["distTraveled"]}");
 
@@ -56,15 +46,14 @@ class LoginController{
         isSaved = isSaved && await DistPersoData.saveDistPerso(int.parse((jsonResult["distTraveled"]).toString()));
         log("Is saved after distTraveled: $isSaved");
 
-        if(isSaved) {
+        if (isSaved) {
           return Result(value: true);
         } else {
           DataUtils.deleteAllData();
           throw Exception('Failed to save dossard or username');
         }
-
       } else {
-        throw Exception('Failed to login');
+        throw Exception('Failed to login: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
       log("Error: $error");
@@ -79,64 +68,58 @@ class LoginController{
   /// Return a [Future] object resolving to a [Result] object
   /// containing a boolean value if the request was successful or an error message
   /// if the request failed.
-static Future<Result<bool>> logout() async {
+  static Future<Result<bool>> logout() async {
+    /// Boolean value indicating if a measure is running
+    bool isMeasureRunning = await UuidData.doesUuidExist();
 
-  /// Boolean value indicating if a measure is running
-  bool isMeasureRunning = await UuidData.doesUuidExist();
+    log("Is measure running: $isMeasureRunning");
 
-  log("Is measure running: $isMeasureRunning");
+    // Stop the measure if it is running
+    if (isMeasureRunning) {
+      Result result = await MeasureController.stopMeasure();
+      isMeasureRunning = result.hasError;
+    }
 
-  // Stop the measure if it is running
-  if(isMeasureRunning){
-    Result result = await MeasureController.stopMeasure();
-    isMeasureRunning = result.hasError;
+    log("Is measure running: $isMeasureRunning");
+
+    if (!isMeasureRunning) {
+      bool deletionDone = await DataUtils.deleteAllData();
+
+      return Result(value: deletionDone);
+    } else {
+      return Result(error: "Failed to logout");
+    }
   }
-
-  log("Is measure running: $isMeasureRunning");
-
-  if(!isMeasureRunning){
-    bool deletionDone = await DataUtils.deleteAllData();
-
-    return Result(value: deletionDone);
-  } else {
-    return Result(error: "Failed to logout");
-  }
-}
 
   /// Retrieve the name of the user with the dossard number [dosNumber] from the API.
   /// Return a [Future] object resolving to a [Result] object
   /// containing the name corresponding to the [dosNumber]
   /// if the request was successful or an error message if the request failed.
   static Future<Result<String>> getDossardName(int dosNumber) async {
-
-    final uri =
-    Uri.http(Config.API_URL, '${Config.API_COMMON_ADDRESS}ident', {"dosNumber": dosNumber.toString().padLeft(4, '0')});
+    final uri = Uri.https(
+        Config.API_URL, '${Config.API_COMMON_ADDRESS}ident', {"dosNumber": dosNumber.toString().padLeft(4, '0')});
 
     log('URI: $uri');
 
-    return http.get(uri)
-        .then((response) async {
-          log("Status code: ${response.statusCode}");
-          if (response.statusCode == 200) {
-            log("Response body: ${response.body}");
+    return http.get(uri).then((response) async {
+      log("Status code: ${response.statusCode}");
+      if (response.statusCode == 200) {
+        log("Response body: ${response.body}");
 
-            var name = jsonDecode(response.body)["name"];
+        var name = jsonDecode(response.body)["name"];
 
-            return Result<String>(value: name);
-
-          } else if (response.statusCode == 404) {
-            return Result<String>(error: "Ce dossard n'existe pas dans cet univers, essayez de demander à Dr.Strange!");
-          } else {
-            throw Exception('Failed to get username');
-          }
-        })
-        .onError((error, stackTrace) {
-          log("Error: $error");
-          if (error is http.ClientException) {
-            return Result<String>(error: "No connection to the server");
-          }
-          return Result<String>(error: 'Failed to get username');
-        });
+        return Result<String>(value: name);
+      } else if (response.statusCode == 404) {
+        return Result<String>(error: "Ce dossard n'existe pas dans cet univers, essayez de demander à Dr.Strange!");
+      } else {
+        throw Exception('Failed to get username');
+      }
+    }).onError((error, stackTrace) {
+      log("Error: $error");
+      if (error is http.ClientException) {
+        return Result<String>(error: "No connection to the server");
+      }
+      return Result<String>(error: 'Failed to get username');
+    });
   }
-
 }
