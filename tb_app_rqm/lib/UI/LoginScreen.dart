@@ -117,8 +117,8 @@ class _LoginState extends State<Login> {
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
                   Flexible(
-                    flex: isKeyboardVisible ? 1 : 2,
-                    child: SizedBox(height: isKeyboardVisible ? 40 : 80),
+                    flex: isKeyboardVisible ? 2 : 3,
+                    child: SizedBox(height: isKeyboardVisible ? 100 : 100),
                   ),
                   Visibility(
                     //visible: !isKeyboardVisible,
@@ -131,8 +131,8 @@ class _LoginState extends State<Login> {
                     ),
                   ),
                   Flexible(
-                    flex: isKeyboardVisible ? 1 : 2,
-                    child: SizedBox(height: isKeyboardVisible ? 40 : 80),
+                    flex: isKeyboardVisible ? 2 : 3,
+                    child: SizedBox(height: isKeyboardVisible ? 60 : 80),
                   ),
                   Expanded(
                     flex: 12,
