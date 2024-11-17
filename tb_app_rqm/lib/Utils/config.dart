@@ -50,6 +50,8 @@ class Config {
   static const int COLOR_TITRE = 0xFFFFFFFF;
   static const int COLOR_BACKGROUND = 0xFFf5f5f5;
 
+  static const double CIRCUIT_SIZE = 5000.0; // Define the circuit size in meters
+
   static String getAppVersion() {
     return APP_VERSION;
   }

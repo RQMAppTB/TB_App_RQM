@@ -5,6 +5,7 @@ import '../API/LoginController.dart';
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
 import 'InfoScreen.dart';
+import 'Components/InfoCard.dart';
 
 class ConfirmScreen extends StatelessWidget {
   final String name;
@@ -43,29 +44,14 @@ class ConfirmScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.start, // Reduce margin
                       crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                       children: [
-                        Container(
-                          width: double.infinity, // Full width
-                          padding: const EdgeInsets.all(16.0),
-                          decoration: BoxDecoration(
-                            color: Color(Config.COLOR_BUTTON).withOpacity(0.3),
-                            borderRadius: BorderRadius.circular(8.0),
+                        InfoCard(
+                          logo: CircleAvatar(
+                            radius: 36,
+                            backgroundColor: Color(Config.COLOR_APP_BAR).withOpacity(0.2),
+                            child: Icon(Icons.face, size: 40),
                           ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              const Text(
-                                "Est-ce bien toi ?",
-                                style: TextStyle(fontSize: 20, color: Color(Config.COLOR_APP_BAR)),
-                              ),
-                              const SizedBox(height: 16),
-                              Text(
-                                name,
-                                textAlign: TextAlign.center, // Center the text
-                                style: const TextStyle(
-                                    fontSize: 24, color: Color(Config.COLOR_APP_BAR), fontWeight: FontWeight.bold),
-                              ),
-                            ],
-                          ),
+                          title: "Est-ce bien toi ?",
+                          data: name,
                         ),
                         Spacer(), // Add spacer to push the buttons to the bottom
                         Container(

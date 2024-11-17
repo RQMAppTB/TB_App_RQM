@@ -182,7 +182,7 @@ class _LoginState extends State<Login> {
                               LengthLimitingTextInputFormatter(4),
                             ],
                             decoration: InputDecoration(
-                              hintText: 'N° de dossard (1 à 9999)',
+                              hintText: '1 à 9999',
                               hintStyle: TextStyle(
                                   color: Color(Config.COLOR_BUTTON),
                                   fontSize: 20), // Set placeholder color and increase font size
