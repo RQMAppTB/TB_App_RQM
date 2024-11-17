@@ -3,7 +3,7 @@ import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 /// Class to manage the configuration of the application.
 class Config {
   // ------------------- Version----------------
-  static const String APP_VERSION = '1.0.0-beta.5';
+  static const String APP_VERSION = '1.0.0-beta.6';
   // ------------------- API -------------------
   static const String API_URL = 'api.rqm.duckdns.org';
   static const String API_COMMON_ADDRESS = '/app/measures/';
@@ -48,6 +48,9 @@ class Config {
   static const int COLOR_APP_BAR = 0xFF403c74;
   static const int COLOR_BUTTON = 0xFFFF9900;
   static const int COLOR_TITRE = 0xFFFFFFFF;
+  static const int COLOR_BACKGROUND = 0xFFf5f5f5;
+
+  static const double CIRCUIT_SIZE = 5000.0; // Define the circuit size in meters
 
   static String getAppVersion() {
     return APP_VERSION;

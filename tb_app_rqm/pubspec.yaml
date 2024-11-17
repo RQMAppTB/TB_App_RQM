@@ -38,6 +38,7 @@ dependencies:
   geolocator: ^12.0.0             # For getting the user's location
   maps_toolkit: ^3.0.0            # For calculating distances between two points
   flutter_launcher_icons: ^0.13.1 # For changing the app icon
+  simple_circular_progress_bar: ^1.0.2
 
 dev_dependencies:
   flutter_test:

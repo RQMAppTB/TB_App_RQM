@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../Utils/config.dart';
 
 class LoadingPage extends StatelessWidget {
   const LoadingPage({Key? key}) : super(key: key);
@@ -6,9 +7,19 @@ class LoadingPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5), // Set background color to light grey
-      body: Center(
-        child: Image.asset('assets/pictures/LogoSimpleAnimated.gif'),
+      backgroundColor: const Color(Config.COLOR_BACKGROUND), // Set background color to light grey
+      body: Stack(
+        children: [
+          Positioned.fill(
+            child: Align(
+              alignment: Alignment.center,
+              child: Image.asset(
+                'assets/pictures/LogoSimpleAnimated.gif',
+                width: 60.0, // Set width to 50px
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
