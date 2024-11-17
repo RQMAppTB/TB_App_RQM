@@ -4,6 +4,7 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:tb_app_rqm/API/DistanceController.dart';
+import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 
 import '../API/LoginController.dart';
 import '../API/MeasureController.dart';
@@ -55,8 +56,14 @@ class _InfoScreenState extends State<InfoScreen> {
   /// Name of the user
   String _name = "";
 
+  /// Number of participants
+  int? _numberOfParticipants;
+
   /// Boolean to check if the start button is enabled
   bool _enabledStart = true;
+
+  int _currentPage = 0;
+  final PageController _pageController = PageController();
 
   /// Function to show a snackbar with the message [value]
   void showInSnackBar(String value) {
@@ -112,6 +119,20 @@ class _InfoScreenState extends State<InfoScreen> {
     });
   }
 
+  /// Function to calculate the percentage of remaining time
+  double _calculateRemainingTimePercentage() {
+    Duration totalDuration = end.difference(start);
+    Duration elapsed = DateTime.now().difference(start);
+    return elapsed.inSeconds / totalDuration.inSeconds * 100;
+  }
+
+  /// Function to calculate the percentage of total distance
+  double _calculateTotalDistancePercentage() {
+    // Assuming 2000000 meters (2M meters) as the target total distance for the event
+    const int targetDistance = 2000000;
+    return (_distanceTotale ?? 0) / targetDistance * 100;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -159,6 +180,11 @@ class _InfoScreenState extends State<InfoScreen> {
             _name = value;
           });
         }));
+
+    // Fake the number of participants
+    setState(() {
+      _numberOfParticipants = 150; // Set a fake number of participants
+    });
   }
 
   @override
@@ -208,6 +234,59 @@ class _InfoScreenState extends State<InfoScreen> {
     });
   }
 
+  /// Reusable card widget
+  Widget _buildInfoCard(String title, String value, double percentage) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Color(Config.COLOR_APP_BAR).withOpacity(0.1),
+        borderRadius: BorderRadius.circular(8.0),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.only(top: 24.0, bottom: 24.0, left: 16.0, right: 32.0),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start, // Align items to the top
+          children: <Widget>[
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(fontSize: 16),
+                  ),
+                  const SizedBox(height: 24), // Add spacing between title and value
+                  Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      value,
+                      style: const TextStyle(
+                          fontSize: 24, fontWeight: FontWeight.bold, color: Color(Config.COLOR_APP_BAR)),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            SimpleCircularProgressBar(
+              size: 120,
+              progressStrokeWidth: 18,
+              backStrokeWidth: 20,
+              progressColors: [Color(Config.COLOR_BUTTON)],
+              mergeMode: true,
+              onGetText: (double value) {
+                return Text(
+                  '${value.toStringAsFixed(1)}%',
+                  style: const TextStyle(fontSize: 24),
+                );
+              },
+              valueNotifier: ValueNotifier(percentage),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return PopScope(
@@ -216,92 +295,153 @@ class _InfoScreenState extends State<InfoScreen> {
         log("Trying to pop");
       },
       child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: const Color(Config.COLOR_APP_BAR),
-          centerTitle: true,
-          title: const Text(style: TextStyle(color: Color(Config.COLOR_TITRE)), 'Info'),
-          actions: [
-            // Logout button
-            IconButton(
-              icon: const Icon(color: Color(Config.COLOR_TITRE), Icons.logout),
-              onPressed: () {
-                LoginController.logout().then((result) {
-                  if (result.hasError) {
-                    showInSnackBar("Please try again later");
-                  } else {
-                    Navigator.pushReplacement(
-                      context,
-                      MaterialPageRoute(builder: (context) => const Login()),
-                    );
-                  }
-                });
-              },
-            ),
-          ],
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: <Widget>[
-              Expanded(
-                  flex: 9,
-                  child: Center(
-                      child: Column(children: <Widget>[
-                    const Expanded(
-                      flex: 2,
+        backgroundColor: const Color(Config.COLOR_BACKGROUND),
+        body: Stack(
+          children: [
+            Center(
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 40.0), // Add margin
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.start,
+                  crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                  children: <Widget>[
+                    const SizedBox(height: 30), // Add margin at the top
+                    Center(
                       child: Image(image: AssetImage('assets/pictures/LogoText.png')),
                     ),
-                    const Spacer(),
-                    Expanded(
-                      flex: 1,
-                      child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                        Text('Bonjour N°$_dossard : $_name'),
-                        Text('Vous avez parcouru ${_distancePerso ?? 0} mètres'),
-                      ]),
-                    ),
-                    Expanded(
-                        flex: 5,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                          children: [
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                const Text('Temps restant'),
-                                Text(_remainingTime),
-                              ],
-                            ),
-                            Column(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: <Widget>[
-                                const Text('Distance totale'),
-                                Text('${_distanceTotale ?? 0}'),
-                              ],
-                            )
-                          ],
-                        )),
-                  ]))),
-              Expanded(
-                flex: 1,
-                child: SizedBox(
-                  width: double.infinity,
-                  // Start button
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(Config.COLOR_BUTTON),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(0),
+                    const SizedBox(height: 20), // Add margin below the logo
+                    Text(
+                      _currentPage == 0 ? 'Greeting' : 'Event Info',
+                      textAlign: TextAlign.center,
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        color: Color(Config.COLOR_APP_BAR), // Add color
                       ),
                     ),
-                    onPressed: () async {
-                      _enabledStart ? await _startMeasure() : null;
-                    },
-                    child: const Text('Start'),
-                  ),
+                    const SizedBox(height: 10), // Add margin below the title
+                    Expanded(
+                      flex: 12,
+                      child: PageView(
+                        controller: _pageController,
+                        onPageChanged: (int page) {
+                          setState(() {
+                            _currentPage = page;
+                          });
+                        },
+                        children: [
+                          Container(
+                            width: double.infinity, // Full width
+                            padding: const EdgeInsets.all(16.0),
+                            decoration: BoxDecoration(
+                              color: Color(Config.COLOR_BUTTON).withOpacity(0.3),
+                              borderRadius: BorderRadius.circular(8.0),
+                            ),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text('Bonjour N°$_dossard : $_name'),
+                                Text('Vous avez parcouru ${_distancePerso ?? 0} mètres'),
+                              ],
+                            ),
+                          ),
+                          Column(
+                            children: [
+                              Expanded(
+                                child: SingleChildScrollView(
+                                  child: Column(
+                                    children: [
+                                      _buildInfoCard(
+                                        'Temps restant',
+                                        _remainingTime,
+                                        _calculateRemainingTimePercentage(),
+                                      ),
+                                      const SizedBox(height: 20), // Add margin between sections
+                                      _buildInfoCard(
+                                        'Distance totale parcourue',
+                                        '${_distanceTotale ?? 0} m',
+                                        _calculateTotalDistancePercentage(),
+                                      ),
+                                      const SizedBox(height: 20), // Add margin between sections
+                                      _buildInfoCard(
+                                        'Nombre de participants',
+                                        '${_numberOfParticipants ?? 0}',
+                                        1000.0, // Assuming 100% as we don't have a target number for participants
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(), // Add spacer to push the button to the bottom
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        for (int i = 0; i < 2; i++)
+                          Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                            width: 8.0,
+                            height: 8.0,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: _currentPage == i ? Colors.blue : Colors.grey,
+                            ),
+                          ),
+                      ],
+                    ),
+                    const SizedBox(height: 20), // Add margin below the dots
+                    Container(
+                      width: double.infinity, // Full width
+                      decoration: BoxDecoration(
+                        color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.transparent,
+                          shadowColor: Colors.transparent,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                        ),
+                        onPressed: () async {
+                          _enabledStart ? await _startMeasure() : null;
+                        },
+                        child: const Text(
+                          'Start',
+                          style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 30), // Add margin below the button
+                  ],
                 ),
               ),
-            ],
-          ),
+            ),
+            Positioned(
+              top: 10,
+              right: 10,
+              child: IconButton(
+                icon: const Icon(color: Color(Config.COLOR_APP_BAR), Icons.logout),
+                onPressed: () {
+                  LoginController.logout().then((result) {
+                    if (result.hasError) {
+                      showInSnackBar("Please try again later");
+                    } else {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => const Login()),
+                      );
+                    }
+                  });
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

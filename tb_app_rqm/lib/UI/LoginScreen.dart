@@ -106,12 +106,12 @@ class _LoginState extends State<Login> {
   Widget build(BuildContext context) {
     bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom != 0;
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F5F5), // Set background color to light grey
+      backgroundColor: const Color(Config.COLOR_BACKGROUND), // Set background color to light grey
       body: Stack(
         children: [
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50.0), // Add margin
+              padding: const EdgeInsets.symmetric(horizontal: 40.0), // Add margin
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
@@ -157,13 +157,13 @@ class _LoginState extends State<Login> {
                               TextSpan(
                                 text: 'numéro de dossard',
                                 style: TextStyle(
-                                  fontSize: 16,
+                                  fontSize: 20,
                                   color: Color(Config.COLOR_APP_BAR), // Blue color
                                   fontWeight: FontWeight.bold, // Bold
                                 ),
                               ),
                               const TextSpan(
-                                text: ' pour te connecter.',
+                                text: ' pour t\'identifier à l`évènement.',
                                 style: TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
                               ),
                             ],
@@ -183,59 +183,56 @@ class _LoginState extends State<Login> {
                             ],
                             decoration: InputDecoration(
                               hintText: 'N° de dossard (1 à 9999)',
-                              hintStyle: TextStyle(color: Color(Config.COLOR_BUTTON)), // Set placeholder color
+                              hintStyle: TextStyle(
+                                  color: Color(Config.COLOR_BUTTON),
+                                  fontSize: 20), // Set placeholder color and increase font size
                               border: InputBorder.none,
                               contentPadding: const EdgeInsets.all(16.0),
                             ),
+                            style: TextStyle(fontSize: 18), // Increase input text size
                           ),
                         ),
                         Spacer(), // Add spacer to push the button and version text to the bottom
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.end,
-                            children: [
-                              Container(
-                                width: double.infinity, // Full width
-                                decoration: BoxDecoration(
-                                  color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
-                                  borderRadius: BorderRadius.circular(8.0),
-                                ),
-                                child: ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.transparent,
-                                    shadowColor: Colors.transparent,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8.0),
-                                    ),
-                                  ),
-                                  onPressed: _getUserame,
-                                  child: const Text(
-                                    'Se connecter',
-                                    style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
-                                  ),
-                                ),
+                        Container(
+                          width: double.infinity, // Full width
+                          decoration: BoxDecoration(
+                            color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
+                            borderRadius: BorderRadius.circular(8.0),
+                          ),
+                          child: ElevatedButton(
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Colors.transparent,
+                              shadowColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
                               ),
-                              const SizedBox(height: 20), // Add margin below the button
-                              Align(
-                                alignment: Alignment.bottomRight,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 10.0, bottom: 10.0), // Add margin
-                                  child: Text(
-                                    'v${Config.APP_VERSION}',
-                                    style: const TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
+                            ),
+                            onPressed: _getUserame,
+                            child: const Text(
+                              'Se connecter',
+                              style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
+                            ),
                           ),
                         ),
+                        const SizedBox(height: 30), // Add margin below the button
                       ],
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: 10,
+            left: 0,
+            right: 0, // Center horizontally
+            child: Center(
+              child: Text(
+                'v${Config.APP_VERSION}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
               ),
             ),
           ),

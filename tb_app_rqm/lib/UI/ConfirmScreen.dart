@@ -24,7 +24,7 @@ class ConfirmScreen extends StatelessWidget {
         children: [
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 50.0), // Add margin
+              padding: const EdgeInsets.symmetric(horizontal: 40.0), // Add margin
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
@@ -57,9 +57,10 @@ class ConfirmScreen extends StatelessWidget {
                                 "Est-ce bien toi ?",
                                 style: TextStyle(fontSize: 20, color: Color(Config.COLOR_APP_BAR)),
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 16),
                               Text(
                                 name,
+                                textAlign: TextAlign.center, // Center the text
                                 style: const TextStyle(
                                     fontSize: 24, color: Color(Config.COLOR_APP_BAR), fontWeight: FontWeight.bold),
                               ),
@@ -105,13 +106,15 @@ class ConfirmScreen extends StatelessWidget {
                         const SizedBox(height: 10), // Add space between buttons
                         Container(
                           width: double.infinity, // Full width
+                          height: 50.0, // Set height to match the "Oui" button
                           decoration: BoxDecoration(
-                            color: Color(Config.COLOR_APP_BAR).withOpacity(1), // 100% opacity
+                            border: Border.all(
+                                color: Color(Config.COLOR_APP_BAR), width: 2.0), // Outline with COLOR_APP_BAR
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: ElevatedButton(
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
+                              backgroundColor: Colors.transparent, // Center transparent
                               shadowColor: Colors.transparent,
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
@@ -120,30 +123,32 @@ class ConfirmScreen extends StatelessWidget {
                             onPressed: () {
                               Navigator.pop(context);
                             },
-                            child: const Text(
-                              'Non',
-                              style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
-                            ),
-                          ),
-                        ),
-                        const SizedBox(height: 20), // Add margin below the buttons
-                        Align(
-                          alignment: Alignment.bottomRight,
-                          child: Padding(
-                            padding: const EdgeInsets.only(right: 10.0, bottom: 10.0), // Add margin
                             child: Text(
-                              'v${Config.APP_VERSION}',
-                              style: const TextStyle(
-                                fontSize: 12,
-                                color: Colors.grey,
-                              ),
+                              'Non',
+                              style: TextStyle(
+                                  color: Color(Config.COLOR_APP_BAR), fontSize: 20), // Text color in COLOR_APP_BAR
                             ),
                           ),
                         ),
+                        const SizedBox(height: 30), // Add margin below the button
                       ],
                     ),
                   ),
                 ],
+              ),
+            ),
+          ),
+          Positioned(
+            top: 10,
+            left: 0,
+            right: 0, // Center horizontally
+            child: Center(
+              child: Text(
+                'v${Config.APP_VERSION}',
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey,
+                ),
               ),
             ),
           ),
