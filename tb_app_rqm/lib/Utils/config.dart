@@ -1,9 +1,10 @@
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
+import 'package:package_info_plus/package_info_plus.dart'; // Ensure this import is present
 
 /// Class to manage the configuration of the application.
 class Config {
   // ------------------- Version----------------
-  static const String APP_VERSION = '1.0.0-beta.6';
+  static String _appVersion = 'Unknown';
   // ------------------- API -------------------
   static const String API_URL = 'api.rqm.duckdns.org';
   static const String API_COMMON_ADDRESS = '/app/measures/';
@@ -48,11 +49,17 @@ class Config {
   static const int COLOR_APP_BAR = 0xFF403c74;
   static const int COLOR_BUTTON = 0xFFFF9900;
   static const int COLOR_TITRE = 0xFFFFFFFF;
-  static const int COLOR_BACKGROUND = 0xFFf5f5f5;
+  static const int COLOR_BACKGROUND = 0xFFF0F0F0;
 
+  // ----------------- Constantes -----------------
   static const double CIRCUIT_SIZE = 5000.0; // Define the circuit size in meters
 
-  static String getAppVersion() {
-    return APP_VERSION;
+  /// Function to get the application version.
+  static Future<String> getAppVersion() async {
+    if (_appVersion == 'Unknown') {
+      PackageInfo packageInfo = await PackageInfo.fromPlatform();
+      _appVersion = '${packageInfo.version}+${packageInfo.buildNumber}';
+    }
+    return _appVersion;
   }
 }

@@ -4,10 +4,12 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:tb_app_rqm/API/DistanceController.dart';
-import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import 'Components/ProgressCard.dart';
 import 'Components/InfoCard.dart';
 import 'LoadingPage.dart';
+import 'Components/Dialog.dart';
+import 'Components/ActionButton.dart';
+import 'Components/TopAppBar.dart';
 
 import '../API/LoginController.dart';
 import '../API/MeasureController.dart';
@@ -36,7 +38,7 @@ class InfoScreen extends StatefulWidget {
 }
 
 /// State of the InfoScreen class.
-class _InfoScreenState extends State<InfoScreen> {
+class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateMixin {
   /// Timer to update the remaining time every second
   Timer? _timer;
 
@@ -76,6 +78,8 @@ class _InfoScreenState extends State<InfoScreen> {
 
   int? _tempsPerso;
 
+  final ScrollController _parentScrollController = ScrollController();
+
   void _showIconMenu(BuildContext context) {
     final List<IconData> icons = [
       Icons.face,
@@ -86,70 +90,18 @@ class _InfoScreenState extends State<InfoScreen> {
       Icons.face_6,
     ];
 
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return GestureDetector(
-          onTap: () => Navigator.pop(context),
-          child: Container(
-            color: Colors.black54, // Grey out the rest of the screen
-            child: Center(
-              child: Container(
-                width: MediaQuery.of(context).size.width * 0.8, // Make it 80% of the screen width
-                decoration: BoxDecoration(
-                  color: Colors.white, // Match the background color of the InfoCard
-                  borderRadius: BorderRadius.circular(16.0),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.1),
-                      spreadRadius: 2,
-                      blurRadius: 8,
-                      offset: Offset(0, 4),
-                    ),
-                  ],
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0), // Add padding around the content
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Align(
-                        alignment: Alignment.center,
-                        child: Text(
-                          'Choisis ton avatar !',
-                          style: TextStyle(
-                            fontSize: 16,
-                            color: Color(Config.COLOR_APP_BAR),
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 16),
-                      Wrap(
-                        alignment: WrapAlignment.start,
-                        spacing: 8.0,
-                        runSpacing: 8.0,
-                        children: icons.map((icon) {
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedIcon = icon;
-                              });
-                              Navigator.pop(context);
-                            },
-                            child: Padding(
-                              padding: const EdgeInsets.all(8.0),
-                              child: Icon(icon, size: 40, color: Color(Config.COLOR_APP_BAR)),
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ),
-          ),
-        );
+    final List<Widget> iconWidgets = icons.map((icon) {
+      return Icon(icon, size: 40, color: Color(Config.COLOR_APP_BAR));
+    }).toList();
+
+    CustomDialog.showCustomDialog(
+      context,
+      'Choisis ton avatar !',
+      iconWidgets,
+      (selectedItem) {
+        setState(() {
+          _selectedIcon = (selectedItem as Icon).icon!;
+        });
       },
     );
   }
@@ -348,10 +300,9 @@ class _InfoScreenState extends State<InfoScreen> {
 
   Widget _buildPageViewContent() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16.0), // Add padding to the left and right
+      padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding to the left and right
       child: Column(
         children: [
-          const SizedBox(height: 16),
           InfoCard(
             logo: GestureDetector(
               key: iconKey,
@@ -365,7 +316,7 @@ class _InfoScreenState extends State<InfoScreen> {
             title: 'N°$_dossard',
             data: '$_name',
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 24),
           InfoCard(
             logo: Image.asset(
               'assets/pictures/LogoSimple.png',
@@ -405,45 +356,40 @@ class _InfoScreenState extends State<InfoScreen> {
         setState(() {
           _currentPage = page;
         });
+        // Scroll to the top of the parent scroll view instantly when the page changes
+        _parentScrollController.jumpTo(0.0);
       },
       children: [
         _buildPageViewContent(),
-        Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.symmetric(horizontal: 16.0), // Add padding here
-                child: Column(
-                  children: [
-                    const SizedBox(height: 16),
-                    ProgressCard(
-                      title: 'Temps restant',
-                      value: _remainingTime,
-                      percentage: _calculateRemainingTimePercentage(),
-                      logo: Icon(Icons.timer_outlined),
-                    ),
-                    const SizedBox(height: 12),
-                    ProgressCard(
-                      title: 'Distance totale parcourue',
-                      value: '${_distanceTotale ?? 0} m',
-                      percentage: _calculateTotalDistancePercentage(),
-                      logo: Image.asset(
-                        'assets/pictures/LogoSimple.png',
-                        width: 32, // Adjust the width as needed
-                        height: 32, // Adjust the height as needed
-                      ),
-                    ),
-                    const SizedBox(height: 12),
-                    InfoCard(
-                      logo: Icon(Icons.people),
-                      title: 'Nombre de participants',
-                      data: '150',
-                    ),
-                  ],
+        Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding here
+          child: Column(
+            children: [
+              ProgressCard(
+                title: 'Temps restant',
+                value: _remainingTime,
+                percentage: _calculateRemainingTimePercentage(),
+                logo: Icon(Icons.timer_outlined),
+              ),
+              const SizedBox(height: 12),
+              ProgressCard(
+                title: 'Distance totale parcourue',
+                value: '${_distanceTotale ?? 0} m',
+                percentage: _calculateTotalDistancePercentage(),
+                logo: Image.asset(
+                  'assets/pictures/LogoSimple.png',
+                  width: 32, // Adjust the width as needed
+                  height: 32, // Adjust the height as needed
                 ),
               ),
-            ),
-          ],
+              const SizedBox(height: 12),
+              InfoCard(
+                logo: Icon(Icons.people),
+                title: 'Nombre de participants',
+                data: '150',
+              ),
+            ],
+          ),
         ),
       ],
     );
@@ -460,32 +406,22 @@ class _InfoScreenState extends State<InfoScreen> {
       },
       child: Scaffold(
         backgroundColor: const Color(Config.COLOR_BACKGROUND),
+        appBar: const TopAppBar(title: 'Informations', showInfoButton: true),
         body: Stack(
           children: [
             Container(
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  colors: [Color(Config.COLOR_BACKGROUND), Colors.white],
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
-                ),
-              ),
+              color: Color(Config.COLOR_BACKGROUND), // Set background color
             ),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
-                  const SizedBox(height: 20), // Add margin at the top
+                  const SizedBox(height: 30), // Add margin at the top
+                  // Remove the logo text from the screen
+                  // const SizedBox(height: 35), // Add margin below the logo
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 80.0), // Add margin for logo
-                    child: Center(
-                      child: Image(image: AssetImage('assets/pictures/LogoText.png')),
-                    ),
-                  ),
-                  const SizedBox(height: 35), // Add margin below the logo
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40.0), // Add margin
+                    padding: const EdgeInsets.symmetric(horizontal: 30.0), // Add margin
                     child: Text.rich(
                       TextSpan(
                         children: [
@@ -510,89 +446,65 @@ class _InfoScreenState extends State<InfoScreen> {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: 10), // Add margin below the title
+                  const SizedBox(height: 16),
                   Expanded(
                     flex: 12,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 30.0), // Adjust padding for PageView
+                      padding: const EdgeInsets.symmetric(horizontal: 22.0), // Adjust padding for PageView
                       child: SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            SizedBox(
-                              height: MediaQuery.of(context).size.height * 0.8, // Adjust height as needed
-                              child: _buildPageView(),
-                            ),
-                          ],
+                        controller: _parentScrollController,
+                        child: SizedBox(
+                          height: MediaQuery.of(context).size.height * 0.8, // Adjust height as needed
+                          child: _buildPageView(),
                         ),
                       ),
                     ),
                   ),
                   const Spacer(), // Add spacer to push the button to the bottom
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      for (int i = 0; i < 2; i++)
+                  Container(
+                    child: Column(
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            for (int i = 0; i < 2; i++)
+                              Container(
+                                margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                                width: 8.0,
+                                height: 8.0,
+                                decoration: BoxDecoration(
+                                  shape: BoxShape.circle,
+                                  color: _currentPage == i
+                                      ? Color(Config.COLOR_APP_BAR)
+                                      : Color(Config.COLOR_APP_BAR).withOpacity(0.1),
+                                ),
+                              ),
+                          ],
+                        ),
+                        const SizedBox(height: 16), // Add margin below the dots
                         Container(
-                          margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                          width: 8.0,
-                          height: 8.0,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: _currentPage == i
-                                ? Color(Config.COLOR_BUTTON)
-                                : Color(Config.COLOR_BUTTON).withOpacity(0.3),
+                          color: Colors.white, // Set background color to white
+                          child: Column(
+                            children: [
+                              const SizedBox(height: 12), // Add margin between dots and start button
+                              Padding(
+                                padding: const EdgeInsets.symmetric(horizontal: 30.0), // Add margin for Start button
+                                child: ActionButton(
+                                  icon: Icons.play_arrow_outlined,
+                                  text: 'START',
+                                  onPressed: () async {
+                                    _enabledStart ? await _startMeasure() : null;
+                                  },
+                                ),
+                              ),
+                              const SizedBox(height: 20), // Add margin below the button
+                            ],
                           ),
                         ),
-                    ],
-                  ),
-                  const SizedBox(height: 20), // Add margin below the dots
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 40.0), // Add margin for Start button
-                    child: Container(
-                      width: double.infinity, // Full width
-                      decoration: BoxDecoration(
-                        color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
-                        borderRadius: BorderRadius.circular(8.0),
-                      ),
-                      child: ElevatedButton(
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Colors.transparent,
-                          shadowColor: Colors.transparent,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                        ),
-                        onPressed: () async {
-                          _enabledStart ? await _startMeasure() : null;
-                        },
-                        child: const Text(
-                          'Start',
-                          style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
-                        ),
-                      ),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 30), // Add margin below the button
                 ],
-              ),
-            ),
-            Positioned(
-              top: 10,
-              right: 10,
-              child: IconButton(
-                icon: const Icon(color: Color(Config.COLOR_APP_BAR), Icons.logout),
-                onPressed: () {
-                  LoginController.logout().then((result) {
-                    if (result.hasError) {
-                      showInSnackBar("Please try again later");
-                    } else {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(builder: (context) => const Login()),
-                      );
-                    }
-                  });
-                },
               ),
             ),
           ],
