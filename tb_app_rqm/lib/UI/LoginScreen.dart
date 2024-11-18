@@ -8,9 +8,10 @@ import '../Data/DistPersoData.dart';
 import '../Data/DistTotaleData.dart';
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
-import 'InfoScreen.dart';
 import 'ConfirmScreen.dart';
 import 'LoadingPage.dart'; // Import the LoadingPage
+import 'Components/ActionButton.dart'; // Import the ActionButton
+import 'Components/HighlightPainter.dart'; // Import the HighlightPainter
 
 /// Class to display the login screen.
 /// This screen allows the user to enter his dossard number
@@ -24,7 +25,7 @@ class Login extends StatefulWidget {
 }
 
 /// State of the Login class.
-class _LoginState extends State<Login> {
+class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   /// Controller to get the dossard number entered by the user.
   final TextEditingController _controller = TextEditingController();
 
@@ -40,11 +41,36 @@ class _LoginState extends State<Login> {
   /// Boolean to check if the app is loading.
   bool _isLoading = false;
 
+  late AnimationController _animationController;
+  late Animation<double> _animation;
+
   @override
   void initState() {
     super.initState();
     DistTotaleData.saveDistTotale(20);
     DistPersoData.saveDistPerso(10);
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
+  void _onTextChanged() {
+    if (_controller.text.isNotEmpty) {
+      _animationController.forward();
+    } else {
+      _animationController.reverse();
+    }
   }
 
   /// Function to show a snackbar with the message [value].
@@ -105,20 +131,21 @@ class _LoginState extends State<Login> {
   @override
   Widget build(BuildContext context) {
     bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom != 0;
+    _controller.addListener(_onTextChanged);
     return Scaffold(
-      backgroundColor: const Color(Config.COLOR_BACKGROUND), // Set background color to light grey
+      backgroundColor: Colors.white, // Set background color to white
       body: Stack(
         children: [
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 40.0), // Add margin
+              padding: const EdgeInsets.symmetric(horizontal: 30.0), // Add margin
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
                   Flexible(
                     flex: 2,
-                    child: SizedBox(height: isKeyboardVisible ? 100 : 100),
+                    child: SizedBox(height: isKeyboardVisible ? 80 : 100),
                   ),
                   Visibility(
                     //visible: !isKeyboardVisible,
@@ -148,31 +175,37 @@ class _LoginState extends State<Login> {
                             fontWeight: FontWeight.bold, // Bold
                           ),
                         ),
-                        const SizedBox(height: 23), // Add small margin
-                        RichText(
-                          text: TextSpan(
-                            text: 'Entre ton ',
-                            style: const TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
-                            children: <TextSpan>[
-                              TextSpan(
-                                text: 'numéro de dossard',
-                                style: TextStyle(
-                                  fontSize: 20,
-                                  color: Color(Config.COLOR_APP_BAR), // Blue color
-                                  fontWeight: FontWeight.bold, // Bold
-                                ),
+                        const SizedBox(height: 20), // Add small margin
+                        Stack(
+                          children: [
+                            RichText(
+                              text: TextSpan(
+                                text: 'Entre ton ',
+                                style: const TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
+                                children: <TextSpan>[
+                                  TextSpan(
+                                    text: 'numéro de dossard',
+                                    style: TextStyle(
+                                      fontSize: 16, // Remove font size difference
+                                      color: Color(Config.COLOR_APP_BAR), // Blue color
+                                      fontWeight: FontWeight.bold, // Bold
+                                      background: Paint()
+                                        ..color = Color(Config.COLOR_BUTTON).withOpacity(0.2), // Highlight background
+                                    ),
+                                  ),
+                                  const TextSpan(
+                                    text: ' pour t\'identifier à l`évènement.',
+                                    style: TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
+                                  ),
+                                ],
                               ),
-                              const TextSpan(
-                                text: ' pour t\'identifier à l`évènement.',
-                                style: TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
-                              ),
-                            ],
-                          ),
+                            ),
+                          ],
                         ),
                         const SizedBox(height: 20), // Add small margin
                         Container(
                           decoration: BoxDecoration(
-                            color: Color(Config.COLOR_BUTTON).withOpacity(0.2),
+                            color: Color(Config.COLOR_BUTTON).withOpacity(0.15),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: TextField(
@@ -181,40 +214,45 @@ class _LoginState extends State<Login> {
                             inputFormatters: [
                               LengthLimitingTextInputFormatter(4),
                             ],
+                            textAlign: TextAlign.center, // Center the text horizontally
                             decoration: InputDecoration(
-                              hintText: '1 à 9999',
-                              hintStyle: TextStyle(
-                                  color: Color(Config.COLOR_BUTTON),
-                                  fontSize: 20), // Set placeholder color and increase font size
                               border: InputBorder.none,
-                              contentPadding: const EdgeInsets.all(16.0),
+                              contentPadding: const EdgeInsets.all(8.0),
                             ),
-                            style: TextStyle(fontSize: 18), // Increase input text size
+                            style: TextStyle(
+                              fontSize: 28,
+                              color: Color(Config.COLOR_APP_BAR), // Set input text color to APP_COLOR
+                              letterSpacing: 4.0, // Increase space between characters
+                            ),
+                          ),
+                        ),
+                        SizeTransition(
+                          sizeFactor: _animation,
+                          axis: Axis.horizontal,
+                          axisAlignment: -1.0,
+                          child: Container(
+                            margin: const EdgeInsets.only(top: 10),
+                            child: Text(
+                              '1 à 9999',
+                              style: TextStyle(
+                                color: Color(Config.COLOR_APP_BAR),
+                                fontSize: 14,
+                                fontWeight: FontWeight.bold,
+                                fontStyle: FontStyle.italic, // Use italic style
+                              ),
+                            ),
                           ),
                         ),
                         Spacer(), // Add spacer to push the button and version text to the bottom
                         Container(
                           width: double.infinity, // Full width
-                          decoration: BoxDecoration(
-                            color: Color(Config.COLOR_BUTTON).withOpacity(1), // 100% opacity
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          child: ElevatedButton(
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.transparent,
-                              shadowColor: Colors.transparent,
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                            ),
+                          child: ActionButton(
+                            icon: Icons.login, // Add connection icon
+                            text: 'Se connecter',
                             onPressed: _getUserame,
-                            child: const Text(
-                              'Se connecter',
-                              style: TextStyle(color: Colors.white, fontSize: 20), // Increase font size
-                            ),
                           ),
                         ),
-                        const SizedBox(height: 30), // Add margin below the button
+                        const SizedBox(height: 20), // Add margin below the button
                       ],
                     ),
                   ),
@@ -223,16 +261,24 @@ class _LoginState extends State<Login> {
             ),
           ),
           Positioned(
-            top: 10,
-            left: 0,
-            right: 0, // Center horizontally
+            top: 25,
+            left: 25,
             child: Center(
-              child: Text(
-                'v${Config.APP_VERSION}',
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: Colors.grey,
-                ),
+              child: FutureBuilder<String>(
+                future: Config.getAppVersion(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.done) {
+                    return Text(
+                      'v${snapshot.data}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey,
+                      ),
+                    );
+                  } else {
+                    return const CircularProgressIndicator();
+                  }
+                },
               ),
             ),
           ),
