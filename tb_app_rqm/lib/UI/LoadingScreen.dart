@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import '../Utils/config.dart';
 
-class LoadingPage extends StatelessWidget {
-  const LoadingPage({Key? key}) : super(key: key);
+class LoadingScreen extends StatelessWidget {
+  const LoadingScreen({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {

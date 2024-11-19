@@ -9,7 +9,7 @@ import '../Data/DistTotaleData.dart';
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
 import 'ConfirmScreen.dart';
-import 'LoadingPage.dart'; // Import the LoadingPage
+import 'LoadingScreen.dart'; // Import the LoadingScreen
 import 'Components/ActionButton.dart'; // Import the ActionButton
 import 'Components/HighlightPainter.dart'; // Import the HighlightPainter
 
@@ -91,7 +91,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const LoadingPage()), // Ensure LoadingPage is correctly referenced
+      MaterialPageRoute(builder: (context) => const LoadingScreen()), // Ensure LoadingScreen is correctly referenced
     );
 
     try {
@@ -189,8 +189,6 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                       fontSize: 16, // Remove font size difference
                                       color: Color(Config.COLOR_APP_BAR), // Blue color
                                       fontWeight: FontWeight.bold, // Bold
-                                      background: Paint()
-                                        ..color = Color(Config.COLOR_BUTTON).withOpacity(0.2), // Highlight background
                                     ),
                                   ),
                                   const TextSpan(
