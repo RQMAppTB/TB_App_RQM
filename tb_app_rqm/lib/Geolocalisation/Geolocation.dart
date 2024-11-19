@@ -8,6 +8,7 @@ import 'package:tb_app_rqm/API/MeasureController.dart';
 import 'package:tb_app_rqm/Data/DistToSendData.dart';
 import 'package:tb_app_rqm/Data/TimeData.dart';
 import 'package:tb_app_rqm/Utils/config.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 class Geolocation {
   /// StreamSubscription to save the position stream and manipulate it
@@ -43,7 +44,7 @@ class Geolocation {
 
   Stream<int> get stream => _streamController.stream;
 
-  /// Handle the permission to access the location
+  /// Handle the permission to access the location and post notifications
   static Future<bool> handlePermission() async {
     final geo.GeolocatorPlatform _geolocatorPlatform = geo.GeolocatorPlatform.instance;
     bool serviceEnabled;
@@ -62,6 +63,16 @@ class Geolocation {
       if (permission == geo.LocationPermission.denied) {
         return false;
       }
+    }
+
+    // Request notification permission
+    PermissionStatus notificationStatus = await Permission.notification.request();
+
+    // Check if notification permissions is granted
+    if (notificationStatus.isGranted) {
+      return true;
+    } else {
+      return false;
     }
 
     // Check if the permission is denied forever
@@ -84,6 +95,7 @@ class Geolocation {
             notificationTitle: "Running in Background",
             enableWakeLock: true,
             notificationIcon: geo.AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
+            setOngoing: true,
           ));
     } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
       return geo.AppleSettings(
