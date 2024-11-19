@@ -94,7 +94,7 @@ class Geolocation {
             notificationText: "Pas de panique, c'est la RQM qui vous suit!",
             notificationTitle: "Running in Background",
             enableWakeLock: false,
-            // notificationIcon: geo.AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
+            notificationIcon: geo.AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
             setOngoing: true,
           ));
     } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
