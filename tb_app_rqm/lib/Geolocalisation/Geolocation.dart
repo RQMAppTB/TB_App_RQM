@@ -68,7 +68,7 @@ class Geolocation {
     // Request notification permission
     PermissionStatus notificationStatus = await Permission.notification.request();
 
-    // Check if both permissions are granted
+    // Check if notification permissions is granted
     if (notificationStatus.isGranted) {
       return true;
     } else {
