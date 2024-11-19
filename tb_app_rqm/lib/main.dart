@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'RQM application',
+      title: 'LRQM APP',
       theme: ThemeData(
         fontFamily: 'Roboto', // Ensure the default font family is set to Poppins
       ),
