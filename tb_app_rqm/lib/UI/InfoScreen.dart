@@ -6,10 +6,11 @@ import 'package:flutter/material.dart';
 import 'package:lrqm/API/DistanceController.dart';
 import 'Components/ProgressCard.dart';
 import 'Components/InfoCard.dart';
-import 'LoadingPage.dart';
+import 'LoadingScreen.dart';
 import 'Components/Dialog.dart';
 import 'Components/ActionButton.dart';
 import 'Components/TopAppBar.dart';
+import 'SetupPosScreen.dart'; // Add this import
 
 import '../API/LoginController.dart';
 import '../API/MeasureController.dart';
@@ -17,11 +18,8 @@ import '../Data/DistPersoData.dart';
 import '../Data/DistTotaleData.dart';
 import '../Data/DossardData.dart';
 import '../Data/NameData.dart';
-import '../Geolocalisation/Geolocation.dart';
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
-import 'ConfigScreen.dart';
-import 'LoginScreen.dart';
 import '../Data/NbPersonData.dart';
 import '../Data/TimeData.dart';
 
@@ -184,18 +182,6 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
       _enabledStart = false;
       _remainingTime = "L'évènement ${DateTime.now().isAfter(end) ? "est terminé" : "n'a pas encore commencé"} !";
     } else {
-      Geolocation.handlePermission().then((value) {
-        if (!value) {
-          log('Location permission not granted');
-          exit(0);
-        } else {
-          log('Location permission granted');
-        }
-      }).onError((error, stackTrace) {
-        log('Error: $error');
-        exit(0);
-      });
-
       _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
     }
 
@@ -244,58 +230,6 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
     log("Dispose");
     _timer?.cancel();
     super.dispose();
-  }
-
-  /// Function to go to the configuration screen
-  Future<void> _startMeasure() async {
-    log("Start measure");
-    setState(() {
-      _enabledStart = false;
-    });
-
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (BuildContext context) {
-        return const LoadingPage();
-      },
-    );
-
-    bool canStartNewMeasure = true;
-    if (await MeasureController.isThereAMeasure()) {
-      Result result = await MeasureController.stopMeasure();
-      canStartNewMeasure = !result.hasError;
-    }
-
-    log("Can start new measure: $canStartNewMeasure");
-
-    if (await Geolocation.handlePermission()) {
-      log("1");
-      if (await Geolocation().isInZone()) {
-        log("2");
-        if (canStartNewMeasure) {
-          log("3");
-          Navigator.pop(context); // Close the loading dialog
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ConfigScreen()),
-          );
-        }
-      } else {
-        Navigator.pop(context); // Close the loading dialog
-        showInSnackBar("Vous n'êtes pas dans la zone");
-        log("You are not in the zone");
-      }
-    } else {
-      Navigator.pop(context); // Close the loading dialog
-      showInSnackBar("Vous n'avez pas autorisé la localisation");
-      log("You did not allow location");
-    }
-
-    log("4");
-    setState(() {
-      _enabledStart = true;
-    });
   }
 
   Widget _buildPageViewContent() {
@@ -483,7 +417,9 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
                         ),
                         const SizedBox(height: 16), // Add margin below the dots
                         Container(
-                          color: Colors.white, // Set background color to white
+                          decoration: BoxDecoration(
+                            color: Colors.white, // Set background color to white
+                          ),
                           child: Column(
                             children: [
                               const SizedBox(height: 12), // Add margin between dots and start button
@@ -492,8 +428,11 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
                                 child: ActionButton(
                                   icon: Icons.play_arrow_outlined,
                                   text: 'START',
-                                  onPressed: () async {
-                                    _enabledStart ? await _startMeasure() : null;
+                                  onPressed: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) => const SetupPosScreen()),
+                                    );
                                   },
                                 ),
                               ),

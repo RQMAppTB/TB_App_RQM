@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:simple_circular_progress_bar/simple_circular_progress_bar.dart';
 import '../../Utils/config.dart';
-import 'HighlightPainter.dart';
 
 class ProgressCard extends StatefulWidget {
   final String title;
@@ -71,11 +70,6 @@ class _ProgressCardState extends State<ProgressCard> {
                       const SizedBox(height: 8),
                       Stack(
                         children: [
-                          Positioned.fill(
-                            child: CustomPaint(
-                              painter: HighlightPainter(),
-                            ),
-                          ),
                           Text(
                             widget.value,
                             style: const TextStyle(
