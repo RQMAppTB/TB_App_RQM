@@ -93,7 +93,7 @@ class Geolocation {
           foregroundNotificationConfig: const geo.ForegroundNotificationConfig(
             notificationText: "Pas de panique, c'est la RQM qui vous suit!",
             notificationTitle: "Running in Background",
-            enableWakeLock: false,
+            enableWakeLock: true,
             notificationIcon: geo.AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
             setOngoing: true,
           ));
