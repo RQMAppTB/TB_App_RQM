@@ -2,9 +2,9 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:tb_app_rqm/API/MeasureController.dart';
-import 'package:tb_app_rqm/UI/InfoScreen.dart';
-import 'package:tb_app_rqm/Utils/config.dart';
+import 'package:lrqm/API/MeasureController.dart';
+import 'package:lrqm/UI/InfoScreen.dart';
+import 'package:lrqm/Utils/config.dart';
 
 import '../Geolocalisation/Geolocation.dart';
 

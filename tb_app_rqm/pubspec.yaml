@@ -1,5 +1,5 @@
-name: tb_app_rqm
-description: "A new Flutter project."
+name: lrqm
+description: "La roue qui marche asso app"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+7
+version: 1.0.0+8
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -54,9 +54,10 @@ dev_dependencies:
   flutter_lints: ^3.0.0
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
-  image_path: "assets/pictures/LogoSimple.png"
+  image_path: "assets/pictures/LogoSimpleSquare.png"
+  image_path_android: "assets/pictures/LogoSimpleSquare.png"
   min_sdk_android: 21
 
 # For information on the generic Dart part of this file, see the
@@ -73,6 +74,7 @@ flutter:
   # Image of the logo as text and as a simple image
   assets:
     - assets/pictures/LogoSimple.png
+    - assets/pictures/LogoSimpleSquare.png
     - assets/pictures/LogoText.png
     - assets/pictures/LogoTextAnimated.gif
     - assets/pictures/LogoSimpleAnimated.gif
@@ -89,6 +91,17 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
   # fonts:
   #   - family: Schyler
   #     fonts:

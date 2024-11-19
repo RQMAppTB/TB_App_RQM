@@ -10,7 +10,7 @@ class DiscardButton extends StatelessWidget {
     Key? key,
     required this.text,
     required this.onPressed,
-    this.icon,
+    this.icon = Icons.close, // Default icon set to close
   }) : super(key: key);
 
   @override

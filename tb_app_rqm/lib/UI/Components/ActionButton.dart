@@ -8,7 +8,7 @@ class ActionButton extends StatelessWidget {
 
   const ActionButton({
     Key? key,
-    this.icon,
+    this.icon = Icons.check, // Default icon set to check
     required this.text,
     required this.onPressed,
   }) : super(key: key);

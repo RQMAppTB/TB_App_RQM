@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:tb_app_rqm/Data/DossardData.dart';
-import 'package:tb_app_rqm/UI/InfoScreen.dart';
-import 'package:tb_app_rqm/UI/LoginScreen.dart';
+import 'package:lrqm/Data/DossardData.dart';
+import 'package:lrqm/UI/InfoScreen.dart';
+import 'package:lrqm/UI/LoginScreen.dart';
 
 import 'Data/NameData.dart';
 
@@ -10,11 +10,25 @@ void main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
   /// Check if there are a name and a dossard number saved in the shared preferences
-  final bool _isLoggedIn = await NameData.doesNameExist() && await DossardData.doesDossardExist();
+  final bool isLoggedIn = await NameData.doesNameExist() && await DossardData.doesDossardExist();
 
   /// Run the application
-  runApp(MaterialApp(
-    title: 'RQM application',
-    home: _isLoggedIn ? const InfoScreen() : const Login(),
-  ));
+  runApp(MyApp(isLoggedIn: isLoggedIn));
+}
+
+class MyApp extends StatelessWidget {
+  final bool isLoggedIn;
+
+  MyApp({required this.isLoggedIn});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'LRQM APP',
+      theme: ThemeData(
+        fontFamily: 'Roboto', // Ensure the default font family is set to Poppins
+      ),
+      home: isLoggedIn ? const InfoScreen() : const Login(),
+    );
+  }
 }

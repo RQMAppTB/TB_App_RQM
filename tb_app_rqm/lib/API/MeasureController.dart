@@ -1,7 +1,7 @@
 import 'dart:convert';
 import 'dart:developer';
 
-import 'package:tb_app_rqm/Data/DistToSendData.dart';
+import 'package:lrqm/Data/DistToSendData.dart';
 
 import '../Utils/Result.dart';
 import '../Data/NbPersonData.dart';

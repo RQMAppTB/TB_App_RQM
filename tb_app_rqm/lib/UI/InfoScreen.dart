@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
-import 'package:tb_app_rqm/API/DistanceController.dart';
+import 'package:lrqm/API/DistanceController.dart';
 import 'Components/ProgressCard.dart';
 import 'Components/InfoCard.dart';
 import 'LoadingPage.dart';
