@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
-import 'package:tb_app_rqm/API/MeasureController.dart';
-import 'package:tb_app_rqm/Data/DistToSendData.dart';
-import 'package:tb_app_rqm/Data/TimeData.dart';
-import 'package:tb_app_rqm/Utils/config.dart';
+import 'package:lrqm/API/MeasureController.dart'; // Correct package name
+import 'package:lrqm/Data/DistToSendData.dart'; // Correct package name
+import 'package:lrqm/Data/TimeData.dart'; // Correct package name
+import 'package:lrqm/Utils/config.dart'; // Correct package name
+import 'package:flutter/foundation.dart'; // Add this import
 
 class Geolocation {
   /// StreamSubscription to save the position stream and manipulate it
