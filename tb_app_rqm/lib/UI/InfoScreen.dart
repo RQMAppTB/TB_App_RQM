@@ -173,6 +173,10 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
     return (_distanceTotale ?? 0) / targetDistance * 100;
   }
 
+  String _formatDistance(int distance) {
+    return distance.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}\'');
+  }
+
   @override
   void initState() {
     super.initState();
@@ -258,11 +262,9 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
               height: 32, // Adjust the height as needed
             ),
             title: 'Distance parcourue',
-            data: '${_distancePerso ?? 0} mètres',
+            data: '${_formatDistance(_distancePerso ?? 0)} mètres',
             additionalDetails:
                 "C'est ${((_distancePerso ?? 0) / Config.CIRCUIT_SIZE).toStringAsFixed(1)} fois le tour du circuit, continue comme ça !",
-            progressValue: double.parse(
-                ((_distancePerso ?? 0) / Config.CIRCUIT_SIZE).toStringAsFixed(1)), // Progress based on circuit size
           ),
           const SizedBox(height: 12),
           InfoCard(
@@ -308,7 +310,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
               const SizedBox(height: 12),
               ProgressCard(
                 title: 'Distance totale parcourue',
-                value: '${_distanceTotale ?? 0} m',
+                value: '${_formatDistance(_distanceTotale ?? 0)} m',
                 percentage: _calculateTotalDistancePercentage(),
                 logo: Image.asset(
                   'assets/pictures/LogoSimple.png',
