@@ -57,9 +57,10 @@ dev_dependencies:
 flutter_launcher_icons:
   android: true
   ios: true
-  image_path: "assets/pictures/LogoSimpleSquare.png"
-  image_path_android: "assets/pictures/LogoSimpleSquare.png"
+  image_path: "assets/pictures/LauncherLogo.png"
   min_sdk_android: 21
+  adaptive_icon_background: "#FF9900" # use a solid color
+  adaptive_icon_foreground: "assets/pictures/LauncherLogo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -80,6 +81,7 @@ flutter:
     - assets/pictures/LogoTextAnimated.gif
     - assets/pictures/LogoSimpleAnimated.gif
     - assets/pictures/question.png
+    - assets/pictures/LauncherLogo.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

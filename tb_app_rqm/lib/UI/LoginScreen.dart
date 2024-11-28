@@ -41,37 +41,19 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   /// Boolean to check if the app is loading.
   bool _isLoading = false;
 
-  late AnimationController _animationController;
-  late Animation<double> _animation;
-
   @override
   void initState() {
     super.initState();
     DistTotaleData.saveDistTotale(20);
     DistPersoData.saveDistPerso(10);
-    _animationController = AnimationController(
-      duration: const Duration(milliseconds: 300),
-      vsync: this,
-    );
-    _animation = CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOut,
-    );
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
     super.dispose();
   }
 
-  void _onTextChanged() {
-    if (_controller.text.isNotEmpty) {
-      _animationController.forward();
-    } else {
-      _animationController.reverse();
-    }
-  }
+  void _onTextChanged() {}
 
   /// Function to show a snackbar with the message [value].
   void showInSnackBar(String value) {
@@ -224,20 +206,15 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        SizeTransition(
-                          sizeFactor: _animation,
-                          axis: Axis.horizontal,
-                          axisAlignment: -1.0,
-                          child: Container(
-                            margin: const EdgeInsets.only(top: 10),
-                            child: Text(
-                              '1 à 9999',
-                              style: TextStyle(
-                                color: Color(Config.COLOR_APP_BAR),
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                fontStyle: FontStyle.italic, // Use italic style
-                              ),
+                        Container(
+                          margin: const EdgeInsets.only(top: 10),
+                          child: Text(
+                            '1 à 9999',
+                            style: TextStyle(
+                              color: Color(Config.COLOR_APP_BAR),
+                              fontSize: 14,
+                              fontWeight: FontWeight.bold,
+                              fontStyle: FontStyle.italic, // Use italic style
                             ),
                           ),
                         ),

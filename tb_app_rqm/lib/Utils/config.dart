@@ -52,7 +52,7 @@ class Config {
   static const int COLOR_BACKGROUND = 0xFFF0F0F0;
 
   // ----------------- Constantes -----------------
-  static const double CIRCUIT_SIZE = 5000.0; // Define the circuit size in meters
+  static const double CIRCUIT_SIZE = 3500.0; // Define the circuit size in meters
 
   /// Function to get the application version.
   static Future<String> getAppVersion() async {
