@@ -49,7 +49,11 @@ class _InfoCardState extends State<InfoCard> {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white, // Set the background color to white
+          gradient: LinearGradient(
+            colors: [Colors.white, Colors.grey.shade200],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
           borderRadius: BorderRadius.circular(16.0),
           boxShadow: [
             BoxShadow(
