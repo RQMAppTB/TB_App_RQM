@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import '../../Utils/config.dart';
 
-class ParticipantCard extends StatelessWidget {
+class TapCard extends StatelessWidget {
   final Widget logo;
   final String text;
   final VoidCallback onTap;
   final bool isSelected; // Add isSelected property
 
-  const ParticipantCard({
+  const TapCard({
     super.key,
     required this.logo,
     required this.text,
@@ -23,7 +23,7 @@ class ParticipantCard extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           color: isSelected ? Color(Config.COLOR_BUTTON) : Colors.white, // Change background color if selected
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: BorderRadius.circular(32.0),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),

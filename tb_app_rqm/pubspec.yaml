@@ -84,6 +84,7 @@ flutter:
     - assets/pictures/LauncherLogo.png
     - assets/pictures/DrawPosition-removebg.png
     - assets/pictures/DrawTeam-removebg.png
+    - assets/pictures/DrawScan-removebg.png
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

@@ -35,6 +35,7 @@ class Config {
 
   // ----------------- Constantes -----------------
   static const double CIRCUIT_SIZE = 3500.0; // Define the circuit size in meters
+  static const int TARGET_DISTANCE = 2000000; // Define the target total distance in meters
 
   /// Function to get the application version.
   static Future<String> getAppVersion() async {

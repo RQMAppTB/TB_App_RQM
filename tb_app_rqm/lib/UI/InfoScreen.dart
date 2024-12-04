@@ -9,6 +9,8 @@ import 'Components/Dialog.dart';
 import 'Components/ActionButton.dart';
 import 'Components/TopAppBar.dart';
 import 'SetupPosScreen.dart'; // Add this import
+import 'package:lrqm/Data/DataManagement.dart';
+import 'package:lrqm/Data/Session.dart';
 
 import '../Data/DistPersoData.dart';
 import '../Data/DistTotaleData.dart';
@@ -18,6 +20,8 @@ import '../Utils/Result.dart';
 import '../Utils/config.dart';
 import '../Data/NbPersonData.dart';
 import '../Data/TimeData.dart';
+import '../Geolocalisation/Geolocation.dart';
+import 'Components/DiscardButton.dart';
 
 /// Class to display the information screen.
 /// This screen displays the remaining time before the end of the event,
@@ -71,9 +75,14 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
 
   final ScrollController _parentScrollController = ScrollController();
 
+  bool _isSessionActive = false;
+  Geolocation _geolocation = Geolocation();
+  int _distance = 0;
+
   void _showIconMenu(BuildContext context) {
     final List<IconData> icons = [
       Icons.face,
+      Icons.face_2,
       Icons.face_2,
       Icons.face_3,
       Icons.face_4,
@@ -159,9 +168,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
 
   /// Function to calculate the percentage of total distance
   double _calculateTotalDistancePercentage() {
-    // Assuming 2000000 meters (2M meters) as the target total distance for the event
-    const int targetDistance = 2000000;
-    return (_distanceTotale ?? 0) / targetDistance * 100;
+    return (_distanceTotale ?? 0) / Config.TARGET_DISTANCE * 100;
   }
 
   String _formatDistance(int distance) {
@@ -171,6 +178,31 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
   @override
   void initState() {
     super.initState();
+
+    // Check if a session is ongoing
+    Session.isStarted().then((isOngoing) {
+      if (isOngoing) {
+        setState(() {
+          _isSessionActive = true;
+        });
+        _geolocation.stream.listen((event) {
+          log("Stream event: $event");
+          if (event == -1) {
+            log("Stream event: $event");
+            _geolocation.stopListening();
+            Session.stopSession();
+            setState(() {
+              _isSessionActive = false;
+            });
+          } else {
+            setState(() {
+              _distance = event;
+            });
+          }
+        });
+        _geolocation.startListening();
+      }
+    });
 
     // Check if the event has started or ended
     if (DateTime.now().isAfter(end) || DateTime.now().isBefore(start)) {
@@ -223,7 +255,76 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
   void dispose() {
     log("Dispose");
     _timer?.cancel();
+    _geolocation.stopListening();
     super.dispose();
+  }
+
+  /// Function to refresh all values
+  void _refreshValues() {
+    // Get the total distance
+    _getValue(DistanceController.getTotalDistance, DistTotaleData.getDistTotale).then((value) => setState(() {
+          _distanceTotale = value;
+        }));
+
+    // Get the personal distance
+    _getValue(DistanceController.getPersonalDistance, DistPersoData.getDistPerso).then((value) => setState(() {
+          _distancePerso = value;
+        }));
+
+    // Get the dossard number
+    DossardData.getDossard().then((value) => setState(() {
+          _dossard = value.toString().padLeft(4, '0');
+        }));
+
+    // Get the name of the user
+    NameData.getName().then((value) => setState(() {
+          _name = value;
+        }));
+
+    // Get the number of participants
+    NbPersonData.getNbPerson().then((value) => setState(() {
+          _numberOfParticipants = value;
+        }));
+
+    // Get the time spent on the track
+    TimeData.getTime().then((value) => setState(() {
+          _tempsPerso = value;
+        }));
+  }
+
+  void _confirmStopSession(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: const Text('Confirmation'),
+          content: const Text('Arréter la session en cours ?'),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Non'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: const Text('Oui'),
+              onPressed: () async {
+                try {
+                  await Session.stopSession();
+                } catch (e) {
+                  await Session.forceStopSession();
+                }
+                setState(() {
+                  _isSessionActive = false;
+                });
+                _refreshValues(); // Refresh values after stopping the session
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   Widget _buildPageViewContent() {
@@ -248,14 +349,14 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
           const SizedBox(height: 24),
           InfoCard(
             logo: Image.asset(
-              'assets/pictures/LogoSimple.png',
-              width: 32, // Adjust the width as needed
-              height: 32, // Adjust the height as needed
+              _isSessionActive ? 'assets/pictures/LogoSimpleAnimated.gif' : 'assets/pictures/LogoSimple.png',
+              width: _isSessionActive ? 40 : 32, // Adjust the width as needed
+              height: _isSessionActive ? 40 : 32, // Adjust the height as needed
             ),
             title: 'Distance parcourue',
-            data: '${_formatDistance(_distancePerso ?? 0)} mètres',
+            data: '${_formatDistance(_isSessionActive ? _distance : (_distancePerso ?? 0))} mètres',
             additionalDetails:
-                "C'est ${((_distancePerso ?? 0) / Config.CIRCUIT_SIZE).toStringAsFixed(1)} fois le tour du circuit, continue comme ça !",
+                "C'est ${((_isSessionActive ? _distance : (_distancePerso ?? 0)) / Config.CIRCUIT_SIZE).toStringAsFixed(1)} fois le tour du circuit, continue comme ça !",
           ),
           const SizedBox(height: 12),
           InfoCard(
@@ -418,16 +519,24 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
                           children: [
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 30.0), // Add margin for Start button
-                              child: ActionButton(
-                                icon: Icons.play_arrow_outlined,
-                                text: 'START',
-                                onPressed: () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(builder: (context) => const SetupPosScreen()),
-                                  );
-                                },
-                              ),
+                              child: _isSessionActive
+                                  ? DiscardButton(
+                                      text: 'STOP',
+                                      icon: Icons.stop, // Pass the icon parameter
+                                      onPressed: () {
+                                        _confirmStopSession(context);
+                                      },
+                                    )
+                                  : ActionButton(
+                                      icon: Icons.play_arrow_outlined,
+                                      text: 'START',
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(builder: (context) => const SetupPosScreen()),
+                                        );
+                                      },
+                                    ),
                             ),
                             const SizedBox(height: 20), // Add margin below the button
                           ],

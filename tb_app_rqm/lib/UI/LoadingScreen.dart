@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import '../Utils/config.dart';
 
 class LoadingScreen extends StatelessWidget {
-  const LoadingScreen({super.key});
+  final String? text;
+
+  const LoadingScreen({super.key, this.text});
 
   @override
   Widget build(BuildContext context) {
@@ -13,9 +15,27 @@ class LoadingScreen extends StatelessWidget {
           Positioned.fill(
             child: Align(
               alignment: Alignment.center,
-              child: Image.asset(
-                'assets/pictures/LogoSimpleAnimated.gif',
-                width: 60.0, // Set width to 50px
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Image.asset(
+                    'assets/pictures/LogoSimpleAnimated.gif',
+                    width: 60.0, // Set width to 50px
+                  ),
+                  if (text != null) ...[
+                    const SizedBox(height: 32),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0), // Add padding
+                      child: Text(
+                        text!,
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Color(Config.COLOR_APP_BAR),
+                        ),
+                      ),
+                    ),
+                  ],
+                ],
               ),
             ),
           ),

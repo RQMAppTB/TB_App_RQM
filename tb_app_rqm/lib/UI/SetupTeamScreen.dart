@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import '../Utils/config.dart';
 import 'Components/InfoCard.dart';
 import 'Components/ActionButton.dart';
-import 'ConfigScreen.dart';
+import 'SetupScanScreen.dart';
 import 'LoadingScreen.dart';
-import 'Components/ParticipantCard.dart';
+import 'Components/TapCard.dart';
+import 'Components/ActionButton.dart';
 
 class SetupTeamScreen extends StatefulWidget {
   const SetupTeamScreen({super.key});
@@ -18,18 +19,15 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
   bool _isLoading = false;
   int _selectedParticipants = 0;
 
-  void _navigateToConfigScreen() async {
+  void _navigateToSetupScanScreen() async {
     setState(() {
       _isLoading = true;
     });
 
-    // Simulate some async operation
-    await Future.delayed(const Duration(seconds: 2));
-
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ConfigScreen(nbParticipants: _selectedParticipants),
+        builder: (context) => SetupScanScreen(nbParticipants: _selectedParticipants),
       ),
     );
 
@@ -97,28 +95,28 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
                             padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding to the left and right
                             child: Column(
                               children: [
-                                ParticipantCard(
+                                TapCard(
                                   logo: Icon(Icons.looks_one, size: 32),
                                   text: "Je pars en solo",
                                   onTap: () => _selectParticipants(1),
                                   isSelected: _selectedParticipants == 1,
                                 ),
                                 const SizedBox(height: 12),
-                                ParticipantCard(
+                                TapCard(
                                   logo: Icon(Icons.looks_two, size: 32),
                                   text: "On fait la paire",
                                   onTap: () => _selectParticipants(2),
                                   isSelected: _selectedParticipants == 2,
                                 ),
                                 const SizedBox(height: 12),
-                                ParticipantCard(
+                                TapCard(
                                   logo: Icon(Icons.looks_3, size: 32),
                                   text: "On se lance en triplettte",
                                   onTap: () => _selectParticipants(3),
                                   isSelected: _selectedParticipants == 3,
                                 ),
                                 const SizedBox(height: 12),
-                                ParticipantCard(
+                                TapCard(
                                   logo: Icon(Icons.looks_4, size: 32),
                                   text: "La monstre équipe",
                                   onTap: () => _selectParticipants(4),
@@ -133,11 +131,12 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
                     ),
                   ),
                   const Spacer(),
-                  ActionButton(
-                    icon: Icons.arrow_forward,
-                    text: 'Suivant',
-                    onPressed: _navigateToConfigScreen,
-                  ),
+                  if (_selectedParticipants > 0 && _selectedParticipants < 5)
+                    ActionButton(
+                      icon: Icons.arrow_forward,
+                      text: 'Suivant',
+                      onPressed: _navigateToSetupScanScreen,
+                    ),
                   const SizedBox(height: 20),
                 ],
               ),
