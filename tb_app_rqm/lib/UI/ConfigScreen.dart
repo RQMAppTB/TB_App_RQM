@@ -12,7 +12,9 @@ import 'WorkingScreen.dart';
 /// This screen allows the user to configure the number of participants
 /// and start the measure by scanning a QR code.
 class ConfigScreen extends StatefulWidget {
-  const ConfigScreen({super.key});
+  final int nbParticipants;
+
+  const ConfigScreen({super.key, required this.nbParticipants});
 
   @override
   State<ConfigScreen> createState() => _ConfigScreenState();
@@ -20,9 +22,6 @@ class ConfigScreen extends StatefulWidget {
 
 /// State of the ConfigScreen class.
 class _ConfigScreenState extends State<ConfigScreen> {
-  /// Number of participants
-  int _nbParticipants = 1;
-
   /// Instance of the MobileScannerController class
   final MobileScannerController controller = MobileScannerController(
     torchEnabled: false,
@@ -50,7 +49,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
       barrierDismissible: false, // user must tap button!
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Vous êtes $_nbParticipants participants'),
+          title: Text('Vous êtes ${widget.nbParticipants} participants'),
           content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
@@ -62,8 +61,8 @@ class _ConfigScreenState extends State<ConfigScreen> {
             TextButton(
               child: const Text('Oui'),
               onPressed: () {
-                NbPersonData.saveNbPerson(_nbParticipants);
-                MeasureController.startMeasure(_nbParticipants).then((result) {
+                NbPersonData.saveNbPerson(widget.nbParticipants);
+                MeasureController.startMeasure(widget.nbParticipants).then((result) {
                   log("Result: $result");
                   if (result.error != null) {
                     ScaffoldMessenger.of(context).showSnackBar(
@@ -100,28 +99,6 @@ class _ConfigScreenState extends State<ConfigScreen> {
     );
   }
 
-  /// Function to add a participant
-  /// This function increments the number of participants
-  /// by one as long as the number of participants is less than 4
-  void addParticipant() {
-    if (_nbParticipants < 4) {
-      setState(() {
-        _nbParticipants++;
-      });
-    }
-  }
-
-  /// Function to remove a participant
-  /// This function decrements the number of participants
-  /// by one as long as the number of participants is greater than 1
-  void removeParticipant() {
-    if (_nbParticipants > 1) {
-      setState(() {
-        _nbParticipants--;
-      });
-    }
-  }
-
   @override
   void dispose() {
     super.dispose();
@@ -144,7 +121,7 @@ class _ConfigScreenState extends State<ConfigScreen> {
               centerTitle: true,
               title: GestureDetector(
                 onDoubleTap: () {
-                  _handleBarcode(BarcodeCapture(barcodes: [Barcode(displayValue: Config.QR_CODE_S_VALUE)]));
+                  _handleBarcode(const BarcodeCapture(barcodes: [Barcode(displayValue: Config.QR_CODE_S_VALUE)]));
                 },
                 child: const Text(
                   'Config',
@@ -161,28 +138,6 @@ class _ConfigScreenState extends State<ConfigScreen> {
                     onDetect: _handleBarcode,
                     controller: controller,
                     fit: BoxFit.contain,
-                  ),
-                ),
-                Expanded(
-                  child: Center(
-                    child: Column(children: <Widget>[
-                      const Padding(padding: EdgeInsets.all(10.0)),
-                      const Text('Combien de personnes participent ?'),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: <Widget>[
-                          IconButton(
-                            onPressed: removeParticipant,
-                            icon: const Icon(Icons.remove),
-                          ),
-                          Text('$_nbParticipants'),
-                          IconButton(
-                            onPressed: addParticipant,
-                            icon: const Icon(Icons.add),
-                          ),
-                        ],
-                      ),
-                    ]),
                   ),
                 ),
               ],

@@ -1,19 +1,15 @@
 import 'dart:async';
 import 'dart:developer';
-import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'package:lrqm/API/DistanceController.dart';
 import 'Components/ProgressCard.dart';
 import 'Components/InfoCard.dart';
-import 'LoadingScreen.dart';
 import 'Components/Dialog.dart';
 import 'Components/ActionButton.dart';
 import 'Components/TopAppBar.dart';
 import 'SetupPosScreen.dart'; // Add this import
 
-import '../API/LoginController.dart';
-import '../API/MeasureController.dart';
 import '../Data/DistPersoData.dart';
 import '../Data/DistTotaleData.dart';
 import '../Data/DossardData.dart';
@@ -64,9 +60,6 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
   /// Number of participants
   int? _numberOfParticipants;
 
-  /// Boolean to check if the start button is enabled
-  bool _enabledStart = true;
-
   int _currentPage = 0;
   final PageController _pageController = PageController();
 
@@ -89,7 +82,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
     ];
 
     final List<Widget> iconWidgets = icons.map((icon) {
-      return Icon(icon, size: 40, color: Color(Config.COLOR_APP_BAR));
+      return Icon(icon, size: 40, color: const Color(Config.COLOR_APP_BAR));
     }).toList();
 
     CustomDialog.showCustomDialog(
@@ -106,7 +99,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
 
   /// Function to show a snackbar with the message [value]
   void showInSnackBar(String value) {
-    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: new Text(value)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
   }
 
   /// Function to update the remaining time every second
@@ -116,13 +109,11 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
     if (remaining.isNegative) {
       _timer?.cancel();
       setState(() {
-        _enabledStart = false;
         _remainingTime = "L'évènement est terminé !";
       });
       return;
     } else if (now.isBefore(start)) {
       setState(() {
-        _enabledStart = false;
         _remainingTime = "L'évènement n'a pas encore commencé !";
       });
       return;
@@ -183,7 +174,6 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
 
     // Check if the event has started or ended
     if (DateTime.now().isAfter(end) || DateTime.now().isBefore(start)) {
-      _enabledStart = false;
       _remainingTime = "L'évènement ${DateTime.now().isAfter(end) ? "est terminé" : "n'a pas encore commencé"} !";
     } else {
       _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
@@ -241,18 +231,19 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
       padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding to the left and right
       child: Column(
         children: [
+          const SizedBox(height: 8), // Add margin before the first card
           InfoCard(
             logo: GestureDetector(
               key: iconKey,
               onTap: () => _showIconMenu(context),
               child: CircleAvatar(
                 radius: 36,
-                backgroundColor: Color(Config.COLOR_APP_BAR).withOpacity(0.2),
+                backgroundColor: const Color(Config.COLOR_APP_BAR).withOpacity(0.2),
                 child: Icon(_selectedIcon, size: 40),
               ),
             ),
             title: 'N°$_dossard',
-            data: '$_name',
+            data: _name,
           ),
           const SizedBox(height: 24),
           InfoCard(
@@ -268,7 +259,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
           ),
           const SizedBox(height: 12),
           InfoCard(
-            logo: Icon(Icons.timer_outlined),
+            logo: const Icon(Icons.timer_outlined),
             title: 'Temps passé sur le parcours',
             data: _tempsPerso != null
                 ? '${(_tempsPerso! ~/ 3600).toString().padLeft(2, '0')}h ${((_tempsPerso! % 3600) ~/ 60).toString().padLeft(2, '0')}m ${(_tempsPerso! % 60).toString().padLeft(2, '0')}s'
@@ -276,7 +267,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
           ),
           const SizedBox(height: 12),
           InfoCard(
-            logo: Icon(Icons.people),
+            logo: const Icon(Icons.people),
             title: 'Nombre de personnes',
             data: '${_numberOfParticipants ?? 0}',
           ),
@@ -301,11 +292,12 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
           padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding here
           child: Column(
             children: [
+              const SizedBox(height: 8), // Add margin before the first card
               ProgressCard(
                 title: 'Temps restant',
                 value: _remainingTime,
                 percentage: _calculateRemainingTimePercentage(),
-                logo: Icon(Icons.timer_outlined),
+                logo: const Icon(Icons.timer_outlined),
               ),
               const SizedBox(height: 12),
               ProgressCard(
@@ -319,7 +311,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
                 ),
               ),
               const SizedBox(height: 12),
-              InfoCard(
+              const InfoCard(
                 logo: Icon(Icons.people),
                 title: 'Nombre de participants',
                 data: '150',
@@ -333,8 +325,6 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
 
   @override
   Widget build(BuildContext context) {
-    final GlobalKey iconKey = GlobalKey();
-
     return PopScope(
       canPop: false,
       onPopInvoked: (bool didPop) async {
@@ -342,18 +332,21 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
       },
       child: Scaffold(
         backgroundColor: const Color(Config.COLOR_BACKGROUND),
-        appBar: const TopAppBar(title: 'Informations', showInfoButton: true),
+        appBar: TopAppBar(
+          title: 'Informations',
+          showInfoButton: true,
+        ),
         body: Stack(
           children: [
             Container(
-              color: Color(Config.COLOR_BACKGROUND), // Set background color
+              color: Colors.white, // Set background color
             ),
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
-                  const SizedBox(height: 30), // Add margin at the top
+                  const SizedBox(height: 24), // Add margin at the top
                   // Remove the logo text from the screen
                   // const SizedBox(height: 35), // Add margin below the logo
                   Padding(
@@ -361,7 +354,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
                     child: Text.rich(
                       TextSpan(
                         children: [
-                          TextSpan(
+                          const TextSpan(
                             text: 'Informations ',
                             style: TextStyle(
                               fontSize: 20,
@@ -371,7 +364,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
                           ),
                           TextSpan(
                             text: _currentPage == 0 ? 'personnelles' : 'sur l\'évènement',
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 20,
                               fontWeight: FontWeight.bold,
                               color: Color(Config.COLOR_APP_BAR),
@@ -382,7 +375,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 8),
                   Expanded(
                     flex: 12,
                     child: Padding(
@@ -397,53 +390,50 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
                     ),
                   ),
                   const Spacer(), // Add spacer to push the button to the bottom
-                  Container(
-                    child: Column(
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            for (int i = 0; i < 2; i++)
-                              Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                                width: 8.0,
-                                height: 8.0,
-                                decoration: BoxDecoration(
-                                  shape: BoxShape.circle,
-                                  color: _currentPage == i
-                                      ? Color(Config.COLOR_APP_BAR)
-                                      : Color(Config.COLOR_APP_BAR).withOpacity(0.1),
-                                ),
+                  Column(
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          for (int i = 0; i < 2; i++)
+                            Container(
+                              margin: const EdgeInsets.symmetric(horizontal: 4.0),
+                              width: 32.0, // Width for oval shape
+                              height: 6.0, // Height for oval shape
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(4.0), // Border radius for oval shape
+                                color: _currentPage == i
+                                    ? const Color(Config.COLOR_APP_BAR)
+                                    : const Color(Config.COLOR_APP_BAR).withOpacity(0.1),
                               ),
+                            ),
+                        ],
+                      ),
+                      const SizedBox(height: 20), // Add margin below the dots
+                      Container(
+                        decoration: const BoxDecoration(
+                          color: Colors.white, // Set background color to white
+                        ),
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.symmetric(horizontal: 30.0), // Add margin for Start button
+                              child: ActionButton(
+                                icon: Icons.play_arrow_outlined,
+                                text: 'START',
+                                onPressed: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => const SetupPosScreen()),
+                                  );
+                                },
+                              ),
+                            ),
+                            const SizedBox(height: 20), // Add margin below the button
                           ],
                         ),
-                        const SizedBox(height: 16), // Add margin below the dots
-                        Container(
-                          decoration: BoxDecoration(
-                            color: Colors.white, // Set background color to white
-                          ),
-                          child: Column(
-                            children: [
-                              const SizedBox(height: 12), // Add margin between dots and start button
-                              Padding(
-                                padding: const EdgeInsets.symmetric(horizontal: 30.0), // Add margin for Start button
-                                child: ActionButton(
-                                  icon: Icons.play_arrow_outlined,
-                                  text: 'START',
-                                  onPressed: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) => const SetupPosScreen()),
-                                    );
-                                  },
-                                ),
-                              ),
-                              const SizedBox(height: 20), // Add margin below the button
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
+                      ),
+                    ],
                   ),
                 ],
               ),

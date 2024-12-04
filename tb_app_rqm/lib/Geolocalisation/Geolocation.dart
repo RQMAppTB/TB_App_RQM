@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/material.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 import 'package:lrqm/API/MeasureController.dart'; // Correct package name
@@ -33,7 +32,7 @@ class Geolocation {
   int _outsideCounter = 0;
 
   /// StreamController to listen to the distance traveled updates
-  StreamController<int> _streamController = StreamController<int>();
+  final StreamController<int> _streamController = StreamController<int>();
 
   /// Boolean to check if the measure stream is started
   bool _positionStreamStarted = false;

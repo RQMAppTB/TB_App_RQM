@@ -8,15 +8,15 @@ import 'package:geolocator/geolocator.dart'; // Replace location import with geo
 import '../Utils/config.dart';
 import 'Components/InfoCard.dart';
 import 'Components/ActionButton.dart';
-import 'ConfigScreen.dart'; // Add this import
 import '../Utils/Result.dart';
 import 'LoadingScreen.dart'; // Add this import
+import 'SetupTeamScreen.dart'; // Rename import
 
 import '../API/MeasureController.dart';
 import '../Geolocalisation/Geolocation.dart';
 
 class SetupPosScreen extends StatefulWidget {
-  const SetupPosScreen({Key? key}) : super(key: key);
+  const SetupPosScreen({super.key});
 
   @override
   _SetupPosScreenState createState() => _SetupPosScreenState();
@@ -59,15 +59,15 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
   }
 
   void _openInGoogleMaps() async {
-    final url = 'geo:${Config.LAT1},${Config.LON1}?q=${Config.LAT1},${Config.LON1}';
+    const url = 'geo:${Config.LAT1},${Config.LON1}?q=${Config.LAT1},${Config.LON1}';
     await launch(url);
   }
 
   void _copyCoordinates() {
-    final coordinates = '${Config.LAT1}, ${Config.LON1}';
-    Clipboard.setData(ClipboardData(text: coordinates));
+    const coordinates = '${Config.LAT1}, ${Config.LON1}';
+    Clipboard.setData(const ClipboardData(text: coordinates));
     ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text('Les coordonnées ont été copiées dans le presse-papiers.')),
+      const SnackBar(content: Text('Les coordonnées ont été copiées dans le presse-papiers.')),
     );
   }
 
@@ -83,7 +83,7 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
             borderRadius: BorderRadius.circular(30.0), // Add rounded borders
             boxShadow: [
               // Add box shadow
-              BoxShadow(
+              const BoxShadow(
                 color: Colors.black26,
                 blurRadius: 10.0,
                 spreadRadius: 5.0,
@@ -101,10 +101,10 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
                   options: MapOptions(
                     initialCameraFit: CameraFit.bounds(
                       bounds: LatLngBounds(
-                        LatLng(Config.LAT1, Config.LON1),
+                        const LatLng(Config.LAT1, Config.LON1),
                         LatLng(_currentPosition?.latitude ?? Config.LAT1, _currentPosition?.longitude ?? Config.LON1),
                       ),
-                      padding: EdgeInsets.all(50.0), // Increase padding to zoom out more
+                      padding: const EdgeInsets.all(50.0), // Increase padding to zoom out more
                     ),
                   ),
                   children: [
@@ -114,14 +114,14 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
                     ),
                     MarkerLayer(
                       markers: [
-                        Marker(
+                        const Marker(
                           point: LatLng(Config.LAT1, Config.LON1), // Updated coordinates
                           child: Icon(Icons.place, color: Color(Config.COLOR_BUTTON), size: 48), // Increase icon size
                         ),
                         if (_currentPosition != null)
                           Marker(
                             point: LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-                            child: Icon(Icons.my_location,
+                            child: const Icon(Icons.my_location,
                                 color: Color(Config.COLOR_APP_BAR), size: 48), // Increase icon size
                           ),
                       ],
@@ -132,7 +132,7 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
                   top: 10,
                   right: 10,
                   child: IconButton(
-                    icon: Icon(Icons.close, color: Colors.black, size: 32),
+                    icon: const Icon(Icons.close, color: Colors.black, size: 32),
                     onPressed: () {
                       Navigator.of(context).pop();
                     },
@@ -146,7 +146,8 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
     );
   }
 
-  void _navigateToConfigScreen() async {
+  void _navigateToSetupTeamScreen() async {
+    // Rename method
     setState(() {
       _isLoading = true; // Set loading state to true
     });
@@ -167,7 +168,7 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
           log("3");
           Navigator.push(
             context,
-            MaterialPageRoute(builder: (context) => const ConfigScreen()),
+            MaterialPageRoute(builder: (context) => const SetupTeamScreen()), // Rename class
           );
         }
       } else {
@@ -200,7 +201,7 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
             top: 40,
             left: 10,
             child: IconButton(
-              icon: Icon(Icons.arrow_back, color: Color(Config.COLOR_APP_BAR), size: 32),
+              icon: const Icon(Icons.arrow_back, color: Color(Config.COLOR_APP_BAR), size: 32),
               onPressed: () {
                 Navigator.of(context).pop();
               },
@@ -213,14 +214,14 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
-                  const SizedBox(height: 100), // Add margin at the top
-                  Flexible(
-                    flex: 3,
-                    child: Center(
-                      child: Image(image: AssetImage('assets/pictures/question.png')),
+                  const SizedBox(height: 90), // Add margin at the top
+                  Center(
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.6,
+                      child: const Image(image: AssetImage('assets/pictures/DrawPosition-removebg.png')),
                     ),
                   ),
-                  const SizedBox(height: 80), // Add margin after the logo
+                  const SizedBox(height: 60), // Add margin after the logo
                   Expanded(
                     flex: 12,
                     child: Column(
@@ -228,37 +229,32 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                       children: [
                         InfoCard(
-                          logo: CircleAvatar(
-                            radius: 36,
-                            backgroundColor: Color(Config.COLOR_APP_BAR).withOpacity(0.2),
-                            child: Icon(Icons.pin_drop, size: 40),
-                          ),
                           title: "Préparez vous",
                           data: "Rendez-vous au point de départ de l'évènement.",
                           actionItems: [
                             ActionItem(
-                              icon: Icon(Icons.map, color: Color(Config.COLOR_APP_BAR), size: 32),
+                              icon: const Icon(Icons.map, color: Color(Config.COLOR_APP_BAR), size: 32),
                               label: 'Carte',
                               onPressed: () => _showMapModal(context),
                             ),
                             ActionItem(
-                              icon: Icon(Icons.directions, color: Color(Config.COLOR_APP_BAR), size: 32),
+                              icon: const Icon(Icons.directions, color: Color(Config.COLOR_APP_BAR), size: 32),
                               label: 'Maps',
                               onPressed: _openInGoogleMaps,
                             ),
                             ActionItem(
-                              icon: Icon(Icons.copy_rounded, color: Color(Config.COLOR_APP_BAR), size: 32),
+                              icon: const Icon(Icons.copy_rounded, color: Color(Config.COLOR_APP_BAR), size: 32),
                               label: 'Copier',
                               onPressed: _copyCoordinates,
                             ),
                           ],
                         ),
                         const SizedBox(height: 20), // Add margin between cards
-                        Spacer(), // Add spacer to push the button to the bottom
+                        const Spacer(), // Add spacer to push the button to the bottom
                         ActionButton(
                           icon: Icons.arrow_forward, // Add icon to "Suivant" button
                           text: 'Suivant',
-                          onPressed: _navigateToConfigScreen,
+                          onPressed: _navigateToSetupTeamScreen, // Update method call
                         ),
                         const SizedBox(height: 20), // Add margin below the button
                       ],

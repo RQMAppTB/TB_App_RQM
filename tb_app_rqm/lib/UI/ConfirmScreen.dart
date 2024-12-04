@@ -2,7 +2,6 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import '../API/LoginController.dart';
-import '../Utils/Result.dart';
 import '../Utils/config.dart';
 import 'InfoScreen.dart';
 import 'Components/InfoCard.dart';
@@ -13,7 +12,7 @@ class ConfirmScreen extends StatelessWidget {
   final String name;
   final int dossard;
 
-  const ConfirmScreen({Key? key, required this.name, required this.dossard}) : super(key: key);
+  const ConfirmScreen({super.key, required this.name, required this.dossard});
 
   void showInSnackBar(BuildContext context, String value) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
@@ -33,7 +32,7 @@ class ConfirmScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
                   const SizedBox(height: 100), // Add margin at the top
-                  Flexible(
+                  const Flexible(
                     flex: 3,
                     child: Center(
                       child: Image(image: AssetImage('assets/pictures/question.png')),
@@ -49,13 +48,13 @@ class ConfirmScreen extends StatelessWidget {
                         InfoCard(
                           logo: CircleAvatar(
                             radius: 36,
-                            backgroundColor: Color(Config.COLOR_APP_BAR).withOpacity(0.2),
-                            child: Icon(Icons.face, size: 40),
+                            backgroundColor: const Color(Config.COLOR_APP_BAR).withOpacity(0.2),
+                            child: const Icon(Icons.face, size: 40),
                           ),
                           title: "Est-ce bien toi ?",
                           data: name,
                         ),
-                        Spacer(), // Add spacer to push the buttons to the bottom
+                        const Spacer(), // Add spacer to push the buttons to the bottom
                         ActionButton(
                           icon: Icons.check, // Add icon to "Oui" button
                           text: 'Oui',
