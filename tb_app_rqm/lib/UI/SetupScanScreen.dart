@@ -9,6 +9,7 @@ import 'Components/InfoCard.dart';
 import 'Components/ActionButton.dart';
 import 'InfoScreen.dart';
 import 'package:lrqm/Data/Session.dart';
+import 'package:lrqm/Data/NbPersonData.dart';
 
 /// Class to display the setup scan screen.
 /// This screen allows the user to configure the number of participants
@@ -43,6 +44,7 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
       ),
     );
     Future.delayed(const Duration(seconds: 3), () async {
+      await NbPersonData.saveNbPerson(widget.nbParticipants); // Save the number of participants
       await Session.startSession(widget.nbParticipants);
       Navigator.pushAndRemoveUntil(
         context,

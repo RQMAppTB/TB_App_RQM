@@ -15,7 +15,7 @@ class ProgressCard extends StatefulWidget {
 }
 
 class _ProgressCardState extends State<ProgressCard> {
-  bool _isExpanded = false;
+  bool _isExpanded = true; // Set to true by default
 
   void _toggleExpanded() {
     setState(() {

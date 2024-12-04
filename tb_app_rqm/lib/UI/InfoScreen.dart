@@ -338,15 +338,15 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
               key: iconKey,
               onTap: () => _showIconMenu(context),
               child: CircleAvatar(
-                radius: 36,
+                radius: 44,
                 backgroundColor: const Color(Config.COLOR_APP_BAR).withOpacity(0.2),
-                child: Icon(_selectedIcon, size: 40),
+                child: Icon(_selectedIcon, size: 52),
               ),
             ),
             title: 'N°$_dossard',
             data: _name,
           ),
-          const SizedBox(height: 24),
+          const SizedBox(height: 32),
           InfoCard(
             logo: Image.asset(
               _isSessionActive ? 'assets/pictures/LogoSimpleAnimated.gif' : 'assets/pictures/LogoSimple.png',
@@ -358,7 +358,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
             additionalDetails:
                 "C'est ${((_isSessionActive ? _distance : (_distancePerso ?? 0)) / Config.CIRCUIT_SIZE).toStringAsFixed(1)} fois le tour du circuit, continue comme ça !",
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           InfoCard(
             logo: const Icon(Icons.timer_outlined),
             title: 'Temps passé sur le parcours',
@@ -366,7 +366,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
                 ? '${(_tempsPerso! ~/ 3600).toString().padLeft(2, '0')}h ${((_tempsPerso! % 3600) ~/ 60).toString().padLeft(2, '0')}m ${(_tempsPerso! % 60).toString().padLeft(2, '0')}s'
                 : '00h 00m 00s',
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: 8),
           InfoCard(
             logo: const Icon(Icons.people),
             title: 'Nombre de personnes',
@@ -393,14 +393,14 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
           padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding here
           child: Column(
             children: [
-              const SizedBox(height: 8), // Add margin before the first card
+              const SizedBox(height: 12), // Add margin before the first card
               ProgressCard(
                 title: 'Temps restant',
                 value: _remainingTime,
                 percentage: _calculateRemainingTimePercentage(),
                 logo: const Icon(Icons.timer_outlined),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               ProgressCard(
                 title: 'Distance totale parcourue',
                 value: '${_formatDistance(_distanceTotale ?? 0)} m',
@@ -411,7 +411,7 @@ class _InfoScreenState extends State<InfoScreen> with SingleTickerProviderStateM
                   height: 32, // Adjust the height as needed
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 8),
               const InfoCard(
                 logo: Icon(Icons.people),
                 title: 'Nombre de participants',
