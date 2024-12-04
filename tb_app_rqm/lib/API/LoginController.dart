@@ -10,8 +10,6 @@ import '../Data/NameData.dart';
 import '../Data/UuidData.dart';
 import '../Utils/config.dart';
 
-import '../Data/DataManagement.dart';
-
 /// Class containing methods to interact with the API to manage all
 /// data about login and logout.
 class LoginController {

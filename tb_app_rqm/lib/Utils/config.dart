@@ -26,24 +26,6 @@ class Config {
     mp.LatLng(LAT2, LON2),
     mp.LatLng(LAT1, LON2),
   ];
-  // ------------- Zone Défense ----------------
-  static const double LON11 = 6.657316176588863;
-  static const double LAT11 = 46.77812438877805;
-  static const double LON22 = 6.657231266655643;
-  static const double LAT22 = 46.782611095302414;
-  static const double LON33 = 6.666675613572716;
-  static const double LAT33 = 46.78271611345879;
-  static const double LON44 = 6.666769701835051;
-  static const double LAT44 = 46.778222689217166;
-  static const double LON55 = 6.653030810529115;
-  static const double LAT55 = 46.78007498916433;
-
-  static List<mp.LatLng> ZONE_DEFENSE = [
-    mp.LatLng(LAT11, LON11),
-    mp.LatLng(LAT22, LON22),
-    mp.LatLng(LAT33, LON33),
-    mp.LatLng(LAT44, LON44),
-  ];
 
   // ----------------- Couleurs -----------------
   static const int COLOR_APP_BAR = 0xFF403c74;
@@ -53,6 +35,7 @@ class Config {
 
   // ----------------- Constantes -----------------
   static const double CIRCUIT_SIZE = 3500.0; // Define the circuit size in meters
+  static const int TARGET_DISTANCE = 2000000; // Define the target total distance in meters
 
   /// Function to get the application version.
   static Future<String> getAppVersion() async {

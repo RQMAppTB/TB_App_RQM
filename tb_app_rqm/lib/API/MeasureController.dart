@@ -77,6 +77,8 @@ class MeasureController {
 
     final uri = Uri.https(Config.API_URL, '${Config.API_COMMON_ADDRESS}update-dist');
 
+    log("Sending measure with uuid: $uuid, dist: ${dist * number}, time: ${time * number}");
+
     return http.post(uri,
         body: {'uuid': uuid, 'dist': (dist * number).toString(), 'time': (time * number).toString()}).then((response) {
       if (response.statusCode == 200) {

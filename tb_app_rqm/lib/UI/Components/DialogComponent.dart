@@ -30,7 +30,7 @@ class DialogComponent {
                       color: Colors.black.withOpacity(0.1),
                       spreadRadius: 2,
                       blurRadius: 8,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -39,7 +39,7 @@ class DialogComponent {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Align(
+                      const Align(
                         alignment: Alignment.center,
                         child: Text(
                           'Choisis ton avatar !',
@@ -62,7 +62,7 @@ class DialogComponent {
                             },
                             child: Padding(
                               padding: const EdgeInsets.all(8.0),
-                              child: Icon(icon, size: 40, color: Color(Config.COLOR_APP_BAR)),
+                              child: Icon(icon, size: 40, color: const Color(Config.COLOR_APP_BAR)),
                             ),
                           );
                         }).toList(),

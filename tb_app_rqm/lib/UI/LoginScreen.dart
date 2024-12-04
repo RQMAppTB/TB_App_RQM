@@ -11,7 +11,7 @@ import '../Utils/config.dart';
 import 'ConfirmScreen.dart';
 import 'LoadingScreen.dart'; // Import the LoadingScreen
 import 'Components/ActionButton.dart'; // Import the ActionButton
-import 'Components/HighlightPainter.dart'; // Import the HighlightPainter
+// Import the HighlightPainter
 
 /// Class to display the login screen.
 /// This screen allows the user to enter his dossard number
@@ -35,12 +35,6 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
   /// Dossard number of the user.
   int _dossard = -1;
 
-  /// Boolean to check if the name is correct.
-  bool _visibility = false;
-
-  /// Boolean to check if the app is loading.
-  bool _isLoading = false;
-
   @override
   void initState() {
     super.initState();
@@ -48,16 +42,11 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     DistPersoData.saveDistPerso(10);
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   void _onTextChanged() {}
 
   /// Function to show a snackbar with the message [value].
   void showInSnackBar(String value) {
-    ScaffoldMessenger.of(context).showSnackBar(new SnackBar(content: new Text(value)));
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
   }
 
   /// Function to get the name of the user with the dossard number entered by the user.
@@ -67,9 +56,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     // Hide the keyboard
     FocusScope.of(context).unfocus();
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
 
     Navigator.push(
       context,
@@ -83,17 +70,12 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
       if (dosNumResult.error != null) {
         //show error message in snackbar
         showInSnackBar(dosNumResult.error!);
-        setState(() {
-          _visibility = false;
-          _isLoading = false;
-        });
+        setState(() {});
         Navigator.pop(context); // Close the loading page
       } else {
         setState(() {
           _name = dosNumResult.value;
           _dossard = dossardNumber;
-          _visibility = true;
-          _isLoading = false;
         });
         Navigator.pushReplacement(
           context,
@@ -102,10 +84,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
       }
     } catch (e) {
       showInSnackBar("Invalid dossard number");
-      setState(() {
-        _visibility = false;
-        _isLoading = false;
-      });
+      setState(() {});
       Navigator.pop(context); // Close the loading page
     }
   }
@@ -129,7 +108,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                     flex: 2,
                     child: SizedBox(height: isKeyboardVisible ? 80 : 100),
                   ),
-                  Visibility(
+                  const Visibility(
                     //visible: !isKeyboardVisible,
                     maintainSize: false,
                     child: Flexible(
@@ -161,9 +140,9 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                         Stack(
                           children: [
                             RichText(
-                              text: TextSpan(
+                              text: const TextSpan(
                                 text: 'Entre ton ',
-                                style: const TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
+                                style: TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
                                 children: <TextSpan>[
                                   TextSpan(
                                     text: 'numéro de dossard',
@@ -173,7 +152,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                                       fontWeight: FontWeight.bold, // Bold
                                     ),
                                   ),
-                                  const TextSpan(
+                                  TextSpan(
                                     text: ' pour t\'identifier à l`évènement.',
                                     style: TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
                                   ),
@@ -185,7 +164,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                         const SizedBox(height: 20), // Add small margin
                         Container(
                           decoration: BoxDecoration(
-                            color: Color(Config.COLOR_BUTTON).withOpacity(0.15),
+                            color: const Color(Config.COLOR_BUTTON).withOpacity(0.15),
                             borderRadius: BorderRadius.circular(8.0),
                           ),
                           child: TextField(
@@ -195,11 +174,11 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                               LengthLimitingTextInputFormatter(4),
                             ],
                             textAlign: TextAlign.center, // Center the text horizontally
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               border: InputBorder.none,
-                              contentPadding: const EdgeInsets.all(8.0),
+                              contentPadding: EdgeInsets.all(8.0),
                             ),
-                            style: TextStyle(
+                            style: const TextStyle(
                               fontSize: 28,
                               color: Color(Config.COLOR_APP_BAR), // Set input text color to APP_COLOR
                               letterSpacing: 4.0, // Increase space between characters
@@ -208,7 +187,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                         ),
                         Container(
                           margin: const EdgeInsets.only(top: 10),
-                          child: Text(
+                          child: const Text(
                             '1 à 9999',
                             style: TextStyle(
                               color: Color(Config.COLOR_APP_BAR),
@@ -218,8 +197,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                             ),
                           ),
                         ),
-                        Spacer(), // Add spacer to push the button and version text to the bottom
-                        Container(
+                        const Spacer(), // Add spacer to push the button and version text to the bottom
+                        SizedBox(
                           width: double.infinity, // Full width
                           child: ActionButton(
                             icon: Icons.login, // Add connection icon

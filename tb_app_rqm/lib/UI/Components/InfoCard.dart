@@ -1,16 +1,16 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import '../../Utils/config.dart';
 
 class InfoCard extends StatefulWidget {
-  final Widget logo;
+  final Widget? logo; // Make logo optional
   final String title;
   final String data;
   final String? additionalDetails;
   final List<ActionItem>? actionItems; // Combine action icons and labels
 
-  InfoCard({
-    required this.logo,
+  const InfoCard({
+    super.key,
+    this.logo, // Make logo optional
     required this.title,
     required this.data,
     this.additionalDetails,
@@ -49,18 +49,14 @@ class _InfoCardState extends State<InfoCard> {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.white, Colors.grey.shade200],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
+          color: Colors.white, // Changed from gradient to white color
           borderRadius: BorderRadius.circular(16.0),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
               spreadRadius: 2,
               blurRadius: 8,
-              offset: Offset(0, 4),
+              offset: const Offset(0, 4),
             ),
           ],
         ),
@@ -70,14 +66,15 @@ class _InfoCardState extends State<InfoCard> {
           children: [
             Row(
               children: [
-                IconTheme(
-                  data: IconThemeData(
-                    size: 32,
-                    color: Color(Config.COLOR_APP_BAR),
+                if (widget.logo != null) // Check if logo is not null
+                  IconTheme(
+                    data: const IconThemeData(
+                      size: 32,
+                      color: Color(Config.COLOR_APP_BAR),
+                    ),
+                    child: widget.logo!,
                   ),
-                  child: widget.logo,
-                ),
-                const SizedBox(width: 16),
+                if (widget.logo != null) const SizedBox(width: 16), // Add spacing if logo is present
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -105,7 +102,7 @@ class _InfoCardState extends State<InfoCard> {
                 if (_canExpand)
                   Icon(
                     _isExpanded ? Icons.expand_less : Icons.expand_more,
-                    color: Color(Config.COLOR_APP_BAR),
+                    color: const Color(Config.COLOR_APP_BAR),
                   ),
               ],
             ),
@@ -136,7 +133,7 @@ class _InfoCardState extends State<InfoCard> {
                         ),
                         Text(
                           actionItem.label,
-                          style: TextStyle(color: Color(Config.COLOR_APP_BAR)),
+                          style: const TextStyle(color: Color(Config.COLOR_APP_BAR)),
                         ),
                       ],
                     ),

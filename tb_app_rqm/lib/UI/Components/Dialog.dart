@@ -21,7 +21,7 @@ class CustomDialog {
                       color: Colors.black.withOpacity(0.1),
                       spreadRadius: 2,
                       blurRadius: 8,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -34,7 +34,7 @@ class CustomDialog {
                         alignment: Alignment.center,
                         child: Text(
                           title,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             color: Color(Config.COLOR_APP_BAR),
                           ),
