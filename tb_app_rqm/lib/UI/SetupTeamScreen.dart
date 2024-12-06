@@ -48,17 +48,8 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
-            top: 40,
-            left: 10,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Color(Config.COLOR_APP_BAR), size: 32),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ),
-          Center(
+          SingleChildScrollView(
+            // Make the full page scrollable
             child: Padding(
               padding: const EdgeInsets.symmetric(horizontal: 22.0),
               child: Column(
@@ -73,75 +64,79 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
                     ),
                   ),
                   const SizedBox(height: 52),
-                  Expanded(
-                    flex: 12,
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.only(bottom: 80),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Container(
-                            margin: const EdgeInsets.only(top: 8.0), // Add margin before the InfoCard
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding to the left and right
-                            child: InfoCard(
-                              title: "L'équipe !",
-                              data: "Pour combien de personnes comptes tu les mètres ?",
-                              actionItems: [],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding to the left and right
-                            child: Column(
-                              children: [
-                                TapCard(
-                                  logo: Icon(Icons.looks_one, size: 32),
-                                  text: "Je pars en solo",
-                                  onTap: () => _selectParticipants(1),
-                                  isSelected: _selectedParticipants == 1,
-                                ),
-                                const SizedBox(height: 12),
-                                TapCard(
-                                  logo: Icon(Icons.looks_two, size: 32),
-                                  text: "On fait la paire",
-                                  onTap: () => _selectParticipants(2),
-                                  isSelected: _selectedParticipants == 2,
-                                ),
-                                const SizedBox(height: 12),
-                                TapCard(
-                                  logo: Icon(Icons.looks_3, size: 32),
-                                  text: "On se lance en triplettte",
-                                  onTap: () => _selectParticipants(3),
-                                  isSelected: _selectedParticipants == 3,
-                                ),
-                                const SizedBox(height: 12),
-                                TapCard(
-                                  logo: Icon(Icons.looks_4, size: 32),
-                                  text: "La monstre équipe",
-                                  onTap: () => _selectParticipants(4),
-                                  isSelected: _selectedParticipants == 4,
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 20),
-                        ],
-                      ),
+                  Container(
+                    margin: const EdgeInsets.only(top: 8.0), // Add margin before the InfoCard
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding to the left and right
+                    child: InfoCard(
+                      title: "L'équipe !",
+                      data: "Pour combien de personnes comptes tu les mètres ?",
+                      actionItems: [],
                     ),
                   ),
-                  const Spacer(),
-                  if (_selectedParticipants > 0 && _selectedParticipants < 5)
-                    ActionButton(
-                      icon: Icons.arrow_forward,
-                      text: 'Suivant',
-                      onPressed: _navigateToSetupScanScreen,
+                  const SizedBox(height: 24),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding to the left and right
+                    child: Column(
+                      children: [
+                        TapCard(
+                          logo: Icon(Icons.looks_one, size: 32),
+                          text: "Je pars en solo",
+                          onTap: () => _selectParticipants(1),
+                          isSelected: _selectedParticipants == 1,
+                        ),
+                        const SizedBox(height: 8),
+                        TapCard(
+                          logo: Icon(Icons.looks_two, size: 32),
+                          text: "On fait la paire",
+                          onTap: () => _selectParticipants(2),
+                          isSelected: _selectedParticipants == 2,
+                        ),
+                        const SizedBox(height: 8),
+                        TapCard(
+                          logo: Icon(Icons.looks_3, size: 32),
+                          text: "On se lance en triplettte",
+                          onTap: () => _selectParticipants(3),
+                          isSelected: _selectedParticipants == 3,
+                        ),
+                        const SizedBox(height: 8),
+                        TapCard(
+                          logo: Icon(Icons.looks_4, size: 32),
+                          text: "La monstre équipe",
+                          onTap: () => _selectParticipants(4),
+                          isSelected: _selectedParticipants == 4,
+                        ),
+                      ],
                     ),
-                  const SizedBox(height: 20),
+                  ),
+                  const SizedBox(height: 100), // Add more margin at the bottom to allow more scrolling
                 ],
               ),
             ),
           ),
+          Align(
+            alignment: Alignment.topLeft, // Fix the back button at the top
+            child: Padding(
+              padding: const EdgeInsets.only(top: 40, left: 10), // Add padding
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Color(Config.COLOR_APP_BAR), size: 32),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
+            ),
+          ),
+          if (_selectedParticipants > 0 && _selectedParticipants < 5)
+            Align(
+              alignment: Alignment.bottomCenter, // Fix the "Suivant" button at the bottom
+              child: Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 20.0), // Add padding
+                child: ActionButton(
+                  icon: Icons.arrow_forward,
+                  text: 'Suivant',
+                  onPressed: _navigateToSetupScanScreen,
+                ),
+              ),
+            ),
           if (_isLoading) const LoadingScreen(),
         ],
       ),

@@ -30,7 +30,7 @@ class _ProgressCardState extends State<ProgressCard> {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white, // Changed from gradient to white color
+          color: Colors.white,
           borderRadius: BorderRadius.circular(16.0),
           boxShadow: [
             BoxShadow(
@@ -49,17 +49,12 @@ class _ProgressCardState extends State<ProgressCard> {
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      IconTheme(
-                        data: const IconThemeData(
-                          size: 32,
-                          color: Color(Config.COLOR_APP_BAR),
-                        ),
-                        child: widget.logo,
-                      ),
-                    ],
+                  IconTheme(
+                    data: const IconThemeData(
+                      size: 32,
+                      color: Color(Config.COLOR_APP_BAR),
+                    ),
+                    child: widget.logo,
                   ),
                   const SizedBox(width: 16),
                   Expanded(
@@ -74,17 +69,13 @@ class _ProgressCardState extends State<ProgressCard> {
                           ),
                         ),
                         const SizedBox(height: 8),
-                        Stack(
-                          children: [
-                            Text(
-                              widget.value,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Color(Config.COLOR_APP_BAR),
-                              ),
-                            ),
-                          ],
+                        Text(
+                          widget.value,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Color(Config.COLOR_APP_BAR),
+                          ),
                         ),
                       ],
                     ),
@@ -97,19 +88,28 @@ class _ProgressCardState extends State<ProgressCard> {
               ),
               if (_isExpanded) ...[
                 const SizedBox(height: 16),
-                Padding(
-                  padding: const EdgeInsets.only(bottom: 8.0),
-                  child: Text(
-                    '${widget.percentage.toStringAsFixed(1)}%',
-                    style:
-                        const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(Config.COLOR_APP_BAR)),
-                  ),
-                ),
-                LinearProgressIndicator(
-                  value: widget.percentage / 100,
-                  backgroundColor: const Color(Config.COLOR_APP_BAR).withOpacity(0.2),
-                  valueColor: const AlwaysStoppedAnimation<Color>(Color(Config.COLOR_APP_BAR)),
-                  minHeight: 4,
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
+                        '${widget.percentage.toStringAsFixed(1)}%',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(Config.COLOR_APP_BAR),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: LinearProgressIndicator(
+                        value: widget.percentage / 100,
+                        backgroundColor: const Color(Config.COLOR_APP_BAR).withOpacity(0.2),
+                        valueColor: const AlwaysStoppedAnimation<Color>(Color(Config.COLOR_APP_BAR)),
+                        minHeight: 4,
+                      ),
+                    ),
+                  ],
                 ),
               ],
             ],

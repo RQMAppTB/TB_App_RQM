@@ -39,7 +39,7 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
       context,
       MaterialPageRoute(
         builder: (context) => const LoadingScreen(
-          text: "C'est parti !",
+          text: "À vos marques, prêts, partez !",
         ),
       ),
     );
@@ -97,65 +97,61 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
       backgroundColor: Colors.white,
       body: Stack(
         children: [
-          Positioned(
-            top: 40,
-            left: 10,
-            child: IconButton(
-              icon: const Icon(Icons.arrow_back, color: Color(Config.COLOR_APP_BAR), size: 32),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
+          SingleChildScrollView(
+            // Make the full page scrollable
+            child: Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 22.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  const SizedBox(height: 90),
+                  Center(
+                    child: GestureDetector(
+                      onDoubleTap: _startSessionDirectly,
+                      child: Container(
+                        width: MediaQuery.of(context).size.width * 0.6,
+                        child: const Image(image: AssetImage('assets/pictures/DrawScan-removebg.png')),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 52),
+                  Container(
+                    margin: const EdgeInsets.only(top: 8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: InfoCard(
+                      title: "Le petit oiseau va sortir !",
+                      data: "Prend en photo le QR code pour démarrer ta session",
+                      actionItems: [],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  const SizedBox(height: 100), // Add more margin at the bottom to allow more scrolling
+                ],
+              ),
+            ),
+          ),
+          Align(
+            alignment: Alignment.topLeft, // Fix the back button at the top
+            child: Padding(
+              padding: const EdgeInsets.only(top: 40, left: 10), // Add padding
+              child: IconButton(
+                icon: const Icon(Icons.arrow_back, color: Color(Config.COLOR_APP_BAR), size: 32),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              ),
             ),
           ),
           if (!_isLoading)
-            Center(
+            Align(
+              alignment: Alignment.bottomCenter, // Fix the "Ouvrir la caméra" button at the bottom
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22.0),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    const SizedBox(height: 90),
-                    Center(
-                      child: GestureDetector(
-                        onDoubleTap: _startSessionDirectly,
-                        child: Container(
-                          width: MediaQuery.of(context).size.width * 0.6,
-                          child: const Image(image: AssetImage('assets/pictures/DrawScan-removebg.png')),
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 52),
-                    Expanded(
-                      flex: 12,
-                      child: SingleChildScrollView(
-                        padding: const EdgeInsets.only(bottom: 80),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Container(
-                              margin: const EdgeInsets.only(top: 8.0),
-                              padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                              child: InfoCard(
-                                title: "Le petit oiseau va sortir !",
-                                data: "Prend en photo le QR code pour démarrer ta session",
-                                actionItems: [],
-                              ),
-                            ),
-                            const SizedBox(height: 24),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const Spacer(),
-                    ActionButton(
-                      icon: Icons.camera_alt,
-                      text: "Ouvrir la caméra",
-                      onPressed: _launchCamera,
-                    ),
-                    const SizedBox(height: 20),
-                  ],
+                padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 20.0), // Add padding
+                child: ActionButton(
+                  icon: Icons.camera_alt,
+                  text: "Ouvrir la caméra",
+                  onPressed: _launchCamera,
                 ),
               ),
             ),

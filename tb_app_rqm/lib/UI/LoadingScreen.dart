@@ -29,7 +29,7 @@ class LoadingScreen extends StatelessWidget {
                       child: Text(
                         text!,
                         style: TextStyle(
-                          fontSize: 20,
+                          fontSize: 16,
                           color: Color(Config.COLOR_APP_BAR),
                         ),
                       ),
