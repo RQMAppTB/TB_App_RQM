@@ -7,7 +7,7 @@ import '../Utils/config.dart';
 import 'LoadingScreen.dart';
 import 'Components/InfoCard.dart';
 import 'Components/ActionButton.dart';
-import 'InfoScreen.dart';
+import 'WorkingScreen.dart';
 import 'package:lrqm/Data/Session.dart';
 import 'package:lrqm/Data/NbPersonData.dart';
 
@@ -32,6 +32,7 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
   );
 
   bool _isLoading = false; // Add _isLoading property
+  bool _isCameraOpen = false; // Add _isCameraOpen property
 
   void _navigateToLoadingScreen() {
     controller.stop();
@@ -48,7 +49,7 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
       await Session.startSession(widget.nbParticipants);
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => const InfoScreen()),
+        MaterialPageRoute(builder: (context) => const WorkingScreen()),
         (route) => false,
       );
     });
@@ -64,15 +65,21 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
     }
   }
 
-  void _launchCamera() {
-    setState(() {
-      _isLoading = true;
-    });
+  void _launchCamera() async {
+    try {
+      setState(() {
+        _isCameraOpen = true;
+      });
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Erreur lors de l\'ouverture de la caméra')),
+      );
+    }
   }
 
   void _quitCamera() {
     setState(() {
-      _isLoading = false;
+      _isCameraOpen = false;
     });
     controller.stop();
   }
@@ -143,7 +150,7 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
               ),
             ),
           ),
-          if (!_isLoading)
+          if (!_isCameraOpen)
             Align(
               alignment: Alignment.bottomCenter, // Fix the "Ouvrir la caméra" button at the bottom
               child: Padding(
@@ -155,7 +162,7 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
                 ),
               ),
             ),
-          if (_isLoading)
+          if (_isCameraOpen)
             Stack(
               children: [
                 MobileScanner(

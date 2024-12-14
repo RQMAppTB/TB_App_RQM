@@ -3,6 +3,7 @@ import 'package:url_launcher/url_launcher.dart'; // Correct import
 import '../../API/LoginController.dart';
 import '../../Utils/config.dart';
 import '../LoginScreen.dart';
+import '../InfoScreen.dart';
 
 class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
   final String title;
@@ -51,7 +52,10 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
                   IconButton(
                     icon: const Icon(Icons.info_outlined, size: 24, color: Color(Config.COLOR_APP_BAR)),
                     onPressed: () {
-                      // Add your info button action here
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => const InfoScreen()),
+                      );
                     },
                   ),
                   IconButton(
@@ -77,7 +81,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
         ),
         Container(
           color: Color(Config.COLOR_APP_BAR).withOpacity(0.1),
-          height: 4.0,
+          height: 3.0,
         ),
       ],
     );

@@ -69,7 +69,7 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding to the left and right
                     child: InfoCard(
                       title: "L'équipe !",
-                      data: "Pour combien de personnes comptes tu les mètres ?",
+                      data: "Pour combien de personnes comptes-tu les mètres ?",
                       actionItems: [],
                     ),
                   ),
@@ -116,12 +116,18 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
           Align(
             alignment: Alignment.topLeft, // Fix the back button at the top
             child: Padding(
-              padding: const EdgeInsets.only(top: 40, left: 10), // Add padding
-              child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Color(Config.COLOR_APP_BAR), size: 32),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
+              padding: const EdgeInsets.only(top: 40, left: 10, right: 10), // Add padding
+              child: Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back, color: Color(Config.COLOR_APP_BAR), size: 32),
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                  ),
+                  const SizedBox(width: 10), // Add padding between the back button and the text
+                  // ...existing code...
+                ],
               ),
             ),
           ),

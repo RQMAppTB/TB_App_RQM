@@ -29,8 +29,29 @@ class ActionItem {
   ActionItem({required this.icon, required this.label, required this.onPressed});
 }
 
-class _InfoCardState extends State<InfoCard> {
+class _InfoCardState extends State<InfoCard> with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   bool get _canExpand => widget.additionalDetails != null;
 
@@ -38,6 +59,11 @@ class _InfoCardState extends State<InfoCard> {
     if (_canExpand) {
       setState(() {
         _isExpanded = !_isExpanded;
+        if (_isExpanded) {
+          _controller.forward();
+        } else {
+          _controller.reverse();
+        }
       });
     }
   }
@@ -106,18 +132,26 @@ class _InfoCardState extends State<InfoCard> {
                   ),
               ],
             ),
-            if (_isExpanded) ...[
-              const SizedBox(height: 16),
-              if (widget.additionalDetails != null)
-                Text(
-                  widget.additionalDetails!,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(Config.COLOR_APP_BAR),
-                  ),
-                ),
-              if (widget.additionalDetails != null) const SizedBox(height: 16),
-            ],
+            SizeTransition(
+              sizeFactor: _animation,
+              axisAlignment: -1.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Add padding before additionalDetails text
+                  if (widget.additionalDetails != null) const SizedBox(height: 16),
+                  if (widget.additionalDetails != null)
+                    Text(
+                      widget.additionalDetails!,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(Config.COLOR_APP_BAR),
+                      ),
+                    ),
+                  if (widget.additionalDetails != null) const SizedBox(height: 16),
+                ],
+              ),
+            ),
             if (widget.actionItems != null && widget.actionItems!.isNotEmpty) ...[
               const SizedBox(height: 16),
               Row(

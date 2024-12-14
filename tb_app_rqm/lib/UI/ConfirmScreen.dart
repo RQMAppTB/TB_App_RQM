@@ -3,7 +3,7 @@ import 'dart:developer';
 import 'package:flutter/material.dart';
 import '../API/LoginController.dart';
 import '../Utils/config.dart';
-import 'InfoScreen.dart';
+import 'WorkingScreen.dart';
 import 'Components/InfoCard.dart';
 import 'Components/ActionButton.dart';
 import 'Components/DiscardButton.dart';
@@ -75,7 +75,7 @@ class ConfirmScreen extends StatelessWidget {
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) {
-                            return const InfoScreen();
+                            return const WorkingScreen();
                           }),
                         );
                       } else {
