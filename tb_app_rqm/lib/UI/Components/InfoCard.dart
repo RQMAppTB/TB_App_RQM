@@ -76,7 +76,7 @@ class _InfoCardState extends State<InfoCard> with SingleTickerProviderStateMixin
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white, // Changed from gradient to white color
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: BorderRadius.circular(8.0),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),

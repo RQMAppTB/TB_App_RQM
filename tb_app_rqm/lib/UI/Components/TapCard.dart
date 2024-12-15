@@ -23,7 +23,7 @@ class TapCard extends StatelessWidget {
         width: double.infinity,
         decoration: BoxDecoration(
           color: isSelected ? Color(Config.COLOR_BUTTON) : Colors.white, // Change background color if selected
-          borderRadius: BorderRadius.circular(32.0),
+          borderRadius: BorderRadius.circular(8.0),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),

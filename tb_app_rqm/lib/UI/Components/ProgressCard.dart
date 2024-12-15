@@ -60,7 +60,7 @@ class _ProgressCardState extends State<ProgressCard> with SingleTickerProviderSt
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(16.0),
+          borderRadius: BorderRadius.circular(8.0),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),

@@ -437,7 +437,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                             title: '№ de dossard: $_dossard',
                             data: _name,
                           ),
-                          const SizedBox(height: 32),
+                          const SizedBox(height: 24),
                           InfoCard(
                             logo: Image.asset(
                               _isSessionActive
@@ -451,7 +451,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                             additionalDetails:
                                 _getDistanceMessage(_isSessionActive ? _distance : (_distancePerso ?? 0)),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           InfoCard(
                             logo: const Icon(Icons.timer_outlined),
                             title: 'Temps passé sur le parcours',
@@ -459,7 +459,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                                 ? '${(_tempsPerso! ~/ 3600).toString().padLeft(2, '0')}h ${((_tempsPerso! % 3600) ~/ 60).toString().padLeft(2, '0')}m ${(_tempsPerso! % 60).toString().padLeft(2, '0')}s'
                                 : '00h 00m 00s',
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           if (_isSessionActive)
                             InfoCard(
                               logo: const Icon(Icons.people),
@@ -467,7 +467,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                               data: '${_numberOfParticipants ?? 0}',
                             )
                           else
-                            const SizedBox(height: 8),
+                            const SizedBox(height: 12),
                           if (!_isSessionActive)
                             Padding(
                               padding: const EdgeInsets.symmetric(horizontal: 10.0),
@@ -529,7 +529,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                             percentage: _calculateRemainingTimePercentage(),
                             logo: const Icon(Icons.timer_outlined),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           ProgressCard(
                             title: 'Distance totale parcourue',
                             value: '${_formatDistance(_distanceTotale ?? 0)} m',
@@ -540,7 +540,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                               height: 32, // Adjust the height as needed
                             ),
                           ),
-                          const SizedBox(height: 8),
+                          const SizedBox(height: 12),
                           const InfoCard(
                             logo: Icon(Icons.people),
                             title: 'Participants ou groupe ou actuellement sur le parcours',
@@ -565,8 +565,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                       for (int i = 0; i < 2; i++)
                         Container(
                           margin: const EdgeInsets.symmetric(horizontal: 4.0),
-                          width: 32.0, // Width for oval shape
-                          height: 6.0, // Height for oval shape
+                          width: 8.0, // Width for oval shape
+                          height: 8.0, // Height for oval shape
                           decoration: BoxDecoration(
                             borderRadius: BorderRadius.circular(4.0), // Border radius for oval shape
                             color: _currentPage == i

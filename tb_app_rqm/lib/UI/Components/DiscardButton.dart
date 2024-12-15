@@ -20,14 +20,14 @@ class DiscardButton extends StatelessWidget {
       height: 50.0, // Set height to match the "Oui" button
       decoration: BoxDecoration(
         border: Border.all(color: const Color(Config.COLOR_APP_BAR), width: 2.0), // Outline with COLOR_APP_BAR
-        borderRadius: BorderRadius.circular(32.0), // Same radius as ActionButton
+        borderRadius: BorderRadius.circular(8.0), // Same radius as ActionButton
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
           backgroundColor: Colors.white, // Center transparent
           shadowColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32.0),
+            borderRadius: BorderRadius.circular(8.0),
           ),
         ),
         onPressed: onPressed,

@@ -83,7 +83,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         );
       }
     } catch (e) {
-      showInSnackBar("Invalid dossard number");
+      showInSnackBar("Numéro de dossard invalide ");
       setState(() {});
       Navigator.pop(context); // Close the loading page
     }
