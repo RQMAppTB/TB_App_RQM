@@ -42,7 +42,7 @@ class TapCard extends StatelessWidget {
                 IconTheme(
                   data: IconThemeData(
                     size: 32,
-                    color: isSelected ? Colors.white : Color(Config.COLOR_APP_BAR), // Change logo color if selected
+                    color: isSelected ? Colors.white : const Color(Config.COLOR_APP_BAR), // Change logo color if selected
                   ),
                   child: logo,
                 ),

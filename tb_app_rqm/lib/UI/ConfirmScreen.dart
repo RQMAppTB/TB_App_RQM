@@ -41,16 +41,10 @@ class ConfirmScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 60), // Add margin after the logo
                   InfoCard(
-                    logo: GestureDetector(
-                      child: CircleAvatar(
-                        radius: 40,
-                        backgroundColor: const Color(Config.COLOR_APP_BAR).withOpacity(0.2),
-                        child: Icon(Icons.face, size: 48),
-                      ),
-                    ),
+                    logo: Icon(Icons.person),
                     title: "Est-ce bien toi ?",
                     data: name,
-                    actionItems: [],
+                    actionItems: const [],
                   ),
                   const SizedBox(height: 100), // Add more margin at the bottom to allow more scrolling
                 ],

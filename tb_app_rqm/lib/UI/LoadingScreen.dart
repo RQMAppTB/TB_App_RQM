@@ -28,7 +28,7 @@ class LoadingScreen extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 20.0), // Add padding
                       child: Text(
                         text!,
-                        style: TextStyle(
+                        style: const TextStyle(
                           fontSize: 16,
                           color: Color(Config.COLOR_APP_BAR),
                         ),

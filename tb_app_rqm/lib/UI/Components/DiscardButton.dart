@@ -24,7 +24,7 @@ class DiscardButton extends StatelessWidget {
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.white, // Center transparent
+          backgroundColor: Color(Config.COLOR_BACKGROUND), // Center transparent
           shadowColor: Colors.white,
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(8.0),

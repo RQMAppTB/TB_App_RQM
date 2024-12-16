@@ -81,9 +81,9 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
           margin: const EdgeInsets.symmetric(vertical: 20.0, horizontal: 20.0), // Add margin left and right
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(30.0), // Add rounded borders
-            boxShadow: [
+            boxShadow: const [
               // Add box shadow
-              const BoxShadow(
+              BoxShadow(
                 color: Colors.black26,
                 blurRadius: 10.0,
                 spreadRadius: 5.0,
@@ -110,7 +110,7 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
                   children: [
                     TileLayer(
                       urlTemplate: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-                      subdomains: ['a', 'b', 'c'],
+                      subdomains: const ['a', 'b', 'c'],
                     ),
                     MarkerLayer(
                       markers: [
@@ -200,7 +200,7 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
           SingleChildScrollView(
             // Make the full page scrollable
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0), // Add margin
+              padding: const EdgeInsets.symmetric(horizontal: 20.0), // Add margin
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
@@ -208,11 +208,11 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
                   const SizedBox(height: 90), // Add margin at the top
                   Center(
                     child: Container(
-                      width: MediaQuery.of(context).size.width * 0.6,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       child: const Image(image: AssetImage('assets/pictures/DrawPosition-removebg.png')),
                     ),
                   ),
-                  const SizedBox(height: 60), // Add margin after the logo
+                  const SizedBox(height: 32), // Add margin after the logo
                   InfoCard(
                     title: "Préparez vous",
                     data: "Rendez-vous au point de départ de l'évènement.",
@@ -255,7 +255,7 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
           Align(
             alignment: Alignment.bottomCenter, // Fix the "Suivant" button at the bottom
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0), // Add padding
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0), // Add padding
               child: ActionButton(
                 icon: Icons.arrow_forward, // Add icon to "Suivant" button
                 text: 'Suivant',

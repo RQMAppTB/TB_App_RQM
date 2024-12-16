@@ -19,7 +19,7 @@ class InfoScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
                   Center(
-                    child: Image.asset('assets/pictures/LogoText.png', height: 100),
+                    child: Image.asset('assets/pictures/LogoText.png', height: 80),
                   ),
                   const SizedBox(height: 32),
                   const Text(
@@ -53,22 +53,53 @@ class InfoScreen extends StatelessWidget {
                     children: [
                       Flexible(
                         child: Wrap(
-                          alignment: WrapAlignment.center,
+                          alignment: WrapAlignment.start,
                           spacing: 20,
                           runSpacing: 20,
                           children: [
-                            _buildContributorProfile(context, 'https://github.com/therundmc',
-                                'https://avatars.githubusercontent.com/u/25774146?v=4', 'Antoine Cavallera'),
-                            _buildContributorProfile(context, 'https://github.com/Maxime-Nicolet',
-                                'https://avatars.githubusercontent.com/u/21175110?v=4', 'Maxime Nicolet'),
                             _buildContributorProfile(context, 'https://github.com/MasterZeus97',
                                 'https://avatars.githubusercontent.com/u/61197576?v=4', 'Thibault'),
-                            _buildContributorProfile(context, 'https://github.com/Chloe',
-                                'https://avatars.githubusercontent.com/u/12345678?v=4', 'Chloé Fontaine'),
-                            _buildContributorProfile(context, 'https://github.com/William',
-                                'https://avatars.githubusercontent.com/u/87654321?v=4', 'William Fromont'),
+                            _buildContributorProfile(context, 'https://github.com/therundmc',
+                                'https://avatars.githubusercontent.com/u/25774146?v=4', 'Antoine Cavallera'),
+                            _buildContributorProfile(context, null, null, 'Chloé Fontaine'),
+                            _buildContributorProfile(context, 'https://github.com/Maxime-Nicolet',
+                                'https://avatars.githubusercontent.com/u/21175110?v=4', 'Maxime Nicolet'),
+                            _buildContributorProfile(context, null, null, 'William Fromont'),
                           ],
                         ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "Product Owner",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold, color: Color(Config.COLOR_APP_BAR)),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildContributorProfile(context, null, null, 'Nicolas Fontaine'),
+                        ],
+                      ),
+                      const SizedBox(width: 50),
+                      Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text(
+                            "GitHub Repo",
+                            style: TextStyle(
+                                fontSize: 18, fontWeight: FontWeight.bold, color: Color(Config.COLOR_APP_BAR)),
+                          ),
+                          const SizedBox(height: 12),
+                          _buildContributorProfile(context, 'https://github.com/RQMAppTB',
+                              'https://avatars.githubusercontent.com/u/179916091?v=4', 'La RQM'),
+                        ],
                       ),
                     ],
                   ),
@@ -93,24 +124,41 @@ class InfoScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildContributorProfile(BuildContext context, String url, String imageUrl, String name) {
+  Widget _buildContributorProfile(BuildContext context, String? url, String? imageUrl, String name) {
     return GestureDetector(
-      onTap: () async {
-        final Uri uri = Uri.parse(url);
-        await launch(
-          uri.toString(),
-          forceSafariVC: false,
-          forceWebView: false,
-          headers: <String, String>{'my_header_key': 'my_header_value'},
-        );
-      },
+      onTap: url != null
+          ? () async {
+              final Uri uri = Uri.parse(url);
+              await launch(
+                uri.toString(),
+                forceSafariVC: false,
+                forceWebView: false,
+                headers: <String, String>{'my_header_key': 'my_header_value'},
+              );
+            }
+          : null,
       child: Container(
         width: 80, // Fixed width
         child: Column(
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(imageUrl),
-              radius: 30,
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    spreadRadius: 2,
+                    blurRadius: 5,
+                    offset: Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                child: imageUrl != null ? null : Icon(Icons.person, size: 30, color: Colors.white),
+                backgroundImage: imageUrl != null ? NetworkImage(imageUrl) : null,
+                radius: 30,
+                backgroundColor: imageUrl != null ? null : Colors.grey,
+              ),
             ),
             const SizedBox(height: 8),
             Text(

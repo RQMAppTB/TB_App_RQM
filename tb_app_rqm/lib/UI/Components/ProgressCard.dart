@@ -78,12 +78,22 @@ class _ProgressCardState extends State<ProgressCard> with SingleTickerProviderSt
               Row(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: <Widget>[
-                  IconTheme(
-                    data: const IconThemeData(
-                      size: 32,
-                      color: Color(Config.COLOR_APP_BAR),
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(Config.COLOR_APP_BAR).withOpacity(0.15),
                     ),
-                    child: widget.logo,
+                    child: Center(
+                      child: IconTheme(
+                        data: const IconThemeData(
+                          size: 32,
+                          color: Color(Config.COLOR_APP_BAR),
+                        ),
+                        child: widget.logo,
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 16),
                   Expanded(

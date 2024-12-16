@@ -1,4 +1,3 @@
-import 'dart:developer';
 import 'package:flutter/material.dart';
 import '../Utils/config.dart';
 import 'Components/InfoCard.dart';
@@ -6,7 +5,6 @@ import 'Components/ActionButton.dart';
 import 'SetupScanScreen.dart';
 import 'LoadingScreen.dart';
 import 'Components/TapCard.dart';
-import 'Components/ActionButton.dart';
 
 class SetupTeamScreen extends StatefulWidget {
   const SetupTeamScreen({super.key});
@@ -51,7 +49,7 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
           SingleChildScrollView(
             // Make the full page scrollable
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -59,15 +57,15 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
                   const SizedBox(height: 90),
                   Center(
                     child: Container(
-                      width: MediaQuery.of(context).size.width * 0.6,
+                      width: MediaQuery.of(context).size.width * 0.5,
                       child: const Image(image: AssetImage('assets/pictures/DrawTeam-removebg.png')),
                     ),
                   ),
-                  const SizedBox(height: 52),
+                  const SizedBox(height: 32),
                   Container(
                     margin: const EdgeInsets.only(top: 8.0), // Add margin before the InfoCard
                     padding: const EdgeInsets.symmetric(horizontal: 8.0), // Add padding to the left and right
-                    child: InfoCard(
+                    child: const InfoCard(
                       title: "L'équipe !",
                       data: "Pour combien de personnes comptes-tu les mètres ?",
                       actionItems: [],
@@ -79,28 +77,28 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
                     child: Column(
                       children: [
                         TapCard(
-                          logo: Icon(Icons.looks_one, size: 32),
+                          logo: const Icon(Icons.looks_one, size: 32),
                           text: "Je pars en solo",
                           onTap: () => _selectParticipants(1),
                           isSelected: _selectedParticipants == 1,
                         ),
                         const SizedBox(height: 8),
                         TapCard(
-                          logo: Icon(Icons.looks_two, size: 32),
+                          logo: const Icon(Icons.looks_two, size: 32),
                           text: "On fait la paire",
                           onTap: () => _selectParticipants(2),
                           isSelected: _selectedParticipants == 2,
                         ),
                         const SizedBox(height: 8),
                         TapCard(
-                          logo: Icon(Icons.looks_3, size: 32),
+                          logo: const Icon(Icons.looks_3, size: 32),
                           text: "On se lance en triplettte",
                           onTap: () => _selectParticipants(3),
                           isSelected: _selectedParticipants == 3,
                         ),
                         const SizedBox(height: 8),
                         TapCard(
-                          logo: Icon(Icons.looks_4, size: 32),
+                          logo: const Icon(Icons.looks_4, size: 32),
                           text: "La monstre équipe",
                           onTap: () => _selectParticipants(4),
                           isSelected: _selectedParticipants == 4,
@@ -135,7 +133,7 @@ class _SetupTeamScreenState extends State<SetupTeamScreen> {
             Align(
               alignment: Alignment.bottomCenter, // Fix the "Suivant" button at the bottom
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 20.0), // Add padding
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0), // Add padding
                 child: ActionButton(
                   icon: Icons.arrow_forward,
                   text: 'Suivant',

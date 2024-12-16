@@ -164,7 +164,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                         const SizedBox(height: 20), // Add small margin
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(Config.COLOR_APP_BAR).withOpacity(0.1),
+                            color: const Color(Config.COLOR_APP_BAR).withOpacity(0.15),
                             borderRadius: BorderRadius.circular(2.0),
                           ),
                           child: TextField(

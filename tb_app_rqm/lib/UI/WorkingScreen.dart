@@ -9,7 +9,6 @@ import 'Components/Dialog.dart';
 import 'Components/ActionButton.dart';
 import 'Components/TopAppBar.dart';
 import 'SetupPosScreen.dart'; // Add this import
-import 'package:lrqm/Data/DataManagement.dart';
 import 'package:lrqm/Data/Session.dart';
 
 import '../Data/DistPersoData.dart';
@@ -22,9 +21,9 @@ import '../Data/NbPersonData.dart';
 import '../Data/TimeData.dart';
 import '../Geolocalisation/Geolocation.dart';
 import 'Components/DiscardButton.dart';
-import 'Components/InfoCard.dart'; // Add this import
 import 'Components/InfoDialog.dart'; // Add this import
 import 'LoadingScreen.dart'; // Add this import
+import 'Components/TitleCard.dart';
 
 /// Class to display the working screen.
 /// This screen displays the remaining time before the end of the event,
@@ -85,7 +84,6 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
   void _showIconMenu(BuildContext context) {
     final List<IconData> icons = [
       Icons.face,
-      Icons.face_2,
       Icons.face_2,
       Icons.face_3,
       Icons.face_4,
@@ -356,7 +354,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
       },
       child: Scaffold(
         backgroundColor: const Color(Config.COLOR_BACKGROUND),
-        appBar: TopAppBar(
+        appBar: const TopAppBar(
           title: 'Informations',
           showInfoButton: true,
         ),
@@ -390,54 +388,27 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                     // Make the full page scrollable
                     controller: _parentScrollController,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 22.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                         children: <Widget>[
                           const SizedBox(height: 24), // Add margin at the top
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0), // Add margin
-                            child: Text.rich(
-                              TextSpan(
-                                children: [
-                                  const TextSpan(
-                                    text: 'Informations ',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.normal,
-                                      color: Color(Config.COLOR_APP_BAR),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'personnelles',
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(Config.COLOR_APP_BAR),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
+                          const TitleCard(
+                            icon: Icons.person,
+                            title: 'Informations ',
+                            subtitle: 'personnelles',
                           ),
-                          const SizedBox(height: 8),
-                          const SizedBox(height: 8), // Add margin before the first card
+                          const SizedBox(height: 24), // Add margin before the first card
                           InfoCard(
                             logo: GestureDetector(
-                              key: iconKey,
                               onTap: () => _showIconMenu(context),
-                              child: CircleAvatar(
-                                radius: 40,
-                                backgroundColor: const Color(Config.COLOR_APP_BAR).withOpacity(0.2),
-                                child: Icon(_selectedIcon, size: 48),
-                              ),
+                              child: Icon(_selectedIcon),
                             ),
                             title: '№ de dossard: $_dossard',
                             data: _name,
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 12),
                           InfoCard(
                             logo: Image.asset(
                               _isSessionActive
@@ -462,15 +433,15 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                           const SizedBox(height: 12),
                           if (_isSessionActive)
                             InfoCard(
-                              logo: const Icon(Icons.people),
+                              logo: const Icon(Icons.groups_2),
                               title: 'L\'équipe',
                               data: '${_numberOfParticipants ?? 0}',
                             )
                           else
                             const SizedBox(height: 12),
                           if (!_isSessionActive)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(horizontal: 10.0),
+                            const Padding(
+                              padding: EdgeInsets.symmetric(horizontal: 10.0),
                               child: Text(
                                 'Appuie sur START pour démarrer une session',
                                 style: TextStyle(
@@ -495,34 +466,12 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                         crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
                         children: <Widget>[
                           const SizedBox(height: 24), // Add margin at the top
-                          Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 10.0), // Add margin
-                            child: Text.rich(
-                              TextSpan(
-                                children: [
-                                  const TextSpan(
-                                    text: 'Informations ',
-                                    style: TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.normal,
-                                      color: Color(Config.COLOR_APP_BAR),
-                                    ),
-                                  ),
-                                  TextSpan(
-                                    text: 'sur l\'évènement',
-                                    style: const TextStyle(
-                                      fontSize: 20,
-                                      fontWeight: FontWeight.bold,
-                                      color: Color(Config.COLOR_APP_BAR),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
+                          const TitleCard(
+                            icon: Icons.calendar_month,
+                            title: 'Informations sur',
+                            subtitle: 'l\'évènement',
                           ),
-                          const SizedBox(height: 8),
-                          const SizedBox(height: 8), // Add margin before the first card
+                          const SizedBox(height: 24),
                           ProgressCard(
                             title: 'Temps restant',
                             value: _remainingTime,
@@ -542,8 +491,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                           ),
                           const SizedBox(height: 12),
                           const InfoCard(
-                            logo: Icon(Icons.people),
-                            title: 'Participants ou groupe ou actuellement sur le parcours',
+                            logo: Icon(Icons.groups_2),
+                            title: 'Participants ou groupe actuellement sur le parcours',
                             data: '150',
                           ),
                           const SizedBox(height: 100), // Add more margin at the bottom to allow more scrolling
@@ -577,18 +526,18 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 8.0)
+                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0)
                         .copyWith(bottom: 20.0), // Add padding
                     child: _isSessionActive
                         ? DiscardButton(
-                            text: 'STOP',
                             icon: Icons.stop, // Pass the icon parameter
+                            text: 'STOP',
                             onPressed: () {
                               _confirmStopSession(context);
                             },
                           )
                         : ActionButton(
-                            icon: Icons.play_arrow_outlined,
+                            icon: Icons.flag_outlined,
                             text: 'START',
                             onPressed: () {
                               Navigator.push(

@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import '../../Utils/config.dart';
 
 class InfoCard extends StatefulWidget {
-  final Widget? logo; // Make logo optional
+  final Widget? logo;
   final String title;
   final String data;
   final String? additionalDetails;
-  final List<ActionItem>? actionItems; // Combine action icons and labels
+  final List<ActionItem>? actionItems;
 
   const InfoCard({
     super.key,
-    this.logo, // Make logo optional
+    this.logo,
     required this.title,
     required this.data,
     this.additionalDetails,
-    this.actionItems, // Initialize action items
+    this.actionItems,
   });
 
   @override
@@ -75,7 +75,7 @@ class _InfoCardState extends State<InfoCard> with SingleTickerProviderStateMixin
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white, // Changed from gradient to white color
+          color: Colors.white,
           borderRadius: BorderRadius.circular(8.0),
           boxShadow: [
             BoxShadow(
@@ -86,21 +86,31 @@ class _InfoCardState extends State<InfoCard> with SingleTickerProviderStateMixin
             ),
           ],
         ),
-        padding: const EdgeInsets.all(16.0), // Move padding here
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                if (widget.logo != null) // Check if logo is not null
-                  IconTheme(
-                    data: const IconThemeData(
-                      size: 32,
-                      color: Color(Config.COLOR_APP_BAR),
+                if (widget.logo != null)
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(Config.COLOR_APP_BAR).withOpacity(0.15),
                     ),
-                    child: widget.logo!,
+                    child: Center(
+                      child: IconTheme(
+                        data: const IconThemeData(
+                          size: 32,
+                          color: Color(Config.COLOR_APP_BAR),
+                        ),
+                        child: widget.logo!,
+                      ),
+                    ),
                   ),
-                if (widget.logo != null) const SizedBox(width: 16), // Add spacing if logo is present
+                if (widget.logo != null) const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -138,7 +148,6 @@ class _InfoCardState extends State<InfoCard> with SingleTickerProviderStateMixin
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Add padding before additionalDetails text
                   if (widget.additionalDetails != null) const SizedBox(height: 16),
                   if (widget.additionalDetails != null)
                     Text(
@@ -158,7 +167,7 @@ class _InfoCardState extends State<InfoCard> with SingleTickerProviderStateMixin
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: widget.actionItems!.map((actionItem) {
                   return Padding(
-                    padding: const EdgeInsets.only(left: 20.0), // Add left margin between icons
+                    padding: const EdgeInsets.only(left: 20.0),
                     child: Column(
                       children: [
                         IconButton(

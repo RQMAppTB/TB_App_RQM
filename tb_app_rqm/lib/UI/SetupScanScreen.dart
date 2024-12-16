@@ -31,7 +31,6 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
     autoStart: true,
   );
 
-  bool _isLoading = false; // Add _isLoading property
   bool _isCameraOpen = false; // Add _isCameraOpen property
 
   void _navigateToLoadingScreen() {
@@ -85,9 +84,6 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
   }
 
   void _startSessionDirectly() {
-    setState(() {
-      _isLoading = true;
-    });
     _navigateToLoadingScreen();
   }
 
@@ -107,7 +103,7 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
           SingleChildScrollView(
             // Make the full page scrollable
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 22.0),
+              padding: const EdgeInsets.symmetric(horizontal: 10.0),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -117,16 +113,16 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
                     child: GestureDetector(
                       onDoubleTap: _startSessionDirectly,
                       child: Container(
-                        width: MediaQuery.of(context).size.width * 0.6,
+                        width: MediaQuery.of(context).size.width * 0.5,
                         child: const Image(image: AssetImage('assets/pictures/DrawScan-removebg.png')),
                       ),
                     ),
                   ),
-                  const SizedBox(height: 52),
+                  const SizedBox(height: 40),
                   Container(
                     margin: const EdgeInsets.only(top: 8.0),
                     padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                    child: InfoCard(
+                    child: const InfoCard(
                       title: "Le petit oiseau va sortir !",
                       data: "Prend en photo le QR code pour démarrer ta session",
                       actionItems: [],
@@ -154,7 +150,7 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
             Align(
               alignment: Alignment.bottomCenter, // Fix the "Ouvrir la caméra" button at the bottom
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 22.0, vertical: 20.0), // Add padding
+                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0), // Add padding
                 child: ActionButton(
                   icon: Icons.camera_alt,
                   text: "Ouvrir la caméra",

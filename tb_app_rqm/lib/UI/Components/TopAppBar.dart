@@ -80,7 +80,7 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
           ],
         ),
         Container(
-          color: Color(Config.COLOR_APP_BAR).withOpacity(0.1),
+          color: const Color(Config.COLOR_APP_BAR).withOpacity(0.1),
           height: 3.0,
         ),
       ],
