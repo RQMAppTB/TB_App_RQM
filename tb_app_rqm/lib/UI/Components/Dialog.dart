@@ -15,7 +15,7 @@ class CustomDialog {
                 width: MediaQuery.of(context).size.width * 0.8, // Make it 80% of the screen width
                 decoration: BoxDecoration(
                   color: Colors.white, // Match the background color of the InfoCard
-                  borderRadius: BorderRadius.circular(16.0),
+                  borderRadius: BorderRadius.circular(8.0),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),

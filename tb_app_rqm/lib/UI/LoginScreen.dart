@@ -83,7 +83,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         );
       }
     } catch (e) {
-      showInSnackBar("Invalid dossard number");
+      showInSnackBar("Numéro de dossard invalide ");
       setState(() {});
       Navigator.pop(context); // Close the loading page
     }
@@ -164,8 +164,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                         const SizedBox(height: 20), // Add small margin
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(Config.COLOR_BUTTON).withOpacity(0.15),
-                            borderRadius: BorderRadius.circular(8.0),
+                            color: const Color(Config.COLOR_APP_BAR).withOpacity(0.15),
+                            borderRadius: BorderRadius.circular(2.0),
                           ),
                           child: TextField(
                             controller: _controller,
@@ -181,7 +181,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                             style: const TextStyle(
                               fontSize: 28,
                               color: Color(Config.COLOR_APP_BAR), // Set input text color to APP_COLOR
-                              letterSpacing: 4.0, // Increase space between characters
+                              letterSpacing: 8.0, // Increase space between characters
+                              fontWeight: FontWeight.bold, //
                             ),
                           ),
                         ),
@@ -190,10 +191,8 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                           child: const Text(
                             '1 à 9999',
                             style: TextStyle(
-                              color: Color(Config.COLOR_APP_BAR),
+                              color: Color(Config.COLOR_APP_BAR), // Reduce opacity to 0.5
                               fontSize: 14,
-                              fontWeight: FontWeight.bold,
-                              fontStyle: FontStyle.italic, // Use italic style
                             ),
                           ),
                         ),

@@ -2,19 +2,19 @@ import 'package:flutter/material.dart';
 import '../../Utils/config.dart';
 
 class InfoCard extends StatefulWidget {
-  final Widget? logo; // Make logo optional
+  final Widget? logo;
   final String title;
   final String data;
   final String? additionalDetails;
-  final List<ActionItem>? actionItems; // Combine action icons and labels
+  final List<ActionItem>? actionItems;
 
   const InfoCard({
     super.key,
-    this.logo, // Make logo optional
+    this.logo,
     required this.title,
     required this.data,
     this.additionalDetails,
-    this.actionItems, // Initialize action items
+    this.actionItems,
   });
 
   @override
@@ -29,8 +29,29 @@ class ActionItem {
   ActionItem({required this.icon, required this.label, required this.onPressed});
 }
 
-class _InfoCardState extends State<InfoCard> {
+class _InfoCardState extends State<InfoCard> with SingleTickerProviderStateMixin {
   bool _isExpanded = false;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
 
   bool get _canExpand => widget.additionalDetails != null;
 
@@ -38,6 +59,11 @@ class _InfoCardState extends State<InfoCard> {
     if (_canExpand) {
       setState(() {
         _isExpanded = !_isExpanded;
+        if (_isExpanded) {
+          _controller.forward();
+        } else {
+          _controller.reverse();
+        }
       });
     }
   }
@@ -49,8 +75,8 @@ class _InfoCardState extends State<InfoCard> {
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white, // Changed from gradient to white color
-          borderRadius: BorderRadius.circular(16.0),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(8.0),
           boxShadow: [
             BoxShadow(
               color: Colors.black.withOpacity(0.1),
@@ -60,21 +86,31 @@ class _InfoCardState extends State<InfoCard> {
             ),
           ],
         ),
-        padding: const EdgeInsets.all(16.0), // Move padding here
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Row(
               children: [
-                if (widget.logo != null) // Check if logo is not null
-                  IconTheme(
-                    data: const IconThemeData(
-                      size: 32,
-                      color: Color(Config.COLOR_APP_BAR),
+                if (widget.logo != null)
+                  Container(
+                    width: 60,
+                    height: 60,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(Config.COLOR_APP_BAR).withOpacity(0.15),
                     ),
-                    child: widget.logo!,
+                    child: Center(
+                      child: IconTheme(
+                        data: const IconThemeData(
+                          size: 32,
+                          color: Color(Config.COLOR_APP_BAR),
+                        ),
+                        child: widget.logo!,
+                      ),
+                    ),
                   ),
-                if (widget.logo != null) const SizedBox(width: 16), // Add spacing if logo is present
+                if (widget.logo != null) const SizedBox(width: 16),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -106,25 +142,32 @@ class _InfoCardState extends State<InfoCard> {
                   ),
               ],
             ),
-            if (_isExpanded) ...[
-              const SizedBox(height: 16),
-              if (widget.additionalDetails != null)
-                Text(
-                  widget.additionalDetails!,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    color: Color(Config.COLOR_APP_BAR),
-                  ),
-                ),
-              if (widget.additionalDetails != null) const SizedBox(height: 16),
-            ],
+            SizeTransition(
+              sizeFactor: _animation,
+              axisAlignment: -1.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.additionalDetails != null) const SizedBox(height: 16),
+                  if (widget.additionalDetails != null)
+                    Text(
+                      widget.additionalDetails!,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(Config.COLOR_APP_BAR),
+                      ),
+                    ),
+                  if (widget.additionalDetails != null) const SizedBox(height: 16),
+                ],
+              ),
+            ),
             if (widget.actionItems != null && widget.actionItems!.isNotEmpty) ...[
               const SizedBox(height: 16),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: widget.actionItems!.map((actionItem) {
                   return Padding(
-                    padding: const EdgeInsets.only(left: 20.0), // Add left margin between icons
+                    padding: const EdgeInsets.only(left: 20.0),
                     child: Column(
                       children: [
                         IconButton(

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lrqm/Data/DossardData.dart';
-import 'package:lrqm/UI/InfoScreen.dart';
+import 'package:lrqm/UI/WorkingScreen.dart';
 import 'package:lrqm/UI/LoginScreen.dart';
 
 import 'Data/NameData.dart';
@@ -28,7 +28,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         fontFamily: 'Roboto', // Ensure the default font family is set to Poppins
       ),
-      home: isLoggedIn ? const InfoScreen() : const Login(),
+      home: isLoggedIn ? const WorkingScreen() : const Login(),
     );
   }
 }
