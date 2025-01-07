@@ -178,7 +178,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   String _getDistanceMessage(int distance) {
     if (distance <= 100) {
-      return "C'est ${(distance / 0.2).toStringAsFixed(0)} saucissons vaudois mis bout à bout. Quel papet! Continue comme ça";
+      return "C'est ${(distance / 0.2).toStringAsFixed(0)} saucisse aux choux mis bout à bout. Quel papet! Continue comme ça";
     } else if (distance <= 4000) {
       return "C'est ${(distance / 400).toStringAsFixed(1)} tour(s) de la piste de la pontaise. Trop fort!";
     } else if (distance <= 38400) {
