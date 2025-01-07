@@ -58,7 +58,7 @@ class InfoScreen extends StatelessWidget {
                           runSpacing: 20,
                           children: [
                             _buildContributorProfile(context, 'https://github.com/MasterZeus97',
-                                'https://avatars.githubusercontent.com/u/61197576?v=4', 'Thibault'),
+                                'https://avatars.githubusercontent.com/u/61197576?v=4', 'Thibault Seem'),
                             _buildContributorProfile(context, 'https://github.com/therundmc',
                                 'https://avatars.githubusercontent.com/u/25774146?v=4', 'Antoine Cavallera'),
                             _buildContributorProfile(context, null, null, 'Chloé Fontaine'),
