@@ -73,7 +73,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   final GlobalKey iconKey = GlobalKey();
 
-  int? _tempsPerso;
+  int? _sessionTimePerso;
+  int? _totalTimePerso;
 
   final ScrollController _parentScrollController = ScrollController();
 
@@ -200,7 +201,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
         });
         _geolocation.stream.listen((event) {
           log("Stream event: $event");
-          if (event == -1) {
+          if (event["distance"] == -1) {
             log("Stream event: $event");
             _geolocation.stopListening();
             Session.stopSession();
@@ -209,11 +210,18 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
             });
           } else {
             setState(() {
-              _distance = event;
+              _distance = event["distance"] ?? 0;
+              _sessionTimePerso = event["time"];
             });
           }
         });
         _geolocation.startListening();
+      } else {
+        // TODO REPLACE WITH TOTAL TIME FROM API
+        // Get the total time spent on the track
+        TimeData.getSessionTime().then((value) => setState(() {
+              _totalTimePerso = value;
+            }));
       }
     });
 
@@ -241,9 +249,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
     // Get the name of the user
     NameData.getName().then((value) => setState(() {
-          setState(() {
-            _name = value;
-          });
+          _name = value;
         }));
 
     // Fake the number of participants
@@ -254,11 +260,6 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
     // Get the number of participants
     NbPersonData.getNbPerson().then((value) => setState(() {
           _numberOfParticipants = value;
-        }));
-
-    // Get the time spent on the track
-    TimeData.getTime().then((value) => setState(() {
-          _tempsPerso = value;
         }));
   }
 
@@ -298,8 +299,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
         }));
 
     // Get the time spent on the track
-    TimeData.getTime().then((value) => setState(() {
-          _tempsPerso = value;
+    TimeData.getSessionTime().then((value) => setState(() {
+          _totalTimePerso = value;
         }));
   }
 
@@ -347,6 +348,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
+    int displayedTime = _isSessionActive ? (_sessionTimePerso ?? 0) : (_totalTimePerso ?? 0);
+
     return PopScope(
       canPop: false,
       onPopInvoked: (bool didPop) async {
@@ -426,9 +429,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                           InfoCard(
                             logo: const Icon(Icons.timer_outlined),
                             title: 'Temps passé sur le parcours',
-                            data: _tempsPerso != null
-                                ? '${(_tempsPerso! ~/ 3600).toString().padLeft(2, '0')}h ${((_tempsPerso! % 3600) ~/ 60).toString().padLeft(2, '0')}m ${(_tempsPerso! % 60).toString().padLeft(2, '0')}s'
-                                : '00h 00m 00s',
+                            data:
+                                '${(displayedTime ~/ 3600).toString().padLeft(2, '0')}h ${((displayedTime % 3600) ~/ 60).toString().padLeft(2, '0')}m ${(displayedTime % 60).toString().padLeft(2, '0')}s',
                           ),
                           const SizedBox(height: 12),
                           if (_isSessionActive)

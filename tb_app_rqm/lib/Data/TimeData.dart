@@ -5,23 +5,23 @@ class TimeData {
   /// Singleton instance of the DataManagement class.
   static final DataManagement _dataManagement = DataManagement();
 
-  /// Save the time spent on the track [time] in the shared preferences
-  static Future<bool> saveTime(int time) async {
-    return _dataManagement.saveInt('time', time);
+  /// Save the session time [sessionTime] in the shared preferences
+  static Future<bool> saveSessionTime(int sessionTime) async {
+    return _dataManagement.saveInt('sessionTime', sessionTime);
   }
 
-  /// Get the time spent on the track from the shared preferences
-  static Future<int?> getTime() async {
-    return _dataManagement.getInt('time');
+  /// Get the session time from the shared preferences
+  static Future<int?> getSessionTime() async {
+    return _dataManagement.getInt('sessionTime');
   }
 
   /// Remove the time spent on the track from the shared preferences
   static Future<bool> removeTime() async {
-    return _dataManagement.removeData('time');
+    return _dataManagement.removeData('sessionTime');
   }
 
   /// Check if the time spent on the track exists in the shared preferences
   Future<bool> doesTimeExist() async {
-    return _dataManagement.doesDataExist('time');
+    return _dataManagement.doesDataExist('sessionTime');
   }
 }
