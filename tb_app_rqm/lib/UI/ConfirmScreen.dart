@@ -41,7 +41,7 @@ class ConfirmScreen extends StatelessWidget {
                   ),
                   const SizedBox(height: 60), // Add margin after the logo
                   InfoCard(
-                    logo: Icon(Icons.person),
+                    logo: Icon(Icons.face),
                     title: "Est-ce bien toi ?",
                     data: name,
                     actionItems: const [],
