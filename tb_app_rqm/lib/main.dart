@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:lrqm/Data/DossardData.dart';
 import 'package:lrqm/UI/WorkingScreen.dart';
 import 'package:lrqm/UI/LoginScreen.dart';
@@ -8,6 +9,12 @@ import 'Data/NameData.dart';
 void main() async {
   /// Ensure that the WidgetsBinding is initialized
   WidgetsFlutterBinding.ensureInitialized();
+
+  /// Set preferred orientations to portrait only
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
 
   /// Check if there are a name and a dossard number saved in the shared preferences
   final bool isLoggedIn = await NameData.doesNameExist() && await DossardData.doesDossardExist();
