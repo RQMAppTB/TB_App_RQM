@@ -7,6 +7,7 @@ import 'package:lrqm/API/MeasureController.dart'; // Correct package name
 import 'package:lrqm/Data/DistToSendData.dart'; // Correct package name
 import 'package:lrqm/Data/TimeData.dart'; // Correct package name
 import 'package:lrqm/Utils/config.dart'; // Correct package name
+import 'package:lrqm/Utils/LogHelper.dart';
 import 'package:flutter/foundation.dart'; // Add this import
 
 class Geolocation {
@@ -140,13 +141,13 @@ class Geolocation {
           _distance = 0;
           _mesureToWait--;
         } else {
-          log("Position: $position");
+          LogHelper.writeLog("Position: $position");
           log("Entered position stream");
           var distSinceLast =
               geo.Geolocator.distanceBetween(_oldPos.latitude, _oldPos.longitude, position.latitude, position.longitude)
                   .round();
 
-          log("Distance: $distSinceLast");
+          LogHelper.writeLog("Distance: $distSinceLast");
 
           // Update the old position
           _oldPos = position;
