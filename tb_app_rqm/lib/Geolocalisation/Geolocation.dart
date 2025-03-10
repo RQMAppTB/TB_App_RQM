@@ -141,13 +141,14 @@ class Geolocation {
           _distance = 0;
           _mesureToWait--;
         } else {
-          LogHelper.writeLog("Position: $position");
+          log("Position: $position");
           log("Entered position stream");
           var distSinceLast =
               geo.Geolocator.distanceBetween(_oldPos.latitude, _oldPos.longitude, position.latitude, position.longitude)
                   .round();
 
-          LogHelper.writeLog("Distance: $distSinceLast");
+          log("Distance: $distSinceLast");
+          LogHelper.writeLog("Position,$position,Dist,$distSinceLast");
 
           // Update the old position
           _oldPos = position;
