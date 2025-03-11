@@ -99,7 +99,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
         children: [
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0), // Add margin
+              padding: const EdgeInsets.symmetric(horizontal: 20.0), // Add margin
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left

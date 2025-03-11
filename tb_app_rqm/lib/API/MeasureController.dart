@@ -46,7 +46,7 @@ class MeasureController {
         log("Uuid: ${jsonResult["myUuid"]}");
 
         bool testIsSaved = await DistToSendData.saveDistToSend(0); // TODO
-        testIsSaved = testIsSaved && await TimeData.saveTime(0);
+        testIsSaved = testIsSaved && await TimeData.saveSessionTime(0);
         testIsSaved = testIsSaved && await UuidData.saveUuid(jsonResult["myUuid"]);
 
         return await UuidData.saveUuid(jsonResult["myUuid"]);
@@ -66,7 +66,7 @@ class MeasureController {
   /// or an error message if the request failed.
   static Future<Result<bool>> sendMesure() async {
     int dist = await DistToSendData.getDistToSend() ?? 0;
-    int time = await TimeData.getTime() ?? 0;
+    int time = await TimeData.getSessionTime() ?? 0;
     int number = await NbPersonData.getNbPerson() ?? 1;
     int? dossard = await DossardData.getDossard();
     String uuid = await UuidData.getUuid();
@@ -98,7 +98,7 @@ class MeasureController {
   /// If the measure is stopped, remove the uuid, distance and time from the shared preferences.
   static Future<Result<bool>> stopMeasure() async {
     int? dist = await DistToSendData.getDistToSend();
-    int? time = await TimeData.getTime();
+    int? time = await TimeData.getSessionTime();
     String uuid = await UuidData.getUuid();
 
     log("Stopping measure with dist: $dist, time: $time, uuid: $uuid");
