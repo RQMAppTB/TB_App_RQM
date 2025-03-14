@@ -10,8 +10,6 @@ import '../Data/NameData.dart';
 import '../Data/UuidData.dart';
 import '../Utils/config.dart';
 
-import '../Data/DataManagement.dart';
-
 /// Class containing methods to interact with the API to manage all
 /// data about login and logout.
 class LoginController {
@@ -53,14 +51,14 @@ class LoginController {
           throw Exception('Failed to save dossard or username');
         }
       } else {
-        throw Exception('Failed to login: ${response.statusCode}');
+        throw Exception('Échec de la connexion : ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
       log("Error: $error");
       if (error is http.ClientException) {
-        return Result(error: "No connection to the server");
+        return Result(error: "Pas de connexion au serveur");
       }
-      return Result(error: "error: ${error.toString()}");
+      return Result(error: "Erreur : ${error.toString()}");
     });
   }
 
@@ -87,7 +85,7 @@ class LoginController {
 
       return Result(value: deletionDone);
     } else {
-      return Result(error: "Failed to logout");
+      return Result(error: "Échec de la déconnexion");
     }
   }
 
@@ -110,16 +108,16 @@ class LoginController {
 
         return Result<String>(value: name);
       } else if (response.statusCode == 404) {
-        return Result<String>(error: "Ce dossard n'existe pas dans cet univers, essayez de demander à Dr.Strange!");
+        return Result<String>(error: "Ce dossard n'existe pas. Veuillez vérifier le numéro et réessayer.");
       } else {
-        throw Exception('Failed to get username');
+        throw Result<String>(error: 'Échec de la récupération du nom d\'utilisateur');
       }
     }).onError((error, stackTrace) {
       log("Error: $error");
       if (error is http.ClientException) {
-        return Result<String>(error: "No connection to the server");
+        return Result<String>(error: "Pas de connexion au serveur");
       }
-      return Result<String>(error: 'Failed to get username');
+      return Result<String>(error: 'Échec de la récupération du nom d\'utilisateur');
     });
   }
 }

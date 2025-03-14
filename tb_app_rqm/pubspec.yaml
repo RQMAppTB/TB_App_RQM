@@ -1,5 +1,5 @@
-name: tb_app_rqm
-description: "A new Flutter project."
+name: lrqm
+description: "La roue qui marche asso app"
 # The following line prevents the package from being accidentally published to
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 1.0.0+7
+version: 1.0.0+13
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -30,7 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
-
+  flutter_map: ^7.0.2
   shared_preferences: ^2.2.3      # For storing data locally
   mobile_scanner: ^5.1.1          # For scanning QR codes
   http: ^1.2.1                    # For making HTTP requests
@@ -39,8 +39,9 @@ dependencies:
   maps_toolkit: ^3.0.0            # For calculating distances between two points
   flutter_launcher_icons: ^0.13.1 # For changing the app icon
   simple_circular_progress_bar: ^1.0.2
-  package_info_plus: ^4.0.0       # Update this dependency version
+  package_info_plus: ^4.2.0       # Update this dependency version
   url_launcher: ^6.3.1
+  latlong2: ^0.9.1
 
 dev_dependencies:
   flutter_test:
@@ -54,10 +55,12 @@ dev_dependencies:
   flutter_lints: ^3.0.0
 
 flutter_launcher_icons:
-  android: "launcher_icon"
+  android: true
   ios: true
-  image_path: "assets/pictures/LogoSimple.png"
+  image_path: "assets/pictures/LauncherLogo.png"
   min_sdk_android: 21
+  adaptive_icon_background: "#FF9900" # use a solid color
+  adaptive_icon_foreground: "assets/pictures/LauncherLogo.png"
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -73,10 +76,17 @@ flutter:
   # Image of the logo as text and as a simple image
   assets:
     - assets/pictures/LogoSimple.png
+    - assets/pictures/LogoSimpleSquare.png
     - assets/pictures/LogoText.png
     - assets/pictures/LogoTextAnimated.gif
     - assets/pictures/LogoSimpleAnimated.gif
+    - assets/pictures/LogoSimpleOutlined.png
     - assets/pictures/question.png
+    - assets/pictures/LauncherLogo.png
+    - assets/pictures/DrawPosition-removebg.png
+    - assets/pictures/DrawTeam-removebg.png
+    - assets/pictures/DrawScan-removebg.png
+    - assets/pictures/HEIG_VD.jpg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
@@ -89,6 +99,17 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts:
+    - family: Roboto
+      fonts:
+        - asset: assets/fonts/Roboto-Regular.ttf
+        - asset: assets/fonts/Roboto-Bold.ttf
+          weight: 700
+    - family: Poppins
+      fonts:
+        - asset: assets/fonts/Poppins-Regular.ttf
+        - asset: assets/fonts/Poppins-Bold.ttf
+          weight: 700
   # fonts:
   #   - family: Schyler
   #     fonts:

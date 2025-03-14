@@ -1,14 +1,14 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
-import 'package:tb_app_rqm/API/MeasureController.dart';
-import 'package:tb_app_rqm/Data/DistToSendData.dart';
-import 'package:tb_app_rqm/Data/TimeData.dart';
-import 'package:tb_app_rqm/Utils/config.dart';
 import 'package:permission_handler/permission_handler.dart';
+import 'package:lrqm/API/MeasureController.dart'; // Correct package name
+import 'package:lrqm/Data/DistToSendData.dart'; // Correct package name
+import 'package:lrqm/Data/TimeData.dart'; // Correct package name
+import 'package:lrqm/Utils/config.dart'; // Correct package name
+import 'package:flutter/foundation.dart'; // Add this import
 
 class Geolocation {
   /// StreamSubscription to save the position stream and manipulate it
@@ -32,17 +32,20 @@ class Geolocation {
   /// Counter to check if the user is outside the zone
   int _outsideCounter = 0;
 
-  /// StreamController to listen to the distance traveled updates
-  StreamController<int> _streamController = StreamController<int>();
+  /// StreamController to listen to the distance and time updates
+  final StreamController<Map<String, int>> _streamController = StreamController<Map<String, int>>();
 
   /// Boolean to check if the measure stream is started
   bool _positionStreamStarted = false;
+
+  /// Timer to update the time stream every second
+  Timer? _timeTimer;
 
   Geolocation() {
     _settings = _getSettings();
   }
 
-  Stream<int> get stream => _streamController.stream;
+  Stream<Map<String, int>> get stream => _streamController.stream;
 
   /// Handle the permission to access the location and post notifications
   static Future<bool> handlePermission() async {
@@ -132,6 +135,14 @@ class Geolocation {
       _positionStreamStarted = true;
 
       _mesureToWait = 3;
+      _startTime = DateTime.now();
+
+      // Start the time timer to update the time stream every second
+      _timeTimer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+        Duration diff = DateTime.now().difference(_startTime);
+        _streamController.sink.add({"time": diff.inSeconds, "distance": _distance});
+      });
+
       _positionStream =
           geo.Geolocator.getPositionStream(locationSettings: _settings).listen((geo.Position position) async {
         // Wait for the first measures to avoid strange values
@@ -139,7 +150,6 @@ class Geolocation {
           log("Position: $position");
           _oldPos = position;
           _distance = 0;
-          _startTime = DateTime.now();
           _mesureToWait--;
         } else {
           log("Position: $position");
@@ -156,9 +166,6 @@ class Geolocation {
           // Update the distance
           _distance += distSinceLast;
 
-          // Calculate the time diff between now and the start time
-          Duration diff = DateTime.now().difference(_startTime);
-
           // Check if the current location is in the zone
           if (!isLocationInZone(position)) {
             log("Out zone");
@@ -166,11 +173,12 @@ class Geolocation {
               _outsideCounter++;
             } else {
               _distance = -1;
-              _streamController.sink.add(_distance);
+              _streamController.sink
+                  .add({"time": DateTime.now().difference(_startTime).inSeconds, "distance": _distance});
             }
           } else {
             log("In zone");
-            await TimeData.saveTime(diff.inSeconds);
+            await TimeData.saveSessionTime(DateTime.now().difference(_startTime).inSeconds);
             await DistToSendData.saveDistToSend(_distance);
             _outsideCounter = 0;
             MeasureController.sendMesure().then((value) {
@@ -179,7 +187,8 @@ class Geolocation {
               } else {
                 log("Value: ${value.value}");
               }
-              _streamController.sink.add(_distance);
+              _streamController.sink
+                  .add({"time": DateTime.now().difference(_startTime).inSeconds, "distance": _distance});
             });
           }
         }
@@ -187,7 +196,7 @@ class Geolocation {
       log("Entered current position");
     } else {
       log("Position stream already started or no rights");
-      _streamController.sink.add(-1);
+      _streamController.sink.add({"time": -1, "distance": -1});
     }
   }
 
@@ -197,6 +206,7 @@ class Geolocation {
     if (_positionStreamStarted) {
       _positionStream.cancel().then((value) {
         _streamController.close();
+        _timeTimer?.cancel();
         _positionStreamStarted = false;
       });
     }

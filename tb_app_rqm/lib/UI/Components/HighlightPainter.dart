@@ -5,7 +5,7 @@ class HighlightPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Color(Config.COLOR_BUTTON).withOpacity(0.2)
+      ..color = const Color(Config.COLOR_BUTTON).withOpacity(0.2)
       ..style = PaintingStyle.fill;
 
     final path = Path()
