@@ -2,14 +2,42 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart'; // Correct import
 import '../../API/LoginController.dart';
 import '../../Utils/config.dart';
+import '../../Utils/LogHelper.dart'; // Add this import
 import '../LoginScreen.dart';
 import '../InfoScreen.dart';
 
-class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
+class TopAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final bool showInfoButton;
 
   const TopAppBar({super.key, required this.title, this.showInfoButton = true});
+
+  @override
+  _TopAppBarState createState() => _TopAppBarState();
+
+  @override
+  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 4.0);
+}
+
+class _TopAppBarState extends State<TopAppBar> {
+  int _infoButtonClickCount = 0;
+  bool _showShareButton = false;
+
+  void _incrementInfoButtonClickCount() {
+    setState(() {
+      _infoButtonClickCount++;
+      if (_infoButtonClickCount >= 5) {
+        _showShareButton = true;
+      }
+    });
+  }
+
+  void _resetInfoButtonClickCount() {
+    setState(() {
+      _infoButtonClickCount = 0;
+      _showShareButton = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,7 +54,10 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
               children: [
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
-                  child: Image.asset('assets/pictures/LogoText.png', height: 28),
+                  child: GestureDetector(
+                    onTap: _incrementInfoButtonClickCount, // Increment count on logo tap
+                    child: Image.asset('assets/pictures/LogoText.png', height: 28),
+                  ),
                 ),
                 const Spacer(),
               ],
@@ -37,6 +68,13 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
               padding: const EdgeInsets.only(right: 20.0),
               child: Row(
                 children: [
+                  if (_showShareButton)
+                    IconButton(
+                      icon: const Icon(Icons.share, size: 24, color: Color(Config.COLOR_APP_BAR)), // Add share button
+                      onPressed: () async {
+                        await LogHelper.shareLogFile(); // Leverage shareLog
+                      },
+                    ),
                   IconButton(
                     icon: const Icon(Icons.public, size: 24, color: Color(Config.COLOR_APP_BAR)),
                     onPressed: () async {
@@ -86,7 +124,4 @@ class TopAppBar extends StatelessWidget implements PreferredSizeWidget {
       ],
     );
   }
-
-  @override
-  Size get preferredSize => const Size.fromHeight(kToolbarHeight + 4.0);
 }

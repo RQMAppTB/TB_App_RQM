@@ -7,6 +7,7 @@ import 'package:lrqm/API/MeasureController.dart'; // Correct package name
 import 'package:lrqm/Data/DistToSendData.dart'; // Correct package name
 import 'package:lrqm/Data/TimeData.dart'; // Correct package name
 import 'package:lrqm/Utils/config.dart'; // Correct package name
+import 'package:lrqm/Utils/LogHelper.dart';
 import 'package:flutter/foundation.dart'; // Add this import
 
 class Geolocation {
@@ -147,6 +148,7 @@ class Geolocation {
                   .round();
 
           log("Distance: $distSinceLast");
+          LogHelper.writeLog("Position,$position,Dist,$distSinceLast");
 
           // Update the old position
           _oldPos = position;
