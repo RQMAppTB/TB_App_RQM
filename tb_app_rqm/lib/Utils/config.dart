@@ -8,7 +8,8 @@ class Config {
   // ------------------- API -------------------
   static const String API_URL = 'api.rqm.duckdns.org';
   static const String API_COMMON_ADDRESS = '/app/measures/';
-  // -------------- Début et fin ---------------
+  // -------------- EVENT DATA ----------------
+  static const String EVENT_NAME = 'test-2';
   static const String START_TIME = '2024-01-25 17:00:00';
   static const String END_TIME = '2025-06-22 17:00:00';
   // ----------------- QR code -----------------
@@ -36,6 +37,7 @@ class Config {
   // ----------------- Constantes -----------------
   static const double CIRCUIT_SIZE = 3500.0; // Define the circuit size in meters
   static const int TARGET_DISTANCE = 2000000; // Define the target total distance in meters
+
 
   /// Function to get the application version.
   static Future<String> getAppVersion() async {

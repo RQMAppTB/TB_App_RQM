@@ -2,22 +2,18 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:lrqm/API/DistanceController.dart';
+import '../API/NewEventController.dart'; // Replace DistanceController with NewEventController
+import '../API/NewUserController.dart'; // Replace user-related calls with NewUserController
+import '../Data/DossardData.dart'; // Import DossardData
 import 'Components/ProgressCard.dart';
 import 'Components/InfoCard.dart';
 import 'Components/Dialog.dart';
 import 'Components/ActionButton.dart';
 import 'Components/TopAppBar.dart';
 import 'SetupPosScreen.dart'; // Add this import
-import 'package:lrqm/Data/Session.dart';
-
-import '../Data/DistPersoData.dart';
-import '../Data/DistTotaleData.dart';
-import '../Data/DossardData.dart';
-import '../Data/NameData.dart';
+import '../Data/Session.dart';
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
-import '../Data/NbPersonData.dart';
 import '../Data/TimeData.dart';
 import '../Geolocalisation/Geolocation.dart';
 import 'Components/DiscardButton.dart';
@@ -193,6 +189,33 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
   void initState() {
     super.initState();
 
+    // Retrieve the dossard number
+    DossardData.getDossard().then((dossardNumber) {
+      if (dossardNumber != null) {
+        setState(() {
+          _dossard = dossardNumber.toString();
+        });
+
+        // Get the personal distance
+        _getValue(() => NewUserController.getUserTotalMeters(dossardNumber), () async => null).then((value) => setState(() {
+              _distancePerso = value;
+            }));
+
+        // Get the name of the user
+        NewUserController.getUser(dossardNumber).then((result) {
+          if (result.value != null) {
+            setState(() {
+              _name = result.value!['username'] ?? "Unknown";
+            });
+          } else {
+            log("Failed to fetch username: ${result.error}");
+          }
+        });
+      } else {
+        log("Dossard number not found");
+      }
+    });
+
     // Check if a session is ongoing
     Session.isStarted().then((isOngoing) {
       if (isOngoing) {
@@ -226,41 +249,25 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
     });
 
     // Check if the event has started or ended
-    if (DateTime.now().isAfter(end) || DateTime.now().isBefore(start)) {
-      _remainingTime = "L'évènement ${DateTime.now().isAfter(end) ? "est terminé" : "n'a pas encore commencé"} !";
+    if (DateTime(2023, 1, 1).isAfter(end) || DateTime(2023, 1, 1).isBefore(start)) { // Replace DateTime.now() with a fixed date
+      _remainingTime = "L'évènement ${DateTime(2023, 1, 1).isAfter(end) ? "est terminé" : "n'a pas encore commencé"} !";
     } else {
       _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
     }
 
     // Get the total distance
-    _getValue(DistanceController.getTotalDistance, DistTotaleData.getDistTotale).then((value) => setState(() {
+    _getValue(() => NewEventController.getTotalMeters(1), () async => null).then((value) => setState(() {
           _distanceTotale = value;
         }));
 
-    // Get the personal distance
-    _getValue(DistanceController.getPersonalDistance, DistPersoData.getDistPerso).then((value) => setState(() {
-          _distancePerso = value;
-        }));
-
-    // Get the dossard number
-    DossardData.getDossard().then((value) => setState(() {
-          _dossard = value.toString();
-        }));
-
-    // Get the name of the user
-    NameData.getName().then((value) => setState(() {
-          _name = value;
-        }));
-
-    // Fake the number of participants
-    setState(() {
-      _numberOfParticipants = 150; // Set a fake number of participants
-    });
-
     // Get the number of participants
-    NbPersonData.getNbPerson().then((value) => setState(() {
-          _numberOfParticipants = value;
-        }));
+    NewEventController.getActiveUsers(1).then((result) {
+      if (!result.hasError) {
+        setState(() {
+          _numberOfParticipants = result.value;
+        });
+      }
+    });
   }
 
   @override
@@ -273,30 +280,46 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   /// Function to refresh all values
   void _refreshValues() {
+    // Retrieve the dossard number
+    DossardData.getDossard().then((dossardNumber) {
+      if (dossardNumber != null) {
+        setState(() {
+          _dossard = dossardNumber.toString();
+        });
+
+        // Get the personal distance
+        _getValue(() => NewUserController.getUserTotalMeters(dossardNumber), () async => null).then((value) => setState(() {
+              _distancePerso = value;
+            }));
+
+        // Get the name of the user
+        NewUserController.getUser(dossardNumber).then((result) {
+          if (result.value != null) {
+            setState(() {
+              _name = result.value!['username'] ?? "Unknown";
+            });
+          } else {
+            log("Failed to fetch username: ${result.error}");
+          }
+        });
+      } else {
+        log("Dossard number not found");
+      }
+    });
+
     // Get the total distance
-    _getValue(DistanceController.getTotalDistance, DistTotaleData.getDistTotale).then((value) => setState(() {
+    _getValue(() => NewEventController.getTotalMeters(1), () async => null).then((value) => setState(() {
           _distanceTotale = value;
         }));
 
-    // Get the personal distance
-    _getValue(DistanceController.getPersonalDistance, DistPersoData.getDistPerso).then((value) => setState(() {
-          _distancePerso = value;
-        }));
-
-    // Get the dossard number
-    DossardData.getDossard().then((value) => setState(() {
-          _dossard = value.toString().padLeft(4, '0');
-        }));
-
-    // Get the name of the user
-    NameData.getName().then((value) => setState(() {
-          _name = value;
-        }));
-
     // Get the number of participants
-    NbPersonData.getNbPerson().then((value) => setState(() {
-          _numberOfParticipants = value;
-        }));
+    NewEventController.getActiveUsers(1).then((result) {
+      if (!result.hasError) {
+        setState(() {
+          _numberOfParticipants = result.value;
+        });
+      }
+    });
 
     // Get the time spent on the track
     TimeData.getSessionTime().then((value) => setState(() {
@@ -420,7 +443,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                               width: _isSessionActive ? 40 : 32, // Adjust the width as needed
                               height: _isSessionActive ? 40 : 32, // Adjust the height as needed
                             ),
-                            title: 'Distance parcourue',
+                            title: 'Distance parcourue pour l\'évènement',
                             data: '${_formatDistance(_isSessionActive ? _distance : (_distancePerso ?? 0))} mètres',
                             additionalDetails:
                                 _getDistanceMessage(_isSessionActive ? _distance : (_distancePerso ?? 0)),
@@ -428,7 +451,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                           const SizedBox(height: 12),
                           InfoCard(
                             logo: const Icon(Icons.timer_outlined),
-                            title: 'Temps passé sur le parcours',
+                            title: 'Temps total passé sur le parcours',
                             data:
                                 '${(displayedTime ~/ 3600).toString().padLeft(2, '0')}h ${((displayedTime % 3600) ~/ 60).toString().padLeft(2, '0')}m ${(displayedTime % 60).toString().padLeft(2, '0')}s',
                           ),
@@ -492,10 +515,10 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                             ),
                           ),
                           const SizedBox(height: 12),
-                          const InfoCard(
-                            logo: Icon(Icons.groups_2),
+                          InfoCard(
+                            logo: const Icon(Icons.groups_2),
                             title: 'Participants ou groupe actuellement sur le parcours',
-                            data: '150',
+                            data: '${_numberOfParticipants ?? 0}',
                           ),
                           const SizedBox(height: 100), // Add more margin at the bottom to allow more scrolling
                         ],

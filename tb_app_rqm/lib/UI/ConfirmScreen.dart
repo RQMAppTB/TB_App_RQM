@@ -1,8 +1,8 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import '../API/LoginController.dart';
-import '../Utils/config.dart';
+import '../API/NewUserController.dart'; // Use NewUserController instead of LoginController
+import '../Data/DossardData.dart'; // Import DossardData
 import 'WorkingScreen.dart';
 import 'Components/InfoCard.dart';
 import 'Components/ActionButton.dart';
@@ -64,7 +64,11 @@ class ConfirmScreen extends StatelessWidget {
                     onPressed: () async {
                       log("Name: $name");
                       log("Dossard: $dossard");
-                      var tmp = await LoginController.login(name, dossard);
+
+                      // Save the dossard number in DossardData
+                      await DossardData.saveDossard(dossard);
+
+                      var tmp = await NewUserController.getUser(dossard); 
                       if (!tmp.hasError) {
                         Navigator.pushReplacement(
                           context,
