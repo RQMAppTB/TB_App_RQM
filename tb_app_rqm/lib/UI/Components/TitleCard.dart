@@ -19,12 +19,17 @@ class TitleCard extends StatelessWidget {
       width: double.infinity,
       decoration: BoxDecoration(
         color: Color(Config.COLOR_APP_BAR),
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(2),
         boxShadow: [
           BoxShadow(
-            color: Colors.black26,
-            blurRadius: 8,
-            offset: Offset(0, 4),
+            color: Color(Config.COLOR_APP_BAR).withOpacity(0.1), // Subtle shadow color
+            blurRadius: 4.0, // Reduced blur radius for subtle shadow
+            offset: Offset(0, 2), // Vertical shadow offset
+          ),
+          BoxShadow(
+            color: Color(Config.COLOR_APP_BAR).withOpacity(0.05), // Even lighter shadow color
+            blurRadius: 2.0, // Smaller blur radius
+            offset: Offset(-1, 0), // Horizontal shadow offset
           ),
         ],
       ),

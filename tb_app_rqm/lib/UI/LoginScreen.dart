@@ -4,14 +4,16 @@ import 'dart:async'; // Import Timer from dart:async
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../API/NewEventController.dart'; // Import NewEventController
+import '../API/NewEventController.dart';
 import '../API/NewUserController.dart';
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
 import 'ConfirmScreen.dart';
 import 'LoadingScreen.dart'; 
 import 'Components/ActionButton.dart'; 
-import '../Data/EventData.dart'; // Ensure this import is present and correct
+import '../Data/EventData.dart';
+import 'Components/CountdownModal.dart';
+import 'Components/TextModal.dart';
 
 /// Class to display the login screen.
 /// This screen allows the user to enter his dossard number
@@ -48,7 +50,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
 void _checkEventStatus() async {
   Result<List<dynamic>> eventsResult = await NewEventController.getAllEvents();
   if (eventsResult.hasError) {
-    _showBlockingModal("Erreur", "Erreur lors de la récupération des évènements.", startDate: DateTime.now());
+    showTextModal(context, "Erreur", "Erreur lors de la récupération des évènements.");
     return;
   }
 
@@ -59,7 +61,7 @@ void _checkEventStatus() async {
   );
 
   if (event == null) {
-    _showBlockingModal("Information", "L'évènement '${Config.EVENT_NAME}' n'existe pas.", startDate: DateTime.now());
+    showTextModal(context, "Erreur", "L'évènement '${Config.EVENT_NAME}' n'existe pas.");
     return;
   }
 
@@ -70,101 +72,15 @@ void _checkEventStatus() async {
   // Save all event details using EventData
   await EventData.saveEvent(event);
 
-  String? eventName = await EventData.getEventName(); // Retrieve event name from EventData
-
   if (now.isBefore(startDate)) {
-    _showBlockingModal("C'est bientôt l'heure !", "", startDate: startDate); // Message is now handled inside _showBlockingModal
+    showCountdownModal(context, "C'est bientôt l'heure !", startDate: startDate); // Show countdown modal
   } else if (now.isAfter(endDate)) {
-    _showBlockingModal("C'est fini !", "Malheureusement, l'évènement $eventName est terminé.", startDate: DateTime.now());
+    showTextModal(context, "C'est fini !", "Malheureusement, l'évènement est terminé.");
   } else {
     setState(() {
       _isEventActive = true;
     });
   }
-}
-
-void _showBlockingModal(String title, String message, {required DateTime startDate}) async {
-  String? eventName = await EventData.getEventName(); // Retrieve event name from EventData
-  WidgetsBinding.instance.addPostFrameCallback((_) {
-    showDialog(
-      context: context,
-      barrierDismissible: false, // Prevent dismissing the dialog
-      builder: (BuildContext context) {
-        return StatefulBuilder(
-          builder: (context, setState) {
-            String calculateCountdown() {
-              Duration difference = startDate.difference(DateTime.now());
-              return "${difference.inDays} J : "
-                  "${difference.inHours.remainder(24).toString().padLeft(2, '0')} H : "
-                  "${difference.inMinutes.remainder(60).toString().padLeft(2, '0')} M : "
-                  "${difference.inSeconds.remainder(60).toString().padLeft(2, '0')} S";
-            }
-
-            String countdown = calculateCountdown();
-
-            Timer.periodic(const Duration(seconds: 1), (timer) {
-              setState(() {
-                countdown = calculateCountdown();
-                if (DateTime.now().isAfter(startDate)) {
-                  timer.cancel();
-                  Navigator.of(context).pop(); // Close the dialog when the event starts
-                }
-              });
-            });
-
-            return AlertDialog(
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0), // Rounded corners
-              ),
-              backgroundColor: Colors.white, // Default background color
-              title: Text(
-                title,
-                style: const TextStyle(
-                  color: Color(Config.COLOR_APP_BAR), // Use COLOR_APP_BAR for text
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20, 
-                ),
-              ),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
-                children: [
-                  Text(
-                    "Hey ! L'évènement \"$eventName\" n'a pas encore démarré.\n\n"
-                    "Pas de stress, on compte les secondes ensemble jusqu'au top départ ! "
-                    "Prépare-toi, hydrate-toi, et surtout, garde ton énergie pour le grand moment. 🚀",
-                    style: const TextStyle(
-                      color: Color(Config.COLOR_APP_BAR), // Use COLOR_APP_BAR for text
-                      fontSize: 16, // Increase font size to 16
-                    ),
-                    textAlign: TextAlign.justify, 
-                  ),
-                  const SizedBox(height: 24), // Add spacing
-                  Container(
-                    width: double.infinity, // Take full width of the dialog
-                    padding: const EdgeInsets.all(10),
-                    decoration: BoxDecoration(
-                      color: const Color(Config.COLOR_APP_BAR).withOpacity(0.2), // Use COLOR_APP_BAR with opacity 0.2
-                      borderRadius: BorderRadius.circular(8.0),
-                    ),
-                    child: Text(
-                      countdown,
-                      style: const TextStyle(
-                        fontSize: 20, // Larger font size for countdown
-                        fontWeight: FontWeight.bold, // Bold text
-                        color: Color(Config.COLOR_APP_BAR), // Use COLOR_APP_BAR for text
-                      ),
-                      textAlign: TextAlign.center, // Center align text
-                    ),
-                  ),
-                ],
-              ),
-            );
-          },
-        );
-      },
-    );
-  });
 }
 
   void _onTextChanged() {}

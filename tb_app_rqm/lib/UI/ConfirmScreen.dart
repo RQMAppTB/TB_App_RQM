@@ -2,7 +2,7 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import '../API/NewUserController.dart'; // Use NewUserController instead of LoginController
-import '../Data/DossardData.dart'; // Import DossardData
+import '../Data/UserData.dart'; // Import UserData
 import 'WorkingScreen.dart';
 import 'Components/InfoCard.dart';
 import 'Components/ActionButton.dart';
@@ -27,7 +27,7 @@ class ConfirmScreen extends StatelessWidget {
           SingleChildScrollView(
             // Make the full page scrollable
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0), // Add margin
+              padding: const EdgeInsets.symmetric(horizontal: 20.0), // Add margin
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
                 crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
@@ -54,7 +54,7 @@ class ConfirmScreen extends StatelessWidget {
           Align(
             alignment: Alignment.bottomCenter, // Fix the buttons at the bottom
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 30.0, vertical: 20.0), // Add padding
+              padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0), // Add padding
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -65,11 +65,16 @@ class ConfirmScreen extends StatelessWidget {
                       log("Name: $name");
                       log("Dossard: $dossard");
 
-                      // Save the dossard number in DossardData
-                      await DossardData.saveDossard(dossard);
-
                       var tmp = await NewUserController.getUser(dossard); 
-                      if (!tmp.hasError) {
+                      if (!tmp.hasError && tmp.value != null) {
+                        // Save user data in UserData
+                        await UserData.saveUser({
+                          "id": tmp.value!['id'], // Use null-aware operator
+                          "username": tmp.value!['username'], // Use null-aware operator
+                          "bib_id": tmp.value!['bib_id'], // Use null-aware operator
+                          "event_id": tmp.value!['event_id'], // Use null-aware operator
+                        });
+
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) {
@@ -77,7 +82,7 @@ class ConfirmScreen extends StatelessWidget {
                           }),
                         );
                       } else {
-                        showInSnackBar(context, tmp.error!);
+                        showInSnackBar(context, tmp.error ?? "An unknown error occurred.");
                       }
                     },
                   ),

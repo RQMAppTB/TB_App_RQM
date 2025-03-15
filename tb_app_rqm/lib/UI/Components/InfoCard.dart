@@ -76,13 +76,23 @@ class _InfoCardState extends State<InfoCard> with SingleTickerProviderStateMixin
         width: double.infinity,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(8.0),
+          borderRadius: BorderRadius.circular(2.0),
+          border: Border(
+            right: BorderSide(
+              color: Color(Config.COLOR_APP_BAR), // Add right border
+              width: 6.0, // Set the width of the right border
+            ),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              spreadRadius: 2,
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              color: Color(Config.COLOR_APP_BAR).withOpacity(0.1), // Subtle shadow color
+              blurRadius: 4.0, // Reduced blur radius for subtle shadow
+              offset: Offset(0, 2), // Vertical shadow offset
+            ),
+            BoxShadow(
+              color: Color(Config.COLOR_APP_BAR).withOpacity(0.05), // Even lighter shadow color
+              blurRadius: 2.0, // Smaller blur radius
+              offset: Offset(-1, 0), // Horizontal shadow offset
             ),
           ],
         ),
@@ -94,23 +104,23 @@ class _InfoCardState extends State<InfoCard> with SingleTickerProviderStateMixin
               children: [
                 if (widget.logo != null)
                   Container(
-                    width: 60,
-                    height: 60,
+                    width: 48,
+                    height: 48,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
-                      color: Color(Config.COLOR_APP_BAR).withOpacity(0.15),
+                      color: Color(Config.COLOR_BACKGROUND).withOpacity(1),
                     ),
                     child: Center(
                       child: IconTheme(
                         data: const IconThemeData(
-                          size: 32,
+                          size: 28,
                           color: Color(Config.COLOR_APP_BAR),
                         ),
                         child: widget.logo!,
                       ),
                     ),
                   ),
-                if (widget.logo != null) const SizedBox(width: 16),
+                if (widget.logo != null) const SizedBox(width: 12),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -123,7 +133,7 @@ class _InfoCardState extends State<InfoCard> with SingleTickerProviderStateMixin
                           color: Color(Config.COLOR_APP_BAR),
                         ),
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: 4),
                       Text(
                         widget.data,
                         style: const TextStyle(

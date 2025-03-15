@@ -9,7 +9,7 @@ class Config {
   static const String API_URL = 'api.rqm.duckdns.org';
   static const String API_COMMON_ADDRESS = '/app/measures/';
   // -------------- EVENT DATA ----------------
-  static const String EVENT_NAME = 'test-2';
+  static const String EVENT_NAME = 'TEST';
   static const String START_TIME = '2024-01-25 17:00:00';
   static const String END_TIME = '2025-06-22 17:00:00';
   // ----------------- QR code -----------------

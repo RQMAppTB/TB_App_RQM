@@ -5,6 +5,7 @@ import '../../Utils/config.dart';
 import '../../Utils/LogHelper.dart'; // Add this import
 import '../LoginScreen.dart';
 import '../InfoScreen.dart';
+import '../../Data/UserData.dart'; // Import UserData
 
 class TopAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
@@ -99,15 +100,22 @@ class _TopAppBarState extends State<TopAppBar> {
                   IconButton(
                     icon: const Icon(Icons.logout, size: 24, color: Color(Config.COLOR_APP_BAR)),
                     onPressed: () {
-                      LoginController.logout().then((result) {
-                        if (result.hasError) {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(content: Text("Please try again later")));
+                      UserData.clearUserData().then((cleared) {
+                        if (cleared) {
+                          LoginController.logout().then((result) {
+                            if (result.hasError) {
+                              ScaffoldMessenger.of(context)
+                                  .showSnackBar(const SnackBar(content: Text("Please try again later")));
+                            } else {
+                              Navigator.pushReplacement(
+                                context,
+                                MaterialPageRoute(builder: (context) => const Login()),
+                              );
+                            }
+                          });
                         } else {
-                          Navigator.pushReplacement(
-                            context,
-                            MaterialPageRoute(builder: (context) => const Login()),
-                          );
+                          ScaffoldMessenger.of(context)
+                              .showSnackBar(const SnackBar(content: Text("Failed to clear user data")));
                         }
                       });
                     },
