@@ -9,8 +9,8 @@ import '../API/NewUserController.dart';
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
 import 'ConfirmScreen.dart';
-import 'LoadingScreen.dart'; 
-import 'Components/ActionButton.dart'; 
+import 'LoadingScreen.dart';
+import 'Components/ActionButton.dart';
 import '../Data/EventData.dart';
 import 'Components/CountdownModal.dart';
 import 'Components/TextModal.dart';
@@ -47,41 +47,75 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
     _checkEventStatus();
   }
 
-void _checkEventStatus() async {
-  Result<List<dynamic>> eventsResult = await NewEventController.getAllEvents();
-  if (eventsResult.hasError) {
-    showTextModal(context, "Erreur", "Erreur lors de la récupération des évènements.");
-    return;
-  }
-
-  var events = eventsResult.value!;
-  var event = events.firstWhere(
-    (event) => event['name'] == Config.EVENT_NAME,
-    orElse: () => null,
-  );
-
-  if (event == null) {
-    showTextModal(context, "Erreur", "L'évènement '${Config.EVENT_NAME}' n'existe pas.");
-    return;
-  }
-
-  DateTime startDate = DateTime.parse(event['start_date']);
-  DateTime endDate = DateTime.parse(event['end_date']);
-  DateTime now = DateTime.now();
-
-  // Save all event details using EventData
-  await EventData.saveEvent(event);
-
-  if (now.isBefore(startDate)) {
-    showCountdownModal(context, "C'est bientôt l'heure !", startDate: startDate); // Show countdown modal
-  } else if (now.isAfter(endDate)) {
-    showTextModal(context, "C'est fini !", "Malheureusement, l'évènement est terminé.");
-  } else {
+  void _checkEventStatus() async {
     setState(() {
-      _isEventActive = true;
+      _isEventActive = false; // Show loading screen while fetching event info
     });
+
+    Result<List<dynamic>> eventsResult =
+        await NewEventController.getAllEvents();
+    if (eventsResult.hasError) {
+      log("Error fetching events: ${eventsResult.error}"); // Log the error details
+      setState(() {
+        _isEventActive = true; // Render login page before showing modal
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showTextModal(
+          context,
+          "Erreur",
+          "Erreur lors de la récupération de l'évènement. Veuillez vérifier votre connexion internet.",
+          showConfirmButton: true,
+          onConfirm: _checkEventStatus, // Retry fetching events on confirmation
+        );
+      });
+      return;
+    }
+
+    var events = eventsResult.value!;
+    var event = events.firstWhere(
+      (event) => event['name'] == Config.EVENT_NAME,
+      orElse: () => null,
+    );
+
+    if (event == null) {
+      setState(() {
+        _isEventActive = true; // Render login page before showing modal
+      });
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showTextModal(
+          context,
+          "Erreur",
+          "L'évènement '${Config.EVENT_NAME}' n'existe pas.",
+          showConfirmButton: true,
+          onConfirm: _checkEventStatus, // Retry fetching events on confirmation
+        );
+      });
+      return;
+    }
+
+    DateTime startDate = DateTime.parse(event['start_date']);
+    DateTime endDate = DateTime.parse(event['end_date']);
+    DateTime now = DateTime.now();
+
+    // Save all event details using EventData
+    await EventData.saveEvent(event);
+
+    setState(() {
+      _isEventActive = true; // Render login page
+    });
+
+    if (now.isBefore(startDate)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showCountdownModal(context, "C'est bientôt l'heure !",
+            startDate: startDate); // Show countdown modal
+      });
+    } else if (now.isAfter(endDate)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        showTextModal(context, "C'est fini !",
+            "Malheureusement, l'évènement est terminé.");
+      });
+    }
   }
-}
 
   void _onTextChanged() {}
 
@@ -101,12 +135,15 @@ void _checkEventStatus() async {
 
     Navigator.push(
       context,
-      MaterialPageRoute(builder: (context) => const LoadingScreen()), // Ensure LoadingScreen is correctly referenced
+      MaterialPageRoute(
+          builder: (context) =>
+              const LoadingScreen()), // Ensure LoadingScreen is correctly referenced
     );
 
     try {
       int dossardNumber = int.parse(_controller.text);
-      Result dosNumResult = await NewUserController.getUser(dossardNumber); // Use NewUserController
+      Result dosNumResult = await NewUserController.getUser(
+          dossardNumber); // Use NewUserController
 
       if (dosNumResult.error != null) {
         // Show error message in snackbar
@@ -115,12 +152,15 @@ void _checkEventStatus() async {
         Navigator.pop(context); // Close the loading page
       } else {
         setState(() {
-          _name = dosNumResult.value['username']; // Extract username from the API response
+          _name = dosNumResult
+              .value['username']; // Extract username from the API response
           _dossard = dossardNumber;
         });
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ConfirmScreen(name: _name, dossard: _dossard)),
+          MaterialPageRoute(
+              builder: (context) =>
+                  ConfirmScreen(name: _name, dossard: _dossard)),
         );
       }
     } catch (e) {
@@ -132,6 +172,10 @@ void _checkEventStatus() async {
 
   @override
   Widget build(BuildContext context) {
+    if (!_isEventActive) {
+      return const LoadingScreen();
+    }
+
     bool isKeyboardVisible = MediaQuery.of(context).viewInsets.bottom != 0;
     _controller.addListener(_onTextChanged);
 
@@ -141,10 +185,12 @@ void _checkEventStatus() async {
         children: [
           Center(
             child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 20.0), // Add margin
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 20.0), // Add margin
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.start,
-                crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                crossAxisAlignment:
+                    CrossAxisAlignment.start, // Align text to the left
                 children: <Widget>[
                   Flexible(
                     flex: 2,
@@ -156,7 +202,9 @@ void _checkEventStatus() async {
                     child: Flexible(
                       flex: 3,
                       child: Center(
-                        child: Image(image: AssetImage('assets/pictures/LogoTextAnimated.gif')),
+                        child: Image(
+                            image: AssetImage(
+                                'assets/pictures/LogoTextAnimated.gif')),
                       ),
                     ),
                   ),
@@ -167,8 +215,10 @@ void _checkEventStatus() async {
                   Expanded(
                     flex: 12,
                     child: Column(
-                      mainAxisAlignment: MainAxisAlignment.start, // Reduce margin
-                      crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                      mainAxisAlignment:
+                          MainAxisAlignment.start, // Reduce margin
+                      crossAxisAlignment:
+                          CrossAxisAlignment.start, // Align text to the left
                       children: [
                         const Text(
                           'Bienvenue,',
@@ -184,19 +234,25 @@ void _checkEventStatus() async {
                             RichText(
                               text: const TextSpan(
                                 text: 'Entre ton ',
-                                style: TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
+                                style: TextStyle(
+                                    fontSize: 16,
+                                    color: Color(Config.COLOR_APP_BAR)),
                                 children: <TextSpan>[
                                   TextSpan(
                                     text: 'numéro de dossard',
                                     style: TextStyle(
-                                      fontSize: 16, // Remove font size difference
-                                      color: Color(Config.COLOR_APP_BAR), // Blue color
+                                      fontSize:
+                                          16, // Remove font size difference
+                                      color: Color(
+                                          Config.COLOR_APP_BAR), // Blue color
                                       fontWeight: FontWeight.bold, // Bold
                                     ),
                                   ),
                                   TextSpan(
                                     text: ' pour t\'identifier à l`évènement.',
-                                    style: TextStyle(fontSize: 16, color: Color(Config.COLOR_APP_BAR)),
+                                    style: TextStyle(
+                                        fontSize: 16,
+                                        color: Color(Config.COLOR_APP_BAR)),
                                   ),
                                 ],
                               ),
@@ -206,7 +262,8 @@ void _checkEventStatus() async {
                         const SizedBox(height: 20), // Add small margin
                         Container(
                           decoration: BoxDecoration(
-                            color: const Color(Config.COLOR_APP_BAR).withOpacity(0.15),
+                            color: const Color(Config.COLOR_APP_BAR)
+                                .withOpacity(0.1),
                             borderRadius: BorderRadius.circular(2.0),
                           ),
                           child: TextField(
@@ -215,15 +272,18 @@ void _checkEventStatus() async {
                             inputFormatters: [
                               LengthLimitingTextInputFormatter(4),
                             ],
-                            textAlign: TextAlign.center, // Center the text horizontally
+                            textAlign: TextAlign
+                                .center, // Center the text horizontally
                             decoration: const InputDecoration(
                               border: InputBorder.none,
-                              contentPadding: EdgeInsets.all(8.0),
+                              contentPadding: EdgeInsets.all(12.0),
                             ),
                             style: const TextStyle(
                               fontSize: 28,
-                              color: Color(Config.COLOR_APP_BAR), // Set input text color to APP_COLOR
-                              letterSpacing: 8.0, // Increase space between characters
+                              color: Color(Config
+                                  .COLOR_APP_BAR), // Set input text color to APP_COLOR
+                              letterSpacing:
+                                  8.0, // Increase space between characters
                               fontWeight: FontWeight.bold, //
                             ),
                           ),
@@ -233,7 +293,8 @@ void _checkEventStatus() async {
                           child: const Text(
                             '1 à 9999',
                             style: TextStyle(
-                              color: Color(Config.COLOR_APP_BAR), // Reduce opacity to 0.5
+                              color: Color(Config
+                                  .COLOR_APP_BAR), // Reduce opacity to 0.5
                               fontSize: 14,
                             ),
                           ),
@@ -247,7 +308,8 @@ void _checkEventStatus() async {
                             onPressed: _getUserame,
                           ),
                         ),
-                        const SizedBox(height: 20), // Add margin below the button
+                        const SizedBox(
+                            height: 12), // Add margin below the button
                       ],
                     ),
                   ),

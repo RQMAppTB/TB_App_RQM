@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:url_launcher/url_launcher.dart'; // Correct import
-import '../../API/LoginController.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../Utils/config.dart';
-import '../../Utils/LogHelper.dart'; // Add this import
+import '../../Utils/LogHelper.dart';
 import '../LoginScreen.dart';
 import '../InfoScreen.dart';
-import '../../Data/UserData.dart'; // Import UserData
+import '../../Data/DataUtils.dart';
+import '../../Data/MeasureData.dart';
+import '../../API/NewMeasureController.dart';
 
 class TopAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
@@ -56,8 +57,10 @@ class _TopAppBarState extends State<TopAppBar> {
                 Padding(
                   padding: const EdgeInsets.only(left: 20.0),
                   child: GestureDetector(
-                    onTap: _incrementInfoButtonClickCount, // Increment count on logo tap
-                    child: Image.asset('assets/pictures/LogoText.png', height: 28),
+                    onTap:
+                        _incrementInfoButtonClickCount, // Increment count on logo tap
+                    child:
+                        Image.asset('assets/pictures/LogoText.png', height: 28),
                   ),
                 ),
                 const Spacer(),
@@ -71,53 +74,71 @@ class _TopAppBarState extends State<TopAppBar> {
                 children: [
                   if (_showShareButton)
                     IconButton(
-                      icon: const Icon(Icons.share, size: 24, color: Color(Config.COLOR_APP_BAR)), // Add share button
+                      icon: const Icon(Icons.share,
+                          size: 24,
+                          color:
+                              Color(Config.COLOR_APP_BAR)), // Add share button
                       onPressed: () async {
                         await LogHelper.shareLogFile(); // Leverage shareLog
                       },
                     ),
                   IconButton(
-                    icon: const Icon(Icons.public, size: 24, color: Color(Config.COLOR_APP_BAR)),
+                    icon: const Icon(Icons.public,
+                        size: 24, color: Color(Config.COLOR_APP_BAR)),
                     onPressed: () async {
                       final Uri url = Uri.parse('https://larouequimarche.ch/');
                       await launch(
                         url.toString(),
                         forceSafariVC: false,
                         forceWebView: false,
-                        headers: <String, String>{'my_header_key': 'my_header_value'},
+                        headers: <String, String>{
+                          'my_header_key': 'my_header_value'
+                        },
                       );
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.info_outlined, size: 24, color: Color(Config.COLOR_APP_BAR)),
+                    icon: const Icon(Icons.info_outlined,
+                        size: 24, color: Color(Config.COLOR_APP_BAR)),
                     onPressed: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => const InfoScreen()),
+                        MaterialPageRoute(
+                            builder: (context) => const InfoScreen()),
                       );
                     },
                   ),
                   IconButton(
-                    icon: const Icon(Icons.logout, size: 24, color: Color(Config.COLOR_APP_BAR)),
-                    onPressed: () {
-                      UserData.clearUserData().then((cleared) {
-                        if (cleared) {
-                          LoginController.logout().then((result) {
-                            if (result.hasError) {
-                              ScaffoldMessenger.of(context)
-                                  .showSnackBar(const SnackBar(content: Text("Please try again later")));
-                            } else {
-                              Navigator.pushReplacement(
-                                context,
-                                MaterialPageRoute(builder: (context) => const Login()),
-                              );
-                            }
-                          });
-                        } else {
-                          ScaffoldMessenger.of(context)
-                              .showSnackBar(const SnackBar(content: Text("Failed to clear user data")));
+                    icon: const Icon(Icons.logout,
+                        size: 24, color: Color(Config.COLOR_APP_BAR)),
+                    onPressed: () async {
+                      if (await MeasureData.isMeasureOngoing()) {
+                        String? measureId = await MeasureData.getMeasureId();
+                        final stopResult =
+                            await NewMeasureController.stopMeasure();
+                        if (stopResult.error != null) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                                content: Text(
+                                    "Failed to stop measure (ID: $measureId): ${stopResult.error}")),
+                          );
+                          return;
                         }
-                      });
+                      }
+
+                      final cleared = await DataUtils.deleteAllData();
+                      if (cleared) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => const Login()),
+                        );
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                              content: Text("Failed to clear user data")),
+                        );
+                      }
                     },
                   ),
                 ],

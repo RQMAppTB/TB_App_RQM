@@ -2,25 +2,31 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import '../API/NewEventController.dart'; // Replace DistanceController with NewEventController
-import '../API/NewUserController.dart'; // Replace user-related calls with NewUserController
+
 import 'Components/ProgressCard.dart';
 import 'Components/InfoCard.dart';
 import 'Components/Dialog.dart';
 import 'Components/ActionButton.dart';
 import 'Components/TopAppBar.dart';
-import 'SetupPosScreen.dart'; // Add this import
-import '../Data/Session.dart';
+import 'Components/TitleCard.dart';
+import 'Components/DiscardButton.dart';
+import 'Components/InfoDialog.dart';
+
+import 'SetupPosScreen.dart';
+import 'LoadingScreen.dart';
+
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
 import '../Data/TimeData.dart';
 import '../Geolocalisation/Geolocation.dart';
-import 'Components/DiscardButton.dart';
-import 'Components/InfoDialog.dart'; // Add this import
-import 'LoadingScreen.dart'; // Add this import
-import 'Components/TitleCard.dart';
-import '../Data/EventData.dart'; // Import EventData
-import '../Data/UserData.dart'; // Import UserData
+
+import '../API/NewEventController.dart';
+import '../API/NewUserController.dart';
+import '../API/NewMeasureController.dart';
+
+import '../Data/EventData.dart';
+import '../Data/UserData.dart';
+import '../Data/MeasureData.dart';
 
 /// Class to display the working screen.
 /// This screen displays the remaining time before the end of the event,
@@ -35,7 +41,8 @@ class WorkingScreen extends StatefulWidget {
 }
 
 /// State of the WorkingScreen class.
-class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProviderStateMixin {
+class _WorkingScreenState extends State<WorkingScreen>
+    with SingleTickerProviderStateMixin {
   /// Timer to update the remaining time every second
   Timer? _timer;
 
@@ -75,7 +82,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   final ScrollController _parentScrollController = ScrollController();
 
-  bool _isSessionActive = false;
+  bool _isMeasureActive = false;
   Geolocation _geolocation = Geolocation();
   int _distance = 0;
 
@@ -118,28 +125,35 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
     Duration remaining = end!.difference(now);
     if (remaining.isNegative) {
       _timer?.cancel();
-      setState(() {
-        _remainingTime = "L'évènement est terminé !";
-      });
+      if (mounted) {
+        setState(() {
+          _remainingTime = "L'évènement est terminé !";
+        });
+      }
       return;
     } else if (now.isBefore(start!)) {
-      setState(() {
-        _remainingTime = "L'évènement n'a pas encore commencé !";
-      });
+      if (mounted) {
+        setState(() {
+          _remainingTime = "L'évènement n'a pas encore commencé !";
+        });
+      }
       return;
     }
 
-    setState(() {
-      _remainingTime =
-          '${remaining.inHours.toString().padLeft(2, '0')}h ${(remaining.inMinutes % 60).toString().padLeft(2, '0')}m ${(remaining.inSeconds % 60).toString().padLeft(2, '0')}s';
-    });
+    if (mounted) {
+      setState(() {
+        _remainingTime =
+            '${remaining.inHours.toString().padLeft(2, '0')}h ${(remaining.inMinutes % 60).toString().padLeft(2, '0')}m ${(remaining.inSeconds % 60).toString().padLeft(2, '0')}s';
+      });
+    }
   }
 
   /// Function to get the value from the API [fetchVal]
   /// and if it fails, get the value from the shared preferences [getVal]
   /// Returns the value
   /// If the value is not found, returns -1
-  Future<int> _getValue(Future<Result<int>> Function() fetchVal, Future<int?> Function() getVal) {
+  Future<int> _getValue(
+      Future<Result<int>> Function() fetchVal, Future<int?> Function() getVal) {
     return fetchVal().then((value) {
       if (value.hasError) {
         throw Exception("Could not fetch value because : ${value.error}");
@@ -175,7 +189,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
   }
 
   String _formatDistance(int distance) {
-    return distance.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}\'');
+    return distance.toString().replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}\'');
   }
 
   String _getDistanceMessage(int distance) {
@@ -196,7 +211,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
     // Retrieve the event start and end times
     EventData.getStartDate().then((startDate) {
-      if (startDate != null) {
+      if (startDate != null && mounted) {
         setState(() {
           start = DateTime.parse(startDate);
         });
@@ -204,7 +219,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
     });
 
     EventData.getEndDate().then((endDate) {
-      if (endDate != null) {
+      if (endDate != null && mounted) {
         setState(() {
           end = DateTime.parse(endDate);
         });
@@ -213,19 +228,24 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
     // Retrieve the bib_id from UserData
     UserData.getBibId().then((bibId) {
-      if (bibId != null) {
+      if (bibId != null && mounted) {
         setState(() {
           _dossard = bibId;
         });
 
         // Get the personal distance
-        _getValue(() => NewUserController.getUserTotalMeters(int.parse(bibId)), () async => null).then((value) => setState(() {
+        _getValue(() => NewUserController.getUserTotalMeters(int.parse(bibId)),
+            () async => null).then((value) {
+          if (mounted) {
+            setState(() {
               _distancePerso = value;
-            }));
+            });
+          }
+        });
 
         // Get the name of the user
         UserData.getUsername().then((username) {
-          if (username != null) {
+          if (username != null && mounted) {
             setState(() {
               _name = username;
             });
@@ -238,40 +258,47 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
       }
     });
 
-    // Check if a session is ongoing
-    Session.isStarted().then((isOngoing) {
-      if (isOngoing) {
+    // Check if a measure is ongoing
+    MeasureData.isMeasureOngoing().then((isOngoing) {
+      if (isOngoing && mounted) {
         setState(() {
-          _isSessionActive = true;
+          _isMeasureActive = true;
         });
         _geolocation.stream.listen((event) {
           log("Stream event: $event");
           if (event["distance"] == -1) {
             log("Stream event: $event");
             _geolocation.stopListening();
-            Session.stopSession();
-            setState(() {
-              _isSessionActive = false;
-            });
+            NewMeasureController.stopMeasure();
+            if (mounted) {
+              setState(() {
+                _isMeasureActive = false;
+              });
+            }
           } else {
-            setState(() {
-              _distance = event["distance"] ?? 0;
-              _sessionTimePerso = event["time"];
-            });
+            if (mounted) {
+              setState(() {
+                _distance = event["distance"] ?? 0;
+                _sessionTimePerso = event["time"];
+              });
+            }
           }
         });
         _geolocation.startListening();
       } else {
-        // TODO REPLACE WITH TOTAL TIME FROM API
         // Get the total time spent on the track
-        TimeData.getSessionTime().then((value) => setState(() {
+        TimeData.getSessionTime().then((value) {
+          if (mounted) {
+            setState(() {
               _totalTimePerso = value;
-            }));
+            });
+          }
+        });
       }
     });
 
     // Check if the event has started or ended
-    Timer.periodic(const Duration(seconds: 1), (Timer t) {
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
       if (start != null && end != null) {
         countDown();
       }
@@ -279,15 +306,20 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
     // Get the event ID
     EventData.getEventId().then((eventId) {
-      if (eventId != null) {
+      if (eventId != null && mounted) {
         // Get the total distance
-        _getValue(() => NewEventController.getTotalMeters(eventId), () async => null).then((value) => setState(() {
+        _getValue(() => NewEventController.getTotalMeters(eventId),
+            () async => null).then((value) {
+          if (mounted) {
+            setState(() {
               _distanceTotale = value;
-            }));
+            });
+          }
+        });
 
         // Get the number of participants
         NewEventController.getActiveUsers(eventId).then((result) {
-          if (!result.hasError) {
+          if (!result.hasError && mounted) {
             setState(() {
               _numberOfParticipants = result.value;
             });
@@ -317,9 +349,11 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
         });
 
         // Get the personal distance
-        _getValue(() => NewUserController.getUserTotalMeters(int.parse(bibId)), () async => null).then((value) => setState(() {
-              _distancePerso = value;
-            }));
+        _getValue(
+                () => NewUserController.getUserTotalMeters(int.parse(bibId)), () async => null)
+            .then((value) => setState(() {
+                  _distancePerso = value;
+                }));
 
         // Get the name of the user
         UserData.getUsername().then((username) {
@@ -340,9 +374,11 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
     EventData.getEventId().then((eventId) {
       if (eventId != null) {
         // Get the total distance
-        _getValue(() => NewEventController.getTotalMeters(eventId), () async => null).then((value) => setState(() {
-              _distanceTotale = value;
-            }));
+        _getValue(
+                () => NewEventController.getTotalMeters(eventId), () async => null)
+            .then((value) => setState(() {
+                  _distanceTotale = value;
+                }));
 
         // Get the number of participants
         NewEventController.getActiveUsers(eventId).then((result) {
@@ -363,35 +399,37 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
         }));
   }
 
-  void _confirmStopSession(BuildContext context) {
+  void _confirmStopMeasure(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return InfoDialog(
           title: 'Confirmation',
-          content: 'Arrêter la session en cours ?',
+          content: 'Arrêter la mesure en cours ?',
           onYes: () async {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const LoadingScreen(text: 'On se repose un peu...'),
+                builder: (context) =>
+                    const LoadingScreen(text: 'On se repose un peu...'),
               ),
             );
             try {
-              await Session.stopSession();
+              await NewMeasureController.stopMeasure();
             } catch (e) {
-              await Session.forceStopSession();
+              log("Failed to stop measure: $e");
             }
             setState(() {
-              _isSessionActive = false;
+              _isMeasureActive = false;
             });
-            _refreshValues(); // Refresh values after stopping the session
+            _refreshValues(); // Refresh values after stopping the measure
             Navigator.of(context).pop(); // Close the loading screen
             Navigator.of(context).pop(); // Close the confirmation dialog
           },
           onNo: () {
             Navigator.of(context).pop();
           },
-          logo: const Icon(Icons.warning_outlined, color: Color(Config.COLOR_APP_BAR)), // Add optional logo
+          logo: const Icon(Icons.warning_outlined,
+              color: Color(Config.COLOR_APP_BAR)), // Add optional logo
         );
       },
     );
@@ -407,7 +445,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    int displayedTime = _isSessionActive ? (_sessionTimePerso ?? 0) : (_totalTimePerso ?? 0);
+    int displayedTime =
+        _isMeasureActive ? (_sessionTimePerso ?? 0) : (_totalTimePerso ?? 0);
 
     return PopScope(
       canPop: false,
@@ -453,7 +492,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start, // Align text to the left
                         children: <Widget>[
                           const SizedBox(height: 24), // Add margin at the top
                           const TitleCard(
@@ -461,7 +501,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                             title: 'Informations ',
                             subtitle: 'personnelles',
                           ),
-                          const SizedBox(height: 24), // Add margin before the first card
+                          const SizedBox(
+                              height: 24), // Add margin before the first card
                           Column(
                             children: [
                               InfoCard(
@@ -475,15 +516,19 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                               const SizedBox(height: 6),
                               InfoCard(
                                 logo: Image.asset(
-                                  _isSessionActive
+                                  _isMeasureActive
                                       ? 'assets/pictures/LogoSimpleAnimated.gif'
                                       : 'assets/pictures/LogoSimple.png',
-                                  width: _isSessionActive ? 32 : 26,
-                                  height: _isSessionActive ? 32 : 26,
+                                  width: _isMeasureActive ? 32 : 26,
+                                  height: _isMeasureActive ? 32 : 26,
                                 ),
                                 title: 'Contribution à l\'évènement',
-                                data: '${_formatDistance(_isSessionActive ? _distance : (_distancePerso ?? 0))} mètres',
-                                additionalDetails: _getDistanceMessage(_isSessionActive ? _distance : (_distancePerso ?? 0)),
+                                data:
+                                    '${_formatDistance(_isMeasureActive ? _distance : (_distancePerso ?? 0))} mètres',
+                                additionalDetails: _getDistanceMessage(
+                                    _isMeasureActive
+                                        ? _distance
+                                        : (_distancePerso ?? 0)),
                               ),
                               const SizedBox(height: 6),
                               InfoCard(
@@ -494,27 +539,29 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                               ),
                             ],
                           ),
-                          const SizedBox(height: 12),
-                          if (_isSessionActive)
+                          const SizedBox(height: 6),
+                          if (_isMeasureActive)
                             InfoCard(
                               logo: const Icon(Icons.groups_2),
                               title: 'L\'équipe',
                               data: '${_numberOfParticipants ?? 0}',
                             )
-                          else
-                          if (!_isSessionActive)
+                          else if (!_isMeasureActive)
                             const Padding(
                               padding: EdgeInsets.symmetric(horizontal: 5.0),
                               child: Text(
-                                'Appuie sur START pour démarrer une session',
+                                'Appuie sur START pour démarrer une mesure',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Color(Config.COLOR_APP_BAR),
                                 ),
                               ),
                             ),
-                          const SizedBox(height: 16), // Add margin before the text
-                          const SizedBox(height: 100), // Add more margin at the bottom to allow more scrolling
+                          const SizedBox(
+                              height: 16), // AdAd margin before the text
+                          const SizedBox(
+                              height:
+                                  100), // Add more margin at the bottom to allow more scrolling
                         ],
                       ),
                     ),
@@ -526,7 +573,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                       padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start, // Align text to the left
                         children: <Widget>[
                           const SizedBox(height: 24), // Add margin at the top
                           const TitleCard(
@@ -555,10 +603,13 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                           const SizedBox(height: 6),
                           InfoCard(
                             logo: const Icon(Icons.groups_2),
-                            title: 'Participants ou groupe actuellement sur le parcours',
+                            title:
+                                'Participants ou groupe actuellement sur le parcours',
                             data: '${_numberOfParticipants ?? 0}',
                           ),
-                          const SizedBox(height: 100), // Add more margin at the bottom to allow more scrolling
+                          const SizedBox(
+                              height:
+                                  100), // Add more margin at the bottom to allow more scrolling
                         ],
                       ),
                     ),
@@ -567,7 +618,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
               ),
             ),
             Align(
-              alignment: Alignment.bottomCenter, // Fix the "START/STOP" button at the bottom
+              alignment: Alignment
+                  .bottomCenter, // Fix the "START/STOP" button at the bottom
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -580,23 +632,26 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                           width: 8.0, // Width for oval shape
                           height: 8.0, // Height for oval shape
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4.0), // Border radius for oval shape
+                            borderRadius: BorderRadius.circular(
+                                4.0), // Border radius for oval shape
                             color: _currentPage == i
                                 ? const Color(Config.COLOR_APP_BAR)
-                                : const Color(Config.COLOR_APP_BAR).withOpacity(0.1),
+                                : const Color(Config.COLOR_APP_BAR)
+                                    .withOpacity(0.1),
                           ),
                         ),
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0)
+                    padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 12.0)
                         .copyWith(bottom: 20.0), // Add padding
-                    child: _isSessionActive
+                    child: _isMeasureActive
                         ? DiscardButton(
                             icon: Icons.stop, // Pass the icon parameter
                             text: 'STOP',
                             onPressed: () {
-                              _confirmStopSession(context);
+                              _confirmStopMeasure(context);
                             },
                           )
                         : ActionButton(
@@ -605,7 +660,9 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const SetupPosScreen()),
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SetupPosScreen()),
                               );
                             },
                           ),

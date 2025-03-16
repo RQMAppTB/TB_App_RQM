@@ -8,7 +8,11 @@ class ProgressCard extends StatelessWidget {
   final Widget logo;
 
   const ProgressCard(
-      {super.key, required this.title, required this.value, required this.percentage, required this.logo});
+      {super.key,
+      required this.title,
+      required this.value,
+      required this.percentage,
+      required this.logo});
 
   @override
   Widget build(BuildContext context) {
@@ -18,21 +22,21 @@ class ProgressCard extends StatelessWidget {
         color: Colors.white,
         borderRadius: BorderRadius.circular(2.0),
         border: Border(
-          right: BorderSide(
-            color: Color(Config.COLOR_APP_BAR), // Add right border
-            width: 6.0, // Set the width of the right border
+          left: BorderSide(
+            color: Color(Config.COLOR_BUTTON), // Add right border
+            width: 2.0, // Set the width of the right border
           ),
         ),
         boxShadow: [
           BoxShadow(
-            color: Color(Config.COLOR_APP_BAR).withOpacity(0.1), // Subtle shadow color
+            color: Colors.black.withOpacity(0.1), // Subtle shadow color
             blurRadius: 4.0, // Reduced blur radius for subtle shadow
             offset: Offset(0, 2), // Vertical shadow offset
           ),
           BoxShadow(
-            color: Color(Config.COLOR_APP_BAR).withOpacity(0.05), // Even lighter shadow color
+            color: Colors.black.withOpacity(0.05), // Even lighter shadow color
             blurRadius: 2.0, // Smaller blur radius
-            offset: Offset(-1, 0), // Horizontal shadow offset
+            offset: Offset(2, 0), // Horizontal shadow offset
           ),
         ],
       ),
@@ -106,8 +110,10 @@ class ProgressCard extends StatelessWidget {
                   flex: 5, // 66% of the row
                   child: LinearProgressIndicator(
                     value: percentage / 100,
-                    backgroundColor: const Color(Config.COLOR_BACKGROUND).withOpacity(1),
-                    valueColor: const AlwaysStoppedAnimation<Color>(Color(Config.COLOR_APP_BAR)),
+                    backgroundColor:
+                        const Color(Config.COLOR_BACKGROUND).withOpacity(1),
+                    valueColor: const AlwaysStoppedAnimation<Color>(
+                        Color(Config.COLOR_APP_BAR)),
                     minHeight: 4,
                   ),
                 ),

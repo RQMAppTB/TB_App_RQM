@@ -16,10 +16,16 @@ class Config {
   static const String QR_CODE_S_VALUE = 'Ready';
   static const String QR_CODE_F_VALUE = 'Stop';
   // ------------- Zone Evènement --------------
-  static const double LAT1 = 46.62094732231268;
-  static const double LON1 = 6.71095185969227;
-  static const double LAT2 = 46.60796048493062;
-  static const double LON2 = 6.7304699219465105;
+  // static const double LAT1 = 46.62094732231268;
+  // static const double LON1 = 6.71095185969227;
+  // static const double LAT2 = 46.60796048493062;
+  // static const double LON2 = 6.7304699219465105;
+
+  // ------------- Zone Suisse --------------
+  static const double LAT1 = 47.8085; // North-East latitude
+  static const double LON1 = 10.4921; // North-East longitude
+  static const double LAT2 = 45.8179; // South-West latitude
+  static const double LON2 = 5.9561; // South-West longitude
 
   static List<mp.LatLng> ZONE_EVENT = [
     mp.LatLng(LAT1, LON1),
@@ -35,9 +41,10 @@ class Config {
   static const int COLOR_BACKGROUND = 0xFFF0F0F0;
 
   // ----------------- Constantes -----------------
-  static const double CIRCUIT_SIZE = 3500.0; // Define the circuit size in meters
-  static const int TARGET_DISTANCE = 2000000; // Define the target total distance in meters
-
+  static const double CIRCUIT_SIZE =
+      3500.0; // Define the circuit size in meters
+  static const int TARGET_DISTANCE =
+      2000000; // Define the target total distance in meters
 
   /// Function to get the application version.
   static Future<String> getAppVersion() async {

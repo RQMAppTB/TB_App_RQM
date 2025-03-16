@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'La RQM APP',
       theme: ThemeData(
-        fontFamily: 'Roboto', // Ensure the default font family is set to Poppins
+        fontFamily: 'Roboto',
       ),
       home: isLoggedIn ? const WorkingScreen() : const Login(),
     );
