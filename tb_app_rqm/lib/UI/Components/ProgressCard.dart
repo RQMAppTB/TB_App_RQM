@@ -23,7 +23,7 @@ class ProgressCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(2.0),
         border: Border(
           left: BorderSide(
-            color: Color(Config.COLOR_APP_BAR), // Add right border
+            color: Color(Config.COLOR_BUTTON), // Add right border
             width: 2.0, // Set the width of the right border
           ),
         ),
@@ -107,7 +107,7 @@ class ProgressCard extends StatelessWidget {
                 ),
                 const SizedBox(width: 10),
                 Expanded(
-                  flex: 5, // 66% of the row
+                  flex: 4, // 66% of the row
                   child: LinearProgressIndicator(
                     value: percentage / 100,
                     backgroundColor:

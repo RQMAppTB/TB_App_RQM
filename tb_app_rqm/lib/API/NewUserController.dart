@@ -6,7 +6,8 @@ import '../Utils/config.dart';
 
 class NewUserController {
   /// Create a new user.
-  static Future<Result<bool>> createUser(String username, String bibId, int eventId) async {
+  static Future<Result<bool>> createUser(
+      String username, String bibId, int eventId) async {
     final uri = Uri.https(Config.API_URL, '/users');
     final body = {
       "username": username,
@@ -16,7 +17,9 @@ class NewUserController {
 
     log("Creating user: $body");
 
-    return http.post(uri, body: jsonEncode(body), headers: {"Content-Type": "application/json"}).then((response) {
+    return http.post(uri,
+        body: jsonEncode(body),
+        headers: {"Content-Type": "application/json"}).then((response) {
       if (response.statusCode == 200) {
         return Result<bool>(value: true);
       } else {
@@ -65,13 +68,16 @@ class NewUserController {
   }
 
   /// Edit a user by ID.
-  static Future<Result<bool>> editUser(int userId, Map<String, dynamic> updates) async {
+  static Future<Result<bool>> editUser(
+      int userId, Map<String, dynamic> updates) async {
     final uri = Uri.https(Config.API_URL, '/users/$userId');
     final body = jsonEncode(updates);
 
     log("Editing user with ID $userId: $body");
 
-    return http.patch(uri, body: body, headers: {"Content-Type": "application/json"}).then((response) {
+    return http.patch(uri,
+        body: body,
+        headers: {"Content-Type": "application/json"}).then((response) {
       if (response.statusCode == 200) {
         return Result<bool>(value: true);
       } else {
@@ -109,7 +115,10 @@ class NewUserController {
 
     return http.get(uri).then((response) {
       if (response.statusCode == 200) {
-        return Result<int>(value: jsonDecode(response.body)['total_time']);
+        final timeString = jsonDecode(response.body)['time'];
+        final time =
+            double.tryParse(timeString)?.toInt() ?? 0; // Convert to int
+        return Result<int>(value: time);
       } else {
         throw Exception('Failed to fetch total time: ${response.statusCode}');
       }

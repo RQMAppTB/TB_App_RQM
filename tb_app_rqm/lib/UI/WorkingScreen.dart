@@ -256,6 +256,16 @@ class _WorkingScreenState extends State<WorkingScreen>
           }
         });
 
+        // Get the total time
+        _getValue(() => NewUserController.getUserTotalTime(int.parse(bibId)),
+            () async => null).then((value) {
+          if (mounted) {
+            setState(() {
+              _totalTimePerso = value;
+            });
+          }
+        });
+
         // Get the name of the user
         UserData.getUsername().then((username) {
           if (username != null && mounted) {
@@ -300,10 +310,14 @@ class _WorkingScreenState extends State<WorkingScreen>
         _geolocation.startListening();
       } else {
         // Get the total time spent on the track
-        TimeData.getSessionTime().then((value) {
-          if (mounted) {
-            setState(() {
-              _totalTimePerso = value;
+        UserData.getBibId().then((bibId) {
+          if (bibId != null) {
+            NewUserController.getUserTotalTime(int.parse(bibId)).then((result) {
+              if (!result.hasError && mounted) {
+                setState(() {
+                  _totalTimePerso = result.value;
+                });
+              }
             });
           }
         });
@@ -425,9 +439,17 @@ class _WorkingScreenState extends State<WorkingScreen>
     });
 
     // Get the time spent on the track
-    TimeData.getSessionTime().then((value) => setState(() {
-          _totalTimePerso = value;
-        }));
+    UserData.getBibId().then((bibId) {
+      if (bibId != null) {
+        NewUserController.getUserTotalTime(int.parse(bibId)).then((result) {
+          if (!result.hasError && mounted) {
+            setState(() {
+              _totalTimePerso = result.value;
+            });
+          }
+        });
+      }
+    });
   }
 
   void _confirmStopMeasure(BuildContext context) {
