@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'dart:async'; // Ensure this import is present for Timer
 import '../../Utils/config.dart';
 import '../../Utils/LogHelper.dart';
 import '../LoginScreen.dart';
@@ -11,8 +12,14 @@ import '../../API/NewMeasureController.dart';
 class TopAppBar extends StatefulWidget implements PreferredSizeWidget {
   final String title;
   final bool showInfoButton;
+  final bool isRecording; // New parameter to indicate recording status
 
-  const TopAppBar({super.key, required this.title, this.showInfoButton = true});
+  const TopAppBar({
+    super.key,
+    required this.title,
+    this.showInfoButton = true,
+    this.isRecording = false, // Default to false,
+  });
 
   @override
   _TopAppBarState createState() => _TopAppBarState();
@@ -24,6 +31,45 @@ class TopAppBar extends StatefulWidget implements PreferredSizeWidget {
 class _TopAppBarState extends State<TopAppBar> {
   int _infoButtonClickCount = 0;
   bool _showShareButton = false;
+  bool _isDotExpanded = true; // State to toggle dot size
+  Timer? _dotAnimationTimer; // Timer for animation
+
+  @override
+  void initState() {
+    super.initState();
+    if (widget.isRecording) {
+      _startDotAnimation(); // Start the animation when recording
+    }
+  }
+
+  void _startDotAnimation() {
+    _dotAnimationTimer =
+        Timer.periodic(const Duration(milliseconds: 500), (timer) {
+      setState(() {
+        _isDotExpanded = !_isDotExpanded; // Toggle the opacity state
+      });
+    });
+  }
+
+  @override
+  void didUpdateWidget(covariant TopAppBar oldWidget) {
+    super.didUpdateWidget(oldWidget);
+    if (widget.isRecording && _dotAnimationTimer == null) {
+      _startDotAnimation(); // Restart animation if recording starts
+    } else if (!widget.isRecording && _dotAnimationTimer != null) {
+      _dotAnimationTimer?.cancel();
+      _dotAnimationTimer = null;
+      setState(() {
+        _isDotExpanded = true; // Reset opacity when not recording
+      });
+    }
+  }
+
+  @override
+  void dispose() {
+    _dotAnimationTimer?.cancel(); // Cancel the timer when widget is disposed
+    super.dispose();
+  }
 
   void _incrementInfoButtonClickCount() {
     setState(() {
@@ -54,15 +100,32 @@ class _TopAppBarState extends State<TopAppBar> {
             padding: const EdgeInsets.symmetric(horizontal: 0.0),
             child: Row(
               children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 20.0),
-                  child: GestureDetector(
-                    onTap:
-                        _incrementInfoButtonClickCount, // Increment count on logo tap
-                    child:
-                        Image.asset('assets/pictures/LogoText.png', height: 28),
+                if (widget.isRecording) ...[
+                  AnimatedOpacity(
+                    duration: const Duration(milliseconds: 2000),
+                    opacity: _isDotExpanded ? 1.0 : 0.3, // Animate opacity
+                    child: Container(
+                      width: 18.0,
+                      height: 18.0,
+                      decoration: const BoxDecoration(
+                        color: Colors.redAccent,
+                        shape: BoxShape.circle,
+                      ),
+                    ),
                   ),
-                ),
+                  const SizedBox(width: 8), // Space between dot and text
+                  const Text(
+                    "ENREGISTREMENT",
+                    style: TextStyle(
+                      color: Colors.redAccent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                ] else ...[
+                  Image.asset('assets/pictures/LogoText.png',
+                      height: 28), // Display logo when not recording
+                ],
                 const Spacer(),
               ],
             ),
@@ -75,11 +138,9 @@ class _TopAppBarState extends State<TopAppBar> {
                   if (_showShareButton)
                     IconButton(
                       icon: const Icon(Icons.share,
-                          size: 24,
-                          color:
-                              Color(Config.COLOR_APP_BAR)), // Add share button
+                          size: 24, color: Color(Config.COLOR_APP_BAR)),
                       onPressed: () async {
-                        await LogHelper.shareLogFile(); // Leverage shareLog
+                        await LogHelper.shareLogFile();
                       },
                     ),
                   IconButton(

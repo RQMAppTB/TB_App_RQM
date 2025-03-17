@@ -27,6 +27,7 @@ import '../API/NewMeasureController.dart';
 import '../Data/EventData.dart';
 import '../Data/UserData.dart';
 import '../Data/MeasureData.dart';
+import '../Data/ContributorsData.dart'; // Import ContributorsData
 
 /// Class to display the working screen.
 /// This screen displays the remaining time before the end of the event,
@@ -70,6 +71,9 @@ class _WorkingScreenState extends State<WorkingScreen>
   /// Number of participants
   int? _numberOfParticipants;
 
+  /// Number of participants
+  int? _contributors;
+
   int _currentPage = 0;
   final PageController _pageController = PageController();
 
@@ -85,6 +89,9 @@ class _WorkingScreenState extends State<WorkingScreen>
   bool _isMeasureActive = false;
   Geolocation _geolocation = Geolocation();
   int _distance = 0;
+
+  /// Event meters goal
+  int? _metersGoal;
 
   void _showIconMenu(BuildContext context) {
     final List<IconData> icons = [
@@ -186,6 +193,12 @@ class _WorkingScreenState extends State<WorkingScreen>
   /// Function to calculate the percentage of total distance
   double _calculateTotalDistancePercentage() {
     return (_distanceTotale ?? 0) / Config.TARGET_DISTANCE * 100;
+  }
+
+  /// Function to calculate the percentage of total distance based on event meters goal
+  double _calculateRealProgress() {
+    if (_metersGoal == null || _metersGoal == 0) return 0.0;
+    return (_distanceTotale ?? 0) / _metersGoal! * 100;
   }
 
   String _formatDistance(int distance) {
@@ -329,6 +342,24 @@ class _WorkingScreenState extends State<WorkingScreen>
         log("Failed to fetch event ID from EventData.");
       }
     });
+
+    // Retrieve the number of contributors
+    ContributorsData.getContributors().then((contributors) {
+      if (contributors != null && mounted) {
+        setState(() {
+          _contributors = contributors;
+        });
+      }
+    });
+
+    // Retrieve the event meters goal
+    EventData.getMetersGoal().then((metersGoal) {
+      if (metersGoal != null && mounted) {
+        setState(() {
+          _metersGoal = metersGoal;
+        });
+      }
+    });
   }
 
   @override
@@ -414,6 +445,8 @@ class _WorkingScreenState extends State<WorkingScreen>
               ),
             );
             try {
+              _geolocation
+                  .stopListening(); // Ensure geolocation stops listening
               await NewMeasureController.stopMeasure();
             } catch (e) {
               log("Failed to stop measure: $e");
@@ -455,9 +488,10 @@ class _WorkingScreenState extends State<WorkingScreen>
       },
       child: Scaffold(
         backgroundColor: const Color(Config.COLOR_BACKGROUND),
-        appBar: const TopAppBar(
+        appBar: TopAppBar(
           title: 'Informations',
           showInfoButton: true,
+          isRecording: _isMeasureActive, // Pass recording status
         ),
         body: Stack(
           children: [
@@ -495,14 +529,13 @@ class _WorkingScreenState extends State<WorkingScreen>
                         crossAxisAlignment:
                             CrossAxisAlignment.start, // Align text to the left
                         children: <Widget>[
-                          const SizedBox(height: 24), // Add margin at the top
+                          const SizedBox(height: 16), // Add margin at the top
                           const TitleCard(
                             icon: Icons.person,
                             title: 'Informations ',
                             subtitle: 'personnelles',
                           ),
-                          const SizedBox(
-                              height: 24), // Add margin before the first card
+                          const SizedBox(height: 16),
                           Column(
                             children: [
                               InfoCard(
@@ -522,7 +555,9 @@ class _WorkingScreenState extends State<WorkingScreen>
                                   width: _isMeasureActive ? 32 : 26,
                                   height: _isMeasureActive ? 32 : 26,
                                 ),
-                                title: 'Contribution à l\'évènement',
+                                title: _isMeasureActive
+                                    ? 'Distance parcourue'
+                                    : 'Contribution à l\'évènement',
                                 data:
                                     '${_formatDistance(_isMeasureActive ? _distance : (_distancePerso ?? 0))} mètres',
                                 additionalDetails: _getDistanceMessage(
@@ -533,7 +568,9 @@ class _WorkingScreenState extends State<WorkingScreen>
                               const SizedBox(height: 6),
                               InfoCard(
                                 logo: const Icon(Icons.timer_outlined),
-                                title: 'Temps total passé sur le parcours',
+                                title: _isMeasureActive
+                                    ? 'Temps passé sur le parcours'
+                                    : 'Temps total passé sur le parcours',
                                 data:
                                     '${(displayedTime ~/ 3600).toString().padLeft(2, '0')}h ${((displayedTime % 3600) ~/ 60).toString().padLeft(2, '0')}m ${(displayedTime % 60).toString().padLeft(2, '0')}s',
                               ),
@@ -544,7 +581,8 @@ class _WorkingScreenState extends State<WorkingScreen>
                             InfoCard(
                               logo: const Icon(Icons.groups_2),
                               title: 'L\'équipe',
-                              data: '${_numberOfParticipants ?? 0}',
+                              data:
+                                  '${_contributors ?? 0}', // Use contributors data
                             )
                           else if (!_isMeasureActive)
                             const Padding(
@@ -576,13 +614,25 @@ class _WorkingScreenState extends State<WorkingScreen>
                         crossAxisAlignment:
                             CrossAxisAlignment.start, // Align text to the left
                         children: <Widget>[
-                          const SizedBox(height: 24), // Add margin at the top
+                          const SizedBox(height: 16), // Add margin at the top
                           const TitleCard(
                             icon: Icons.calendar_month,
                             title: 'Informations sur',
                             subtitle: 'l\'évènement',
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
+                          ProgressCard(
+                            title: 'Objectif',
+                            value:
+                                '${_formatDistance(_distanceTotale ?? 0)} m (${_formatDistance(_metersGoal ?? 0)} m)',
+                            percentage: _calculateRealProgress(),
+                            logo: Image.asset(
+                              'assets/pictures/LogoSimple.png',
+                              width: 28, // Adjust the width as needed
+                              height: 28, // Adjust the height as needed
+                            ),
+                          ),
+                          const SizedBox(height: 6),
                           ProgressCard(
                             title: 'Temps restant',
                             value: _remainingTime,
@@ -591,22 +641,17 @@ class _WorkingScreenState extends State<WorkingScreen>
                           ),
                           const SizedBox(height: 6),
                           ProgressCard(
-                            title: 'Distance totale parcourue',
-                            value: '${_formatDistance(_distanceTotale ?? 0)} m',
-                            percentage: _calculateTotalDistancePercentage(),
-                            logo: Image.asset(
-                              'assets/pictures/LogoSimple.png',
-                              width: 28, // Adjust the width as needed
-                              height: 28, // Adjust the height as needed
-                            ),
-                          ),
-                          const SizedBox(height: 6),
-                          InfoCard(
-                            logo: const Icon(Icons.groups_2),
                             title:
                                 'Participants ou groupe actuellement sur le parcours',
-                            data: '${_numberOfParticipants ?? 0}',
+                            value: '${_numberOfParticipants ?? 0}',
+                            percentage: ((_numberOfParticipants ?? 0) /
+                                    250 *
+                                    100)
+                                .clamp(0,
+                                    100), // Calculate percentage with max 250
+                            logo: const Icon(Icons.groups_2),
                           ),
+                          const SizedBox(height: 6),
                           const SizedBox(
                               height:
                                   100), // Add more margin at the bottom to allow more scrolling
@@ -618,8 +663,7 @@ class _WorkingScreenState extends State<WorkingScreen>
               ),
             ),
             Align(
-              alignment: Alignment
-                  .bottomCenter, // Fix the "START/STOP" button at the bottom
+              alignment: Alignment.bottomCenter,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -632,8 +676,8 @@ class _WorkingScreenState extends State<WorkingScreen>
                           width: 8.0, // Width for oval shape
                           height: 8.0, // Height for oval shape
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(
-                                4.0), // Border radius for oval shape
+                            borderRadius:
+                                BorderRadius.circular(4.0), // Oval shape
                             color: _currentPage == i
                                 ? const Color(Config.COLOR_APP_BAR)
                                 : const Color(Config.COLOR_APP_BAR)

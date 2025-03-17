@@ -23,7 +23,7 @@ class ProgressCard extends StatelessWidget {
         borderRadius: BorderRadius.circular(2.0),
         border: Border(
           left: BorderSide(
-            color: Color(Config.COLOR_BUTTON), // Add right border
+            color: Color(Config.COLOR_APP_BAR), // Add right border
             width: 2.0, // Set the width of the right border
           ),
         ),

@@ -8,11 +8,19 @@ class EventData {
   /// Save all event details in the shared preferences.
   static Future<bool> saveEvent(Map<String, dynamic> event) async {
     bool idSaved = await _dataManagement.saveInt('event_id', event['id']);
-    bool nameSaved = await _dataManagement.saveString('event_name', event['name']);
-    bool startDateSaved = await _dataManagement.saveString('event_start_date', event['start_date']);
-    bool endDateSaved = await _dataManagement.saveString('event_end_date', event['end_date']);
-    bool metersGoalSaved = await _dataManagement.saveInt('event_meters_goal', event['meters_goal']);
-    return idSaved && nameSaved && startDateSaved && endDateSaved && metersGoalSaved;
+    bool nameSaved =
+        await _dataManagement.saveString('event_name', event['name']);
+    bool startDateSaved = await _dataManagement.saveString(
+        'event_start_date', event['start_date']);
+    bool endDateSaved =
+        await _dataManagement.saveString('event_end_date', event['end_date']);
+    bool metersGoalSaved = await _dataManagement.saveInt(
+        'event_meters_goal', event['meters_goal']);
+    return idSaved &&
+        nameSaved &&
+        startDateSaved &&
+        endDateSaved &&
+        metersGoalSaved;
   }
 
   /// Get the event ID from the shared preferences.
@@ -44,9 +52,15 @@ class EventData {
   static Future<bool> clearEventData() async {
     bool idRemoved = await _dataManagement.removeData('event_id');
     bool nameRemoved = await _dataManagement.removeData('event_name');
-    bool startDateRemoved = await _dataManagement.removeData('event_start_date');
+    bool startDateRemoved =
+        await _dataManagement.removeData('event_start_date');
     bool endDateRemoved = await _dataManagement.removeData('event_end_date');
-    bool metersGoalRemoved = await _dataManagement.removeData('event_meters_goal');
-    return idRemoved && nameRemoved && startDateRemoved && endDateRemoved && metersGoalRemoved;
+    bool metersGoalRemoved =
+        await _dataManagement.removeData('event_meters_goal');
+    return idRemoved &&
+        nameRemoved &&
+        startDateRemoved &&
+        endDateRemoved &&
+        metersGoalRemoved;
   }
 }
