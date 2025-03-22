@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
-import 'package:tb_app_rqm/API/MeasureController.dart';
-import 'package:tb_app_rqm/Data/DistToSendData.dart';
-import 'package:tb_app_rqm/Data/TimeData.dart';
-import 'package:tb_app_rqm/Utils/config.dart';
+import 'package:lrqm/API/NewMeasureController.dart'; // Replace MeasureController with NewMeasureController
+import 'package:lrqm/Data/DistToSendData.dart'; // Correct package name
+import 'package:lrqm/Data/TimeData.dart'; // Correct package name
+import 'package:lrqm/Utils/config.dart'; // Correct package name
+import 'package:lrqm/Utils/LogHelper.dart';
+import 'package:flutter/foundation.dart'; // Add this import
 
 class Geolocation {
   /// StreamSubscription to save the position stream and manipulate it
@@ -31,21 +32,26 @@ class Geolocation {
   /// Counter to check if the user is outside the zone
   int _outsideCounter = 0;
 
-  /// StreamController to listen to the distance traveled updates
-  StreamController<int> _streamController = StreamController<int>();
+  /// StreamController to listen to the distance and time updates
+  final StreamController<Map<String, int>> _streamController =
+      StreamController<Map<String, int>>();
 
   /// Boolean to check if the measure stream is started
   bool _positionStreamStarted = false;
+
+  /// Timer to update the time stream every second
+  Timer? _timeTimer;
 
   Geolocation() {
     _settings = _getSettings();
   }
 
-  Stream<int> get stream => _streamController.stream;
+  Stream<Map<String, int>> get stream => _streamController.stream;
 
   /// Handle the permission to access the location
   static Future<bool> handlePermission() async {
-    final geo.GeolocatorPlatform _geolocatorPlatform = geo.GeolocatorPlatform.instance;
+    final geo.GeolocatorPlatform _geolocatorPlatform =
+        geo.GeolocatorPlatform.instance;
     bool serviceEnabled;
     geo.LocationPermission permission;
 
@@ -83,9 +89,11 @@ class Geolocation {
             notificationText: "Pas de panique, c'est la RQM qui vous suit!",
             notificationTitle: "Running in Background",
             enableWakeLock: true,
-            notificationIcon: geo.AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
+            notificationIcon:
+                geo.AndroidResource(name: 'launcher_icon', defType: 'mipmap'),
           ));
-    } else if (defaultTargetPlatform == TargetPlatform.iOS || defaultTargetPlatform == TargetPlatform.macOS) {
+    } else if (defaultTargetPlatform == TargetPlatform.iOS ||
+        defaultTargetPlatform == TargetPlatform.macOS) {
       return geo.AppleSettings(
         accuracy: geo.LocationAccuracy.high,
         activityType: geo.ActivityType.fitness,
@@ -120,32 +128,39 @@ class Geolocation {
       _positionStreamStarted = true;
 
       _mesureToWait = 3;
+      _startTime = DateTime.now();
+
+      // Start the time timer to update the time stream every second
+      _timeTimer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+        Duration diff = DateTime.now().difference(_startTime);
+        _streamController.sink
+            .add({"time": diff.inSeconds, "distance": _distance});
+      });
+
       _positionStream =
-          geo.Geolocator.getPositionStream(locationSettings: _settings).listen((geo.Position position) async {
+          geo.Geolocator.getPositionStream(locationSettings: _settings)
+              .listen((geo.Position position) async {
         // Wait for the first measures to avoid strange values
         if (_mesureToWait > 0) {
           log("Position: $position");
           _oldPos = position;
           _distance = 0;
-          _startTime = DateTime.now();
           _mesureToWait--;
         } else {
           log("Position: $position");
           log("Entered position stream");
-          var distSinceLast =
-              geo.Geolocator.distanceBetween(_oldPos.latitude, _oldPos.longitude, position.latitude, position.longitude)
-                  .round();
+          var distSinceLast = geo.Geolocator.distanceBetween(_oldPos.latitude,
+                  _oldPos.longitude, position.latitude, position.longitude)
+              .round();
 
           log("Distance: $distSinceLast");
+          LogHelper.writeLog("Position,$position,Dist,$distSinceLast");
 
           // Update the old position
           _oldPos = position;
 
           // Update the distance
           _distance += distSinceLast;
-
-          // Calculate the time diff between now and the start time
-          Duration diff = DateTime.now().difference(_startTime);
 
           // Check if the current location is in the zone
           if (!isLocationInZone(position)) {
@@ -154,20 +169,27 @@ class Geolocation {
               _outsideCounter++;
             } else {
               _distance = -1;
-              _streamController.sink.add(_distance);
+              _streamController.sink.add({
+                "time": DateTime.now().difference(_startTime).inSeconds,
+                "distance": _distance
+              });
             }
           } else {
             log("In zone");
-            await TimeData.saveTime(diff.inSeconds);
+            await TimeData.saveSessionTime(
+                DateTime.now().difference(_startTime).inSeconds);
             await DistToSendData.saveDistToSend(_distance);
             _outsideCounter = 0;
-            MeasureController.sendMesure().then((value) {
+            NewMeasureController.editMeters(_distance).then((value) {
               if (value.error != null) {
                 log("Error: ${value.error}");
               } else {
                 log("Value: ${value.value}");
               }
-              _streamController.sink.add(_distance);
+              _streamController.sink.add({
+                "time": DateTime.now().difference(_startTime).inSeconds,
+                "distance": _distance
+              });
             });
           }
         }
@@ -175,7 +197,7 @@ class Geolocation {
       log("Entered current position");
     } else {
       log("Position stream already started or no rights");
-      _streamController.sink.add(-1);
+      _streamController.sink.add({"time": -1, "distance": -1});
     }
   }
 
@@ -185,6 +207,7 @@ class Geolocation {
     if (_positionStreamStarted) {
       _positionStream.cancel().then((value) {
         _streamController.close();
+        _timeTimer?.cancel();
         _positionStreamStarted = false;
       });
     }
@@ -196,7 +219,6 @@ class Geolocation {
   bool isLocationInZone(geo.Position point) {
     var tmp = mp.LatLng(point.latitude, point.longitude);
     var test = mp.PolygonUtil.containsLocation(tmp, Config.ZONE_EVENT, false);
-    return true;
     return test;
   }
 
@@ -207,5 +229,33 @@ class Geolocation {
     final tmp = await determinePosition();
     var test = isLocationInZone(tmp);
     return test;
+  }
+
+  /// Calculate the distance to the nearest point of the event zone if outside.
+  /// Returns the distance in kilometers (1 decimal) or -1 if the user is inside the zone.
+  Future<double> distanceToZone() async {
+    final currentPosition = await determinePosition();
+    if (isLocationInZone(currentPosition)) {
+      return -1; // User is inside the zone
+    }
+
+    // Calculate the minimum distance to the zone's boundary
+    final currentPoint =
+        mp.LatLng(currentPosition.latitude, currentPosition.longitude);
+    double minDistance = double.infinity;
+
+    for (int i = 0; i < Config.ZONE_EVENT.length; i++) {
+      final point1 = Config.ZONE_EVENT[i];
+      final point2 = Config.ZONE_EVENT[(i + 1) % Config.ZONE_EVENT.length];
+      final distance =
+          mp.PolygonUtil.distanceToLine(currentPoint, point1, point2)
+              .toDouble();
+      if (distance < minDistance) {
+        minDistance = distance;
+      }
+    }
+
+    // Convert distance to kilometers and round to 1 decimal place
+    return double.parse((minDistance / 1000).toStringAsFixed(1));
   }
 }

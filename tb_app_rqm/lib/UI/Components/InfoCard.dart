@@ -1,34 +1,71 @@
 import 'package:flutter/material.dart';
-import 'dart:math';
 import '../../Utils/config.dart';
-import 'HighlightPainter.dart';
 
 class InfoCard extends StatefulWidget {
-  final Widget logo;
+  final Widget? logo;
   final String title;
   final String data;
   final String? additionalDetails;
-  final double? progressValue;
+  final List<ActionItem>? actionItems;
 
-  InfoCard({
-    required this.logo,
+  const InfoCard({
+    super.key,
+    this.logo,
     required this.title,
     required this.data,
     this.additionalDetails,
-    this.progressValue,
+    this.actionItems,
   });
 
   @override
   _InfoCardState createState() => _InfoCardState();
 }
 
-class _InfoCardState extends State<InfoCard> {
-  bool _isExpanded = false;
+class ActionItem {
+  final Icon icon;
+  final String label;
+  final VoidCallback onPressed;
 
-  void _toggleExpand() {
-    if (widget.additionalDetails != null || widget.progressValue != null) {
+  ActionItem(
+      {required this.icon, required this.label, required this.onPressed});
+}
+
+class _InfoCardState extends State<InfoCard>
+    with SingleTickerProviderStateMixin {
+  bool _isExpanded = false;
+  late AnimationController _controller;
+  late Animation<double> _animation;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 200),
+      vsync: this,
+    );
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  bool get _canExpand => widget.additionalDetails != null;
+
+  void _toggleExpanded() {
+    if (_canExpand) {
       setState(() {
         _isExpanded = !_isExpanded;
+        if (_isExpanded) {
+          _controller.forward();
+        } else {
+          _controller.reverse();
+        }
       });
     }
   }
@@ -36,96 +73,135 @@ class _InfoCardState extends State<InfoCard> {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: _toggleExpand,
+      onTap: _toggleExpanded,
       child: Container(
         width: double.infinity,
         decoration: BoxDecoration(
-          color: Colors.white, // Set the background color to white
-          borderRadius: BorderRadius.circular(16.0),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(2.0),
+          border: Border(
+            left: BorderSide(
+              color: Color(Config.COLOR_BUTTON), // Add right border
+              width: 2.0, // Set the width of the right border
+            ),
+          ),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.1),
-              spreadRadius: 2,
-              blurRadius: 8,
-              offset: Offset(0, 4),
+              color: Colors.black.withOpacity(0.1), // Subtle shadow color
+              blurRadius: 4.0, // Reduced blur radius for subtle shadow
+              offset: Offset(0, 2), // Vertical shadow offset
+            ),
+            BoxShadow(
+              color:
+                  Colors.black.withOpacity(0.05), // Even lighter shadow color
+              blurRadius: 2.0, // Smaller blur radius
+              offset: Offset(2, 0), // Horizontal shadow offset
             ),
           ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                children: [
-                  IconTheme(
-                    data: IconThemeData(
-                      size: 32,
-                      color: Color(Config.COLOR_APP_BAR),
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                if (widget.logo != null)
+                  Container(
+                    width: 48,
+                    height: 48,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Color(Config.COLOR_BACKGROUND).withOpacity(1),
                     ),
-                    child: widget.logo,
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          widget.title,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            color: Color(Config.COLOR_APP_BAR),
-                          ),
+                    child: Center(
+                      child: IconTheme(
+                        data: const IconThemeData(
+                          size: 28,
+                          color: Color(Config.COLOR_APP_BAR),
                         ),
-                        const SizedBox(height: 8),
-                        Stack(
-                          children: [
-                            Positioned.fill(
-                              child: CustomPaint(
-                                painter: HighlightPainter(),
-                              ),
-                            ),
-                            Text(
-                              widget.data,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Color(Config.COLOR_APP_BAR),
-                              ),
-                            ),
-                          ],
+                        child: widget.logo!,
+                      ),
+                    ),
+                  ),
+                if (widget.logo != null) const SizedBox(width: 12),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Text(
+                        widget.title,
+                        style: const TextStyle(
+                          fontSize: 16,
+                          color: Color(Config.COLOR_APP_BAR),
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      Text(
+                        widget.data,
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Color(Config.COLOR_APP_BAR),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (_canExpand)
+                  Icon(
+                    _isExpanded ? Icons.expand_less : Icons.expand_more,
+                    color: const Color(Config.COLOR_APP_BAR),
+                  ),
+              ],
+            ),
+            SizeTransition(
+              sizeFactor: _animation,
+              axisAlignment: -1.0,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (widget.additionalDetails != null)
+                    const SizedBox(height: 16),
+                  if (widget.additionalDetails != null)
+                    Text(
+                      widget.additionalDetails!,
+                      style: const TextStyle(
+                        fontSize: 16,
+                        color: Color(Config.COLOR_APP_BAR),
+                      ),
+                    ),
+                  if (widget.additionalDetails != null)
+                    const SizedBox(height: 16),
+                ],
+              ),
+            ),
+            if (widget.actionItems != null &&
+                widget.actionItems!.isNotEmpty) ...[
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.end,
+                children: widget.actionItems!.map((actionItem) {
+                  return Padding(
+                    padding: const EdgeInsets.only(left: 20.0),
+                    child: Column(
+                      children: [
+                        IconButton(
+                          icon: actionItem.icon,
+                          onPressed: actionItem.onPressed,
+                        ),
+                        Text(
+                          actionItem.label,
+                          style: const TextStyle(
+                              color: Color(Config.COLOR_APP_BAR)),
                         ),
                       ],
                     ),
-                  ),
-                  if (widget.additionalDetails != null || widget.progressValue != null)
-                    Icon(
-                      _isExpanded ? Icons.expand_less : Icons.expand_more,
-                      color: Color(Config.COLOR_APP_BAR),
-                    ),
-                ],
+                  );
+                }).toList(),
               ),
-              if (_isExpanded) ...[
-                const SizedBox(height: 16),
-                if (widget.additionalDetails != null)
-                  Text(
-                    widget.additionalDetails!,
-                    style: const TextStyle(
-                      fontSize: 16,
-                      color: Color(Config.COLOR_APP_BAR),
-                    ),
-                  ),
-                if (widget.additionalDetails != null) const SizedBox(height: 16),
-                if (widget.progressValue != null)
-                  LinearProgressIndicator(
-                    value: widget.progressValue,
-                    backgroundColor: Colors.grey[200],
-                    valueColor: AlwaysStoppedAnimation<Color>(Color(Config.COLOR_APP_BAR)),
-                  ),
-              ],
             ],
-          ),
+          ],
         ),
       ),
     );

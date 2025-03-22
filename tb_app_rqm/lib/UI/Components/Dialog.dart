@@ -15,13 +15,13 @@ class CustomDialog {
                 width: MediaQuery.of(context).size.width * 0.8, // Make it 80% of the screen width
                 decoration: BoxDecoration(
                   color: Colors.white, // Match the background color of the InfoCard
-                  borderRadius: BorderRadius.circular(16.0),
+                  borderRadius: BorderRadius.circular(8.0),
                   boxShadow: [
                     BoxShadow(
                       color: Colors.black.withOpacity(0.1),
                       spreadRadius: 2,
                       blurRadius: 8,
-                      offset: Offset(0, 4),
+                      offset: const Offset(0, 4),
                     ),
                   ],
                 ),
@@ -34,7 +34,7 @@ class CustomDialog {
                         alignment: Alignment.center,
                         child: Text(
                           title,
-                          style: TextStyle(
+                          style: const TextStyle(
                             fontSize: 16,
                             color: Color(Config.COLOR_APP_BAR),
                           ),

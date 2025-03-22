@@ -7,11 +7,11 @@ class DiscardButton extends StatelessWidget {
   final IconData? icon;
 
   const DiscardButton({
-    Key? key,
+    super.key,
     required this.text,
     required this.onPressed,
-    this.icon,
-  }) : super(key: key);
+    this.icon = Icons.close, // Default icon set to close
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -19,26 +19,31 @@ class DiscardButton extends StatelessWidget {
       width: double.infinity, // Full width
       height: 50.0, // Set height to match the "Oui" button
       decoration: BoxDecoration(
-        border: Border.all(color: Color(Config.COLOR_APP_BAR), width: 2.0), // Outline with COLOR_APP_BAR
-        borderRadius: BorderRadius.circular(32.0), // Same radius as ActionButton
+        border: Border.all(
+            color: const Color(Config.COLOR_APP_BAR),
+            width: 2.0), // Outline with COLOR_APP_BAR
+        borderRadius: BorderRadius.circular(8.0), // Same radius as ActionButton
       ),
       child: ElevatedButton(
         style: ElevatedButton.styleFrom(
-          backgroundColor: Colors.transparent, // Center transparent
-          shadowColor: Colors.transparent,
+          backgroundColor: Colors.white, // Center transparent
+          shadowColor: Colors.white,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(32.0),
+            borderRadius: BorderRadius.circular(8.0),
           ),
         ),
         onPressed: onPressed,
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (icon != null) Icon(icon, color: Color(Config.COLOR_APP_BAR), size: 28),
-            if (icon != null) SizedBox(width: 10),
+            if (icon != null)
+              Icon(icon, color: const Color(Config.COLOR_APP_BAR), size: 28),
+            if (icon != null) const SizedBox(width: 10),
             Text(
               text,
-              style: TextStyle(color: Color(Config.COLOR_APP_BAR), fontSize: 20), // Text color in COLOR_APP_BAR
+              style: const TextStyle(
+                  color: Color(Config.COLOR_APP_BAR),
+                  fontSize: 20), // Text color in COLOR_APP_BAR
             ),
           ],
         ),

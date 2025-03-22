@@ -1,20 +1,42 @@
 import 'package:flutter/material.dart';
-import 'package:tb_app_rqm/Data/DossardData.dart';
-import 'package:tb_app_rqm/UI/InfoScreen.dart';
-import 'package:tb_app_rqm/UI/LoginScreen.dart';
+import 'package:flutter/services.dart';
+import 'package:lrqm/Data/DossardData.dart';
+import 'package:lrqm/UI/WorkingScreen.dart';
+import 'package:lrqm/UI/LoginScreen.dart';
 
 import 'Data/NameData.dart';
+import 'Data/UserData.dart'; // Import UserData
 
 void main() async {
   /// Ensure that the WidgetsBinding is initialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  /// Check if there are a name and a dossard number saved in the shared preferences
-  final bool _isLoggedIn = await NameData.doesNameExist() && await DossardData.doesDossardExist();
+  /// Set preferred orientations to portrait only
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
+  /// Check if user data exists in the shared preferences
+  final bool isLoggedIn = (await UserData.getUserId()) != null;
 
   /// Run the application
-  runApp(MaterialApp(
-    title: 'RQM application',
-    home: _isLoggedIn ? const InfoScreen() : const Login(),
-  ));
+  runApp(MyApp(isLoggedIn: isLoggedIn));
+}
+
+class MyApp extends StatelessWidget {
+  final bool isLoggedIn;
+
+  MyApp({required this.isLoggedIn});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: 'La RQM APP',
+      theme: ThemeData(
+        fontFamily: 'Roboto',
+      ),
+      home: isLoggedIn ? const WorkingScreen() : const Login(),
+    );
+  }
 }
