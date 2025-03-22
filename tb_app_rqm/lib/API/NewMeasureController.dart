@@ -21,12 +21,12 @@ class NewMeasureController {
       if (contributorsNumber != null) "contributors_number": contributorsNumber,
     };
 
-    log("Debug: Starting measure with body: $body");
+    log("Request: POST $uri\nBody: ${jsonEncode(body)}");
 
     return http.post(uri,
         body: jsonEncode(body),
         headers: {"Content-Type": "application/json"}).then((response) async {
-      log("Debug: Received response with status code: ${response.statusCode}");
+      log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
         log("Debug: Response data: $responseData");
@@ -47,7 +47,7 @@ class NewMeasureController {
         throw Exception('Failed to start measure: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
-      log("Error: $error");
+      log("Error: $error\nStackTrace: $stackTrace");
       return Result<int>(error: error.toString());
     });
   }
@@ -65,12 +65,12 @@ class NewMeasureController {
     final uri = Uri.https(Config.API_URL, '/measures/$measureId');
     final body = {"meters": meters};
 
-    log("Debug: Editing meters for measure $measureId with body: $body");
+    log("Request: PUT $uri\nBody: ${jsonEncode(body)}");
 
     return http.put(uri,
         body: jsonEncode(body),
         headers: {"Content-Type": "application/json"}).then((response) {
-      log("Debug: Received response with status code: ${response.statusCode}");
+      log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         log("Debug: Successfully edited meters.");
         return Result<bool>(value: true);
@@ -79,7 +79,7 @@ class NewMeasureController {
         throw Exception('Failed to edit meters: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
-      log("Error: $error");
+      log("Error: $error\nStackTrace: $stackTrace");
       return Result<bool>(error: error.toString());
     });
   }
@@ -96,10 +96,10 @@ class NewMeasureController {
 
     final uri = Uri.https(Config.API_URL, '/measures/$measureId/stop');
 
-    log("Debug: Stopping measure with ID: $measureId");
+    log("Request: PUT $uri");
 
     return http.put(uri).then((response) async {
-      log("Debug: Received response with status code: ${response.statusCode}");
+      log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         await MeasureData.clearMeasureId(); // Clear the measure ID
         log("Debug: Measure ID cleared.");
@@ -109,7 +109,7 @@ class NewMeasureController {
         throw Exception('Failed to stop measure: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
-      log("Error: $error");
+      log("Error: $error\nStackTrace: $stackTrace");
       return Result<bool>(error: error.toString());
     });
   }

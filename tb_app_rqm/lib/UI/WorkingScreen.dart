@@ -509,7 +509,7 @@ class _WorkingScreenState extends State<WorkingScreen>
         log("Trying to pop");
       },
       child: Scaffold(
-        backgroundColor: const Color(Config.COLOR_BACKGROUND),
+        backgroundColor: Colors.white,
         appBar: TopAppBar(
           title: 'Informations',
           showInfoButton: true,

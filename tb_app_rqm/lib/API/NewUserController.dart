@@ -15,18 +15,19 @@ class NewUserController {
       "event_id": eventId,
     };
 
-    log("Creating user: $body");
+    log("Request: POST $uri\nBody: ${jsonEncode(body)}");
 
     return http.post(uri,
         body: jsonEncode(body),
         headers: {"Content-Type": "application/json"}).then((response) {
+      log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<bool>(value: true);
       } else {
         throw Exception('Failed to create user: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
-      log("Error: $error");
+      log("Error: $error\nStackTrace: $stackTrace");
       return Result<bool>(error: error.toString());
     });
   }
@@ -35,16 +36,17 @@ class NewUserController {
   static Future<Result<Map<String, dynamic>>> getUser(int userId) async {
     final uri = Uri.https(Config.API_URL, '/users/$userId');
 
-    log("Fetching user with ID: $userId");
+    log("Request: GET $uri");
 
     return http.get(uri).then((response) {
+      log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<Map<String, dynamic>>(value: jsonDecode(response.body));
       } else {
         throw Exception('Failed to fetch user: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
-      log("Error: $error");
+      log("Error: $error\nStackTrace: $stackTrace");
       return Result<Map<String, dynamic>>(error: error.toString());
     });
   }
@@ -53,16 +55,17 @@ class NewUserController {
   static Future<Result<List<dynamic>>> getAllUsers() async {
     final uri = Uri.https(Config.API_URL, '/users/');
 
-    log("Fetching all users");
+    log("Request: GET $uri");
 
     return http.get(uri).then((response) {
+      log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<List<dynamic>>(value: jsonDecode(response.body));
       } else {
         throw Exception('Failed to fetch users: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
-      log("Error: $error");
+      log("Error: $error\nStackTrace: $stackTrace");
       return Result<List<dynamic>>(error: error.toString());
     });
   }
@@ -73,18 +76,19 @@ class NewUserController {
     final uri = Uri.https(Config.API_URL, '/users/$userId');
     final body = jsonEncode(updates);
 
-    log("Editing user with ID $userId: $body");
+    log("Request: PATCH $uri\nBody: $body");
 
     return http.patch(uri,
         body: body,
         headers: {"Content-Type": "application/json"}).then((response) {
+      log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<bool>(value: true);
       } else {
         throw Exception('Failed to edit user: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
-      log("Error: $error");
+      log("Error: $error\nStackTrace: $stackTrace");
       return Result<bool>(error: error.toString());
     });
   }
@@ -93,16 +97,17 @@ class NewUserController {
   static Future<Result<int>> getUserTotalMeters(int userId) async {
     final uri = Uri.https(Config.API_URL, '/users/$userId/meters');
 
-    log("Fetching total meters for user ID: $userId");
+    log("Request: GET $uri");
 
     return http.get(uri).then((response) {
+      log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<int>(value: jsonDecode(response.body)['meters']);
       } else {
         throw Exception('Failed to fetch total meters: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
-      log("Error: $error");
+      log("Error: $error\nStackTrace: $stackTrace");
       return Result<int>(error: error.toString());
     });
   }
@@ -111,9 +116,10 @@ class NewUserController {
   static Future<Result<int>> getUserTotalTime(int userId) async {
     final uri = Uri.https(Config.API_URL, '/users/$userId/time');
 
-    log("Fetching total time for user ID: $userId");
+    log("Request: GET $uri");
 
     return http.get(uri).then((response) {
+      log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         final timeString = jsonDecode(response.body)['time'];
         final time =
@@ -123,7 +129,7 @@ class NewUserController {
         throw Exception('Failed to fetch total time: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
-      log("Error: $error");
+      log("Error: $error\nStackTrace: $stackTrace");
       return Result<int>(error: error.toString());
     });
   }
