@@ -5,6 +5,7 @@ import 'package:lrqm/UI/WorkingScreen.dart';
 import 'package:lrqm/UI/LoginScreen.dart';
 
 import 'Data/NameData.dart';
+import 'Data/UserData.dart'; // Import UserData
 
 void main() async {
   /// Ensure that the WidgetsBinding is initialized
@@ -16,8 +17,8 @@ void main() async {
     DeviceOrientation.portraitDown,
   ]);
 
-  /// Check if there are a name and a dossard number saved in the shared preferences
-  final bool isLoggedIn = await NameData.doesNameExist() && await DossardData.doesDossardExist();
+  /// Check if user data exists in the shared preferences
+  final bool isLoggedIn = (await UserData.getUserId()) != null;
 
   /// Run the application
   runApp(MyApp(isLoggedIn: isLoggedIn));
@@ -33,7 +34,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'La RQM APP',
       theme: ThemeData(
-        fontFamily: 'Roboto', // Ensure the default font family is set to Poppins
+        fontFamily: 'Roboto',
       ),
       home: isLoggedIn ? const WorkingScreen() : const Login(),
     );

@@ -2,22 +2,27 @@ import 'dart:developer';
 
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:permission_handler/permission_handler.dart';
 
 import '../Utils/config.dart';
 import 'LoadingScreen.dart';
 import 'Components/InfoCard.dart';
 import 'Components/ActionButton.dart';
 import 'WorkingScreen.dart';
-import 'package:lrqm/Data/Session.dart';
-import 'package:lrqm/Data/NbPersonData.dart';
+import 'Components/TextModal.dart';
+
+import '../Data/ContributorsData.dart';
+
+import '../API/NewMeasureController.dart';
+import '../Data/UserData.dart';
 
 /// Class to display the setup scan screen.
 /// This screen allows the user to configure the number of participants
 /// and start the measure by scanning a QR code.
 class SetupScanScreen extends StatefulWidget {
-  final int nbParticipants;
+  final int contributors;
 
-  const SetupScanScreen({super.key, required this.nbParticipants});
+  const SetupScanScreen({super.key, required this.contributors});
 
   @override
   State<SetupScanScreen> createState() => _SetupScanScreenState();
@@ -33,7 +38,7 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
 
   bool _isCameraOpen = false; // Add _isCameraOpen property
 
-  void _navigateToLoadingScreen() {
+  void _navigateToLoadingScreen() async {
     controller.stop();
     Navigator.push(
       context,
@@ -44,8 +49,16 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
       ),
     );
     Future.delayed(const Duration(seconds: 3), () async {
-      await NbPersonData.saveNbPerson(widget.nbParticipants); // Save the number of participants
-      await Session.startSession(widget.nbParticipants);
+      await ContributorsData.saveContributors(
+          widget.contributors); // Save the number of contributors
+      int? userId = await UserData.getUserId(); // Retrieve user ID
+      if (userId != null) {
+        await NewMeasureController.startMeasure(userId,
+            contributorsNumber:
+                widget.contributors); // Use NewMeasureController
+      } else {
+        log("User ID is null. Cannot start measure.");
+      }
       Navigator.pushAndRemoveUntil(
         context,
         MaterialPageRoute(builder: (context) => const WorkingScreen()),
@@ -59,19 +72,39 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
   /// and shows a dialog to confirm the start of the measure.
   /// [barcodes] : List of detected barcodes
   void _handleBarcode(BarcodeCapture barcodes) {
-    if (mounted && barcodes.barcodes.isNotEmpty && barcodes.barcodes.first.displayValue == Config.QR_CODE_S_VALUE) {
+    if (mounted &&
+        barcodes.barcodes.isNotEmpty &&
+        barcodes.barcodes.first.displayValue == Config.QR_CODE_S_VALUE) {
       _navigateToLoadingScreen();
     }
   }
 
   void _launchCamera() async {
     try {
+      var status = await Permission.camera.status;
+      if (status.isDenied || status.isPermanentlyDenied) {
+        showTextModal(
+          context,
+          "Accès à la caméra refusé",
+          "On dirait que l'accès à la caméra est bloqué. Va dans les paramètres de ton téléphone et autorise l'application à utiliser la caméra. Appuie sur OK être redirigé.",
+          showConfirmButton: true,
+          onConfirm: () async {
+            await openAppSettings(); // Open app settings for the user to allow permissions
+          },
+        );
+        return;
+      }
+
       setState(() {
         _isCameraOpen = true;
       });
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erreur lors de l\'ouverture de la caméra')),
+      showTextModal(
+        context,
+        "Erreur d'accès à la caméra",
+        "Une erreur inattendue s'est produite. Vérifie les paramètres de ton téléphone pour autoriser l'application à utiliser la caméra. Appuie sur OK pour réessayer.",
+        showConfirmButton: true,
+        onConfirm: _launchCamera, // Retry launching the camera
       );
     }
   }
@@ -113,23 +146,28 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
                     child: GestureDetector(
                       onDoubleTap: _startSessionDirectly,
                       child: Container(
-                        width: MediaQuery.of(context).size.width * 0.5,
-                        child: const Image(image: AssetImage('assets/pictures/DrawScan-removebg.png')),
+                        width: MediaQuery.of(context).size.width * 0.55,
+                        child: const Image(
+                            image: AssetImage(
+                                'assets/pictures/DrawScan-removebg.png')),
                       ),
                     ),
                   ),
                   const SizedBox(height: 40),
                   Container(
                     margin: const EdgeInsets.only(top: 8.0),
-                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    padding: const EdgeInsets.symmetric(horizontal: 0.0),
                     child: const InfoCard(
                       title: "Le petit oiseau va sortir !",
-                      data: "Prend en photo le QR code pour démarrer ta session",
+                      data:
+                          "Prend en photo le QR code pour démarrer ta session",
                       actionItems: [],
                     ),
                   ),
                   const SizedBox(height: 24),
-                  const SizedBox(height: 100), // Add more margin at the bottom to allow more scrolling
+                  const SizedBox(
+                      height:
+                          100), // Add more margin at the bottom to allow more scrolling
                 ],
               ),
             ),
@@ -139,7 +177,8 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
             child: Padding(
               padding: const EdgeInsets.only(top: 40, left: 10), // Add padding
               child: IconButton(
-                icon: const Icon(Icons.arrow_back, color: Color(Config.COLOR_APP_BAR), size: 32),
+                icon: const Icon(Icons.arrow_back,
+                    color: Color(Config.COLOR_APP_BAR), size: 32),
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -148,9 +187,11 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
           ),
           if (!_isCameraOpen)
             Align(
-              alignment: Alignment.bottomCenter, // Fix the "Ouvrir la caméra" button at the bottom
+              alignment: Alignment
+                  .bottomCenter, // Fix the "Ouvrir la caméra" button at the bottom
               child: Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 20.0), // Add padding
+                padding: const EdgeInsets.symmetric(
+                    horizontal: 10.0, vertical: 20.0), // Add padding
                 child: ActionButton(
                   icon: Icons.camera_alt,
                   text: "Ouvrir la caméra",
@@ -169,7 +210,8 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
                   top: 40,
                   right: 10,
                   child: IconButton(
-                    icon: const Icon(Icons.close, color: Colors.white, size: 32),
+                    icon:
+                        const Icon(Icons.close, color: Colors.white, size: 32),
                     onPressed: _quitCamera,
                   ),
                 ),

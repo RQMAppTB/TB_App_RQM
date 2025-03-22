@@ -61,7 +61,7 @@ class InfoScreen extends StatelessWidget {
                                 'https://avatars.githubusercontent.com/u/61197576?v=4', 'Thibault Seem'),
                             _buildContributorProfile(context, 'https://github.com/therundmc',
                                 'https://avatars.githubusercontent.com/u/25774146?v=4', 'Antoine Cavallera'),
-                            _buildContributorProfile(context, null, null, 'Chloé Fontaine'),
+                            _buildContributorProfile(context, "https://github.com/chloefont?tab=overview&from=2025-03-01&to=2025-03-14", "https://avatars.githubusercontent.com/u/60699567?v=4", 'Chloé Fontaine'),
                             _buildContributorProfile(context, 'https://github.com/Maxime-Nicolet',
                                 'https://avatars.githubusercontent.com/u/21175110?v=4', 'Maxime Nicolet'),
                             _buildContributorProfile(context, 'https://github.com/tchekoto',

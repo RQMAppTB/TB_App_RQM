@@ -34,7 +34,8 @@ class ActionButton extends StatelessWidget {
           backgroundColor: Colors.transparent,
           shadowColor: Colors.transparent,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16.0), // Same radius as InfoCard
+            borderRadius:
+                BorderRadius.circular(16.0), // Same radius as InfoCard
           ),
           padding: const EdgeInsets.symmetric(vertical: 12.0),
         ),
@@ -42,7 +43,8 @@ class ActionButton extends StatelessWidget {
         child: Row(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            if (icon != null) Icon(icon, color: const Color(Config.COLOR_BACKGROUND), size: 28),
+            if (icon != null)
+              Icon(icon, color: const Color(Config.COLOR_BACKGROUND), size: 28),
             if (icon != null) const SizedBox(width: 10),
             Text(
               text,

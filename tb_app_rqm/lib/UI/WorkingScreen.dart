@@ -2,28 +2,32 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
-import 'package:lrqm/API/DistanceController.dart';
+
 import 'Components/ProgressCard.dart';
 import 'Components/InfoCard.dart';
 import 'Components/Dialog.dart';
 import 'Components/ActionButton.dart';
 import 'Components/TopAppBar.dart';
-import 'SetupPosScreen.dart'; // Add this import
-import 'package:lrqm/Data/Session.dart';
+import 'Components/TitleCard.dart';
+import 'Components/DiscardButton.dart';
+import 'Components/InfoDialog.dart';
 
-import '../Data/DistPersoData.dart';
-import '../Data/DistTotaleData.dart';
-import '../Data/DossardData.dart';
-import '../Data/NameData.dart';
+import 'SetupPosScreen.dart';
+import 'LoadingScreen.dart';
+
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
-import '../Data/NbPersonData.dart';
 import '../Data/TimeData.dart';
 import '../Geolocalisation/Geolocation.dart';
-import 'Components/DiscardButton.dart';
-import 'Components/InfoDialog.dart'; // Add this import
-import 'LoadingScreen.dart'; // Add this import
-import 'Components/TitleCard.dart';
+
+import '../API/NewEventController.dart';
+import '../API/NewUserController.dart';
+import '../API/NewMeasureController.dart';
+
+import '../Data/EventData.dart';
+import '../Data/UserData.dart';
+import '../Data/MeasureData.dart';
+import '../Data/ContributorsData.dart'; // Import ContributorsData
 
 /// Class to display the working screen.
 /// This screen displays the remaining time before the end of the event,
@@ -38,15 +42,16 @@ class WorkingScreen extends StatefulWidget {
 }
 
 /// State of the WorkingScreen class.
-class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProviderStateMixin {
+class _WorkingScreenState extends State<WorkingScreen>
+    with SingleTickerProviderStateMixin {
   /// Timer to update the remaining time every second
   Timer? _timer;
 
   /// Start time of the event
-  DateTime start = DateTime.parse(Config.START_TIME);
+  DateTime? start;
 
   /// End time of the event
-  DateTime end = DateTime.parse(Config.END_TIME);
+  DateTime? end;
 
   /// Remaining time before the end of the event
   String _remainingTime = "";
@@ -66,6 +71,9 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
   /// Number of participants
   int? _numberOfParticipants;
 
+  /// Number of participants
+  int? _contributors;
+
   int _currentPage = 0;
   final PageController _pageController = PageController();
 
@@ -78,9 +86,12 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   final ScrollController _parentScrollController = ScrollController();
 
-  bool _isSessionActive = false;
+  bool _isMeasureActive = false;
   Geolocation _geolocation = Geolocation();
   int _distance = 0;
+
+  /// Event meters goal
+  int? _metersGoal;
 
   void _showIconMenu(BuildContext context) {
     final List<IconData> icons = [
@@ -115,32 +126,41 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   /// Function to update the remaining time every second
   void countDown() {
+    if (start == null || end == null) return;
+
     DateTime now = DateTime.now();
-    Duration remaining = end.difference(now);
+    Duration remaining = end!.difference(now);
     if (remaining.isNegative) {
       _timer?.cancel();
-      setState(() {
-        _remainingTime = "L'évènement est terminé !";
-      });
+      if (mounted) {
+        setState(() {
+          _remainingTime = "L'évènement est terminé !";
+        });
+      }
       return;
-    } else if (now.isBefore(start)) {
-      setState(() {
-        _remainingTime = "L'évènement n'a pas encore commencé !";
-      });
+    } else if (now.isBefore(start!)) {
+      if (mounted) {
+        setState(() {
+          _remainingTime = "L'évènement n'a pas encore commencé !";
+        });
+      }
       return;
     }
 
-    setState(() {
-      _remainingTime =
-          '${remaining.inHours.toString().padLeft(2, '0')}h ${(remaining.inMinutes % 60).toString().padLeft(2, '0')}m ${(remaining.inSeconds % 60).toString().padLeft(2, '0')}s';
-    });
+    if (mounted) {
+      setState(() {
+        _remainingTime =
+            '${remaining.inHours.toString().padLeft(2, '0')}h ${(remaining.inMinutes % 60).toString().padLeft(2, '0')}m ${(remaining.inSeconds % 60).toString().padLeft(2, '0')}s';
+      });
+    }
   }
 
   /// Function to get the value from the API [fetchVal]
   /// and if it fails, get the value from the shared preferences [getVal]
   /// Returns the value
   /// If the value is not found, returns -1
-  Future<int> _getValue(Future<Result<int>> Function() fetchVal, Future<int?> Function() getVal) {
+  Future<int> _getValue(
+      Future<Result<int>> Function() fetchVal, Future<int?> Function() getVal) {
     return fetchVal().then((value) {
       if (value.hasError) {
         throw Exception("Could not fetch value because : ${value.error}");
@@ -163,8 +183,10 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   /// Function to calculate the percentage of remaining time
   double _calculateRemainingTimePercentage() {
-    Duration totalDuration = end.difference(start);
-    Duration elapsed = DateTime.now().difference(start);
+    if (start == null || end == null) return 0.0;
+
+    Duration totalDuration = end!.difference(start!);
+    Duration elapsed = DateTime.now().difference(start!);
     return elapsed.inSeconds / totalDuration.inSeconds * 100;
   }
 
@@ -173,8 +195,15 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
     return (_distanceTotale ?? 0) / Config.TARGET_DISTANCE * 100;
   }
 
+  /// Function to calculate the percentage of total distance based on event meters goal
+  double _calculateRealProgress() {
+    if (_metersGoal == null || _metersGoal == 0) return 0.0;
+    return (_distanceTotale ?? 0) / _metersGoal! * 100;
+  }
+
   String _formatDistance(int distance) {
-    return distance.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}\'');
+    return distance.toString().replaceAllMapped(
+        RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}\'');
   }
 
   String _getDistanceMessage(int distance) {
@@ -193,74 +222,158 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
   void initState() {
     super.initState();
 
-    // Check if a session is ongoing
-    Session.isStarted().then((isOngoing) {
-      if (isOngoing) {
+    // Retrieve the event start and end times
+    EventData.getStartDate().then((startDate) {
+      if (startDate != null && mounted) {
         setState(() {
-          _isSessionActive = true;
+          start = DateTime.parse(startDate);
+        });
+      }
+    });
+
+    EventData.getEndDate().then((endDate) {
+      if (endDate != null && mounted) {
+        setState(() {
+          end = DateTime.parse(endDate);
+        });
+      }
+    });
+
+    // Retrieve the bib_id from UserData
+    UserData.getBibId().then((bibId) {
+      if (bibId != null && mounted) {
+        setState(() {
+          _dossard = bibId;
+        });
+
+        // Get the personal distance
+        _getValue(() => NewUserController.getUserTotalMeters(int.parse(bibId)),
+            () async => null).then((value) {
+          if (mounted) {
+            setState(() {
+              _distancePerso = value;
+            });
+          }
+        });
+
+        // Get the total time
+        _getValue(() => NewUserController.getUserTotalTime(int.parse(bibId)),
+            () async => null).then((value) {
+          if (mounted) {
+            setState(() {
+              _totalTimePerso = value;
+            });
+          }
+        });
+
+        // Get the name of the user
+        UserData.getUsername().then((username) {
+          if (username != null && mounted) {
+            setState(() {
+              _name = username;
+            });
+          } else {
+            log("Failed to fetch username from UserData.");
+          }
+        });
+      } else {
+        log("Bib ID not found in UserData.");
+      }
+    });
+
+    // Check if a measure is ongoing
+    MeasureData.isMeasureOngoing().then((isOngoing) {
+      if (isOngoing && mounted) {
+        setState(() {
+          _isMeasureActive = true;
         });
         _geolocation.stream.listen((event) {
           log("Stream event: $event");
           if (event["distance"] == -1) {
             log("Stream event: $event");
             _geolocation.stopListening();
-            Session.stopSession();
-            setState(() {
-              _isSessionActive = false;
-            });
+            NewMeasureController.stopMeasure();
+            if (mounted) {
+              setState(() {
+                _isMeasureActive = false;
+              });
+            }
           } else {
-            setState(() {
-              _distance = event["distance"] ?? 0;
-              _sessionTimePerso = event["time"];
-            });
+            if (mounted) {
+              setState(() {
+                _distance = event["distance"] ?? 0;
+                _sessionTimePerso = event["time"];
+              });
+            }
           }
         });
         _geolocation.startListening();
       } else {
-        // TODO REPLACE WITH TOTAL TIME FROM API
         // Get the total time spent on the track
-        TimeData.getSessionTime().then((value) => setState(() {
-              _totalTimePerso = value;
-            }));
+        UserData.getBibId().then((bibId) {
+          if (bibId != null) {
+            NewUserController.getUserTotalTime(int.parse(bibId)).then((result) {
+              if (!result.hasError && mounted) {
+                setState(() {
+                  _totalTimePerso = result.value;
+                });
+              }
+            });
+          }
+        });
       }
     });
 
     // Check if the event has started or ended
-    if (DateTime.now().isAfter(end) || DateTime.now().isBefore(start)) {
-      _remainingTime = "L'évènement ${DateTime.now().isAfter(end) ? "est terminé" : "n'a pas encore commencé"} !";
-    } else {
-      _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) => countDown());
-    }
-
-    // Get the total distance
-    _getValue(DistanceController.getTotalDistance, DistTotaleData.getDistTotale).then((value) => setState(() {
-          _distanceTotale = value;
-        }));
-
-    // Get the personal distance
-    _getValue(DistanceController.getPersonalDistance, DistPersoData.getDistPerso).then((value) => setState(() {
-          _distancePerso = value;
-        }));
-
-    // Get the dossard number
-    DossardData.getDossard().then((value) => setState(() {
-          _dossard = value.toString();
-        }));
-
-    // Get the name of the user
-    NameData.getName().then((value) => setState(() {
-          _name = value;
-        }));
-
-    // Fake the number of participants
-    setState(() {
-      _numberOfParticipants = 150; // Set a fake number of participants
+    _timer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
+      if (start != null && end != null) {
+        countDown();
+      }
     });
 
-    // Get the number of participants
-    NbPersonData.getNbPerson().then((value) => setState(() {
-          _numberOfParticipants = value;
-        }));
+    // Get the event ID
+    EventData.getEventId().then((eventId) {
+      if (eventId != null && mounted) {
+        // Get the total distance
+        _getValue(() => NewEventController.getTotalMeters(eventId),
+            () async => null).then((value) {
+          if (mounted) {
+            setState(() {
+              _distanceTotale = value;
+            });
+          }
+        });
+
+        // Get the number of participants
+        NewEventController.getActiveUsers(eventId).then((result) {
+          if (!result.hasError && mounted) {
+            setState(() {
+              _numberOfParticipants = result.value;
+            });
+          }
+        });
+      } else {
+        log("Failed to fetch event ID from EventData.");
+      }
+    });
+
+    // Retrieve the number of contributors
+    ContributorsData.getContributors().then((contributors) {
+      if (contributors != null && mounted) {
+        setState(() {
+          _contributors = contributors;
+        });
+      }
+    });
+
+    // Retrieve the event meters goal
+    EventData.getMetersGoal().then((metersGoal) {
+      if (metersGoal != null && mounted) {
+        setState(() {
+          _metersGoal = metersGoal;
+        });
+      }
+    });
   }
 
   @override
@@ -273,66 +386,105 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   /// Function to refresh all values
   void _refreshValues() {
-    // Get the total distance
-    _getValue(DistanceController.getTotalDistance, DistTotaleData.getDistTotale).then((value) => setState(() {
-          _distanceTotale = value;
-        }));
+    // Retrieve the bib_id from UserData
+    UserData.getBibId().then((bibId) {
+      if (bibId != null) {
+        setState(() {
+          _dossard = bibId;
+        });
 
-    // Get the personal distance
-    _getValue(DistanceController.getPersonalDistance, DistPersoData.getDistPerso).then((value) => setState(() {
-          _distancePerso = value;
-        }));
+        // Get the personal distance
+        _getValue(
+                () => NewUserController.getUserTotalMeters(int.parse(bibId)), () async => null)
+            .then((value) => setState(() {
+                  _distancePerso = value;
+                }));
 
-    // Get the dossard number
-    DossardData.getDossard().then((value) => setState(() {
-          _dossard = value.toString().padLeft(4, '0');
-        }));
+        // Get the name of the user
+        UserData.getUsername().then((username) {
+          if (username != null) {
+            setState(() {
+              _name = username;
+            });
+          } else {
+            log("Failed to fetch username from UserData.");
+          }
+        });
+      } else {
+        log("Bib ID not found in UserData.");
+      }
+    });
 
-    // Get the name of the user
-    NameData.getName().then((value) => setState(() {
-          _name = value;
-        }));
+    // Get the event ID
+    EventData.getEventId().then((eventId) {
+      if (eventId != null) {
+        // Get the total distance
+        _getValue(
+                () => NewEventController.getTotalMeters(eventId), () async => null)
+            .then((value) => setState(() {
+                  _distanceTotale = value;
+                }));
 
-    // Get the number of participants
-    NbPersonData.getNbPerson().then((value) => setState(() {
-          _numberOfParticipants = value;
-        }));
+        // Get the number of participants
+        NewEventController.getActiveUsers(eventId).then((result) {
+          if (!result.hasError) {
+            setState(() {
+              _numberOfParticipants = result.value;
+            });
+          }
+        });
+      } else {
+        log("Failed to fetch event ID from EventData.");
+      }
+    });
 
     // Get the time spent on the track
-    TimeData.getSessionTime().then((value) => setState(() {
-          _totalTimePerso = value;
-        }));
+    UserData.getBibId().then((bibId) {
+      if (bibId != null) {
+        NewUserController.getUserTotalTime(int.parse(bibId)).then((result) {
+          if (!result.hasError && mounted) {
+            setState(() {
+              _totalTimePerso = result.value;
+            });
+          }
+        });
+      }
+    });
   }
 
-  void _confirmStopSession(BuildContext context) {
+  void _confirmStopMeasure(BuildContext context) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return InfoDialog(
           title: 'Confirmation',
-          content: 'Arrêter la session en cours ?',
+          content: 'Arrêter la mesure en cours ?',
           onYes: () async {
             Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const LoadingScreen(text: 'On se repose un peu...'),
+                builder: (context) =>
+                    const LoadingScreen(text: 'On se repose un peu...'),
               ),
             );
             try {
-              await Session.stopSession();
+              _geolocation
+                  .stopListening(); // Ensure geolocation stops listening
+              await NewMeasureController.stopMeasure();
             } catch (e) {
-              await Session.forceStopSession();
+              log("Failed to stop measure: $e");
             }
             setState(() {
-              _isSessionActive = false;
+              _isMeasureActive = false;
             });
-            _refreshValues(); // Refresh values after stopping the session
+            _refreshValues(); // Refresh values after stopping the measure
             Navigator.of(context).pop(); // Close the loading screen
             Navigator.of(context).pop(); // Close the confirmation dialog
           },
           onNo: () {
             Navigator.of(context).pop();
           },
-          logo: const Icon(Icons.warning_outlined, color: Color(Config.COLOR_APP_BAR)), // Add optional logo
+          logo: const Icon(Icons.warning_outlined,
+              color: Color(Config.COLOR_APP_BAR)), // Add optional logo
         );
       },
     );
@@ -348,7 +500,8 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
 
   @override
   Widget build(BuildContext context) {
-    int displayedTime = _isSessionActive ? (_sessionTimePerso ?? 0) : (_totalTimePerso ?? 0);
+    int displayedTime =
+        _isMeasureActive ? (_sessionTimePerso ?? 0) : (_totalTimePerso ?? 0);
 
     return PopScope(
       canPop: false,
@@ -356,10 +509,11 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
         log("Trying to pop");
       },
       child: Scaffold(
-        backgroundColor: const Color(Config.COLOR_BACKGROUND),
-        appBar: const TopAppBar(
+        backgroundColor: Colors.white,
+        appBar: TopAppBar(
           title: 'Informations',
           showInfoButton: true,
+          isRecording: _isMeasureActive, // Pass recording status
         ),
         body: Stack(
           children: [
@@ -391,69 +545,83 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                     // Make the full page scrollable
                     controller: _parentScrollController,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start, // Align text to the left
                         children: <Widget>[
-                          const SizedBox(height: 24), // Add margin at the top
+                          const SizedBox(height: 16), // Add margin at the top
                           const TitleCard(
                             icon: Icons.person,
                             title: 'Informations ',
                             subtitle: 'personnelles',
                           ),
-                          const SizedBox(height: 24), // Add margin before the first card
-                          InfoCard(
-                            logo: GestureDetector(
-                              onTap: () => _showIconMenu(context),
-                              child: Icon(_selectedIcon),
-                            ),
-                            title: '№ de dossard: $_dossard',
-                            data: _name,
+                          const SizedBox(height: 16),
+                          Column(
+                            children: [
+                              InfoCard(
+                                logo: GestureDetector(
+                                  onTap: () => _showIconMenu(context),
+                                  child: Icon(_selectedIcon),
+                                ),
+                                title: '№ de dossard: $_dossard',
+                                data: _name,
+                              ),
+                              const SizedBox(height: 6),
+                              InfoCard(
+                                logo: Image.asset(
+                                  _isMeasureActive
+                                      ? 'assets/pictures/LogoSimpleAnimated.gif'
+                                      : 'assets/pictures/LogoSimple.png',
+                                  width: _isMeasureActive ? 32 : 26,
+                                  height: _isMeasureActive ? 32 : 26,
+                                ),
+                                title: _isMeasureActive
+                                    ? 'Distance parcourue'
+                                    : 'Contribution à l\'évènement',
+                                data:
+                                    '${_formatDistance(_isMeasureActive ? _distance : (_distancePerso ?? 0))} mètres',
+                                additionalDetails: _getDistanceMessage(
+                                    _isMeasureActive
+                                        ? _distance
+                                        : (_distancePerso ?? 0)),
+                              ),
+                              const SizedBox(height: 6),
+                              InfoCard(
+                                logo: const Icon(Icons.timer_outlined),
+                                title: _isMeasureActive
+                                    ? 'Temps passé sur le parcours'
+                                    : 'Temps total passé sur le parcours',
+                                data:
+                                    '${(displayedTime ~/ 3600).toString().padLeft(2, '0')}h ${((displayedTime % 3600) ~/ 60).toString().padLeft(2, '0')}m ${(displayedTime % 60).toString().padLeft(2, '0')}s',
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 12),
-                          InfoCard(
-                            logo: Image.asset(
-                              _isSessionActive
-                                  ? 'assets/pictures/LogoSimpleAnimated.gif'
-                                  : 'assets/pictures/LogoSimple.png',
-                              width: _isSessionActive ? 40 : 32, // Adjust the width as needed
-                              height: _isSessionActive ? 40 : 32, // Adjust the height as needed
-                            ),
-                            title: 'Distance parcourue',
-                            data: '${_formatDistance(_isSessionActive ? _distance : (_distancePerso ?? 0))} mètres',
-                            additionalDetails:
-                                _getDistanceMessage(_isSessionActive ? _distance : (_distancePerso ?? 0)),
-                          ),
-                          const SizedBox(height: 12),
-                          InfoCard(
-                            logo: const Icon(Icons.timer_outlined),
-                            title: 'Temps passé sur le parcours',
-                            data:
-                                '${(displayedTime ~/ 3600).toString().padLeft(2, '0')}h ${((displayedTime % 3600) ~/ 60).toString().padLeft(2, '0')}m ${(displayedTime % 60).toString().padLeft(2, '0')}s',
-                          ),
-                          const SizedBox(height: 12),
-                          if (_isSessionActive)
+                          const SizedBox(height: 6),
+                          if (_isMeasureActive)
                             InfoCard(
                               logo: const Icon(Icons.groups_2),
                               title: 'L\'équipe',
-                              data: '${_numberOfParticipants ?? 0}',
+                              data:
+                                  '${_contributors ?? 0}', // Use contributors data
                             )
-                          else
-                            const SizedBox(height: 12),
-                          if (!_isSessionActive)
+                          else if (!_isMeasureActive)
                             const Padding(
-                              padding: EdgeInsets.symmetric(horizontal: 10.0),
+                              padding: EdgeInsets.symmetric(horizontal: 5.0),
                               child: Text(
-                                'Appuie sur START pour démarrer une session',
+                                'Appuie sur START pour démarrer une mesure',
                                 style: TextStyle(
                                   fontSize: 14,
                                   color: Color(Config.COLOR_APP_BAR),
                                 ),
                               ),
                             ),
-                          const SizedBox(height: 16), // Add margin before the text
-                          const SizedBox(height: 100), // Add more margin at the bottom to allow more scrolling
+                          const SizedBox(
+                              height: 16), // AdAd margin before the text
+                          const SizedBox(
+                              height:
+                                  100), // Add more margin at the bottom to allow more scrolling
                         ],
                       ),
                     ),
@@ -462,42 +630,53 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                     // Make the full page scrollable
                     controller: _parentScrollController,
                     child: Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 22.0),
+                      padding: const EdgeInsets.symmetric(horizontal: 10.0),
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start, // Align text to the left
+                        crossAxisAlignment:
+                            CrossAxisAlignment.start, // Align text to the left
                         children: <Widget>[
-                          const SizedBox(height: 24), // Add margin at the top
+                          const SizedBox(height: 16), // Add margin at the top
                           const TitleCard(
                             icon: Icons.calendar_month,
                             title: 'Informations sur',
                             subtitle: 'l\'évènement',
                           ),
-                          const SizedBox(height: 24),
+                          const SizedBox(height: 16),
+                          ProgressCard(
+                            title: 'Objectif',
+                            value:
+                                '${_formatDistance(_distanceTotale ?? 0)} m (${_formatDistance(_metersGoal ?? 0)} m)',
+                            percentage: _calculateRealProgress(),
+                            logo: Image.asset(
+                              'assets/pictures/LogoSimple.png',
+                              width: 28, // Adjust the width as needed
+                              height: 28, // Adjust the height as needed
+                            ),
+                          ),
+                          const SizedBox(height: 6),
                           ProgressCard(
                             title: 'Temps restant',
                             value: _remainingTime,
                             percentage: _calculateRemainingTimePercentage(),
                             logo: const Icon(Icons.timer_outlined),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 6),
                           ProgressCard(
-                            title: 'Distance totale parcourue',
-                            value: '${_formatDistance(_distanceTotale ?? 0)} m',
-                            percentage: _calculateTotalDistancePercentage(),
-                            logo: Image.asset(
-                              'assets/pictures/LogoSimple.png',
-                              width: 32, // Adjust the width as needed
-                              height: 32, // Adjust the height as needed
-                            ),
+                            title:
+                                'Participants ou groupe actuellement sur le parcours',
+                            value: '${_numberOfParticipants ?? 0}',
+                            percentage: ((_numberOfParticipants ?? 0) /
+                                    250 *
+                                    100)
+                                .clamp(0,
+                                    100), // Calculate percentage with max 250
+                            logo: const Icon(Icons.groups_2),
                           ),
-                          const SizedBox(height: 12),
-                          const InfoCard(
-                            logo: Icon(Icons.groups_2),
-                            title: 'Participants ou groupe actuellement sur le parcours',
-                            data: '150',
-                          ),
-                          const SizedBox(height: 100), // Add more margin at the bottom to allow more scrolling
+                          const SizedBox(height: 6),
+                          const SizedBox(
+                              height:
+                                  100), // Add more margin at the bottom to allow more scrolling
                         ],
                       ),
                     ),
@@ -506,7 +685,7 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
               ),
             ),
             Align(
-              alignment: Alignment.bottomCenter, // Fix the "START/STOP" button at the bottom
+              alignment: Alignment.bottomCenter,
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
@@ -519,23 +698,26 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                           width: 8.0, // Width for oval shape
                           height: 8.0, // Height for oval shape
                           decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(4.0), // Border radius for oval shape
+                            borderRadius:
+                                BorderRadius.circular(4.0), // Oval shape
                             color: _currentPage == i
                                 ? const Color(Config.COLOR_APP_BAR)
-                                : const Color(Config.COLOR_APP_BAR).withOpacity(0.1),
+                                : const Color(Config.COLOR_APP_BAR)
+                                    .withOpacity(0.1),
                           ),
                         ),
                     ],
                   ),
                   Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20.0, vertical: 12.0)
+                    padding: const EdgeInsets.symmetric(
+                            horizontal: 10.0, vertical: 12.0)
                         .copyWith(bottom: 20.0), // Add padding
-                    child: _isSessionActive
+                    child: _isMeasureActive
                         ? DiscardButton(
                             icon: Icons.stop, // Pass the icon parameter
                             text: 'STOP',
                             onPressed: () {
-                              _confirmStopSession(context);
+                              _confirmStopMeasure(context);
                             },
                           )
                         : ActionButton(
@@ -544,7 +726,9 @@ class _WorkingScreenState extends State<WorkingScreen> with SingleTickerProvider
                             onPressed: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => const SetupPosScreen()),
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        const SetupPosScreen()),
                               );
                             },
                           ),
