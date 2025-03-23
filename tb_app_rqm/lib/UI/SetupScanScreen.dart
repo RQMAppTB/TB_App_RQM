@@ -81,7 +81,7 @@ class _SetupScanScreenState extends State<SetupScanScreen> {
 
   void _launchCamera() async {
     try {
-      var status = await Permission.camera.status;
+      var status = await Permission.camera.request(); // Request camera permission
       if (status.isDenied || status.isPermanentlyDenied) {
         showTextModal(
           context,

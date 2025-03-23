@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../Utils/config.dart';
+import 'ActionButton.dart';
+import 'DiscardButton.dart';
 
 class InfoDialog extends StatelessWidget {
   final String title;
@@ -24,7 +26,7 @@ class InfoDialog extends StatelessWidget {
       child: Stack(
         children: [
           Align(
-            alignment: Alignment.bottomCenter, // Align to the bottom
+            alignment: Alignment.center, // Align to the bottom
             child: Container(
               width: MediaQuery.of(context).size.width * 0.9, // Increase width
               padding: const EdgeInsets.all(16.0),
@@ -72,27 +74,18 @@ class InfoDialog extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.end,
+                  Column(
                     children: [
-                      TextButton.icon(
-                        onPressed: onNo,
-                        style: TextButton.styleFrom(
-                          foregroundColor: const Color(Config.COLOR_APP_BAR),
-                          side: BorderSide(color: const Color(Config.COLOR_APP_BAR)),
-                        ),
-                        icon: const Icon(Icons.close),
-                        label: const Text('NON'),
-                      ),
-                      const SizedBox(width: 8),
-                      TextButton.icon(
+                      ActionButton(
+                        icon: Icons.check,
+                        text: 'OUI',
                         onPressed: onYes,
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: const Color(Config.COLOR_BUTTON),
-                        ),
-                        icon: const Icon(Icons.check),
-                        label: const Text('OUI'),
+                      ),
+                      const SizedBox(height: 8),
+                      DiscardButton(
+                        icon: Icons.close,
+                        text: 'NON',
+                        onPressed: onNo,
                       ),
                     ],
                   ),

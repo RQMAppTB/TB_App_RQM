@@ -1,6 +1,5 @@
 import 'dart:async';
 import 'dart:developer';
-
 import 'package:geolocator/geolocator.dart' as geo;
 import 'package:maps_toolkit/maps_toolkit.dart' as mp;
 import 'package:lrqm/API/NewMeasureController.dart'; // Replace MeasureController with NewMeasureController
@@ -11,36 +10,20 @@ import 'package:lrqm/Utils/LogHelper.dart';
 import 'package:flutter/foundation.dart'; // Add this import
 
 class Geolocation {
-  /// StreamSubscription to save the position stream and manipulate it
   late StreamSubscription<geo.Position> _positionStream;
-
-  /// Location settings to define the accuracy of the location
   late geo.LocationSettings _settings;
-
-  /// last position to calculate the distance between two points
   late geo.Position _oldPos;
-
-  /// distance traveled by the user
   int _distance = 0;
-
-  /// Number of measures to wait before starting to calculate the distance
   int _mesureToWait = 0;
-
-  /// Start time of the measure
   DateTime _startTime = DateTime.now();
-
-  /// Counter to check if the user is outside the zone
   int _outsideCounter = 0;
-
-  /// StreamController to listen to the distance and time updates
   final StreamController<Map<String, int>> _streamController =
       StreamController<Map<String, int>>();
-
-  /// Boolean to check if the measure stream is started
   bool _positionStreamStarted = false;
-
-  /// Timer to update the time stream every second
   Timer? _timeTimer;
+
+  // Add a new variable to track the last sent distance to prevent duplicates
+  int _lastSentDistance = 0;
 
   Geolocation() {
     _settings = _getSettings();
@@ -48,20 +31,17 @@ class Geolocation {
 
   Stream<Map<String, int>> get stream => _streamController.stream;
 
-  /// Handle the permission to access the location
   static Future<bool> handlePermission() async {
     final geo.GeolocatorPlatform _geolocatorPlatform =
         geo.GeolocatorPlatform.instance;
     bool serviceEnabled;
     geo.LocationPermission permission;
 
-    // Test if location services are enabled.
     serviceEnabled = await _geolocatorPlatform.isLocationServiceEnabled();
     if (!serviceEnabled) {
       return false;
     }
 
-    // Request permission if not granted
     permission = await _geolocatorPlatform.checkPermission();
     if (permission == geo.LocationPermission.denied) {
       permission = await _geolocatorPlatform.requestPermission();
@@ -70,16 +50,13 @@ class Geolocation {
       }
     }
 
-    // Check if the permission is denied forever
     if (permission == geo.LocationPermission.deniedForever) {
       return false;
     }
 
-    // All is good
     return true;
   }
 
-  /// Get the settings for the location stream depending on the platform
   geo.LocationSettings _getSettings() {
     if (defaultTargetPlatform == TargetPlatform.android) {
       return geo.AndroidSettings(
@@ -108,101 +85,96 @@ class Geolocation {
     }
   }
 
-  /// Determine the current position of the user and return it
-  /// Returns the current position of the user
   Future<geo.Position> determinePosition() async {
     return await geo.Geolocator.getCurrentPosition();
   }
 
-  /// Start measuring the distance traveled by the user and send the data to the server
-  /// If the measure is already started or the location rights are not granted,
-  /// the function will return while notifying the stream with -1.
-  /// If the current location is not in the zone for 5 consecutive measures,
-  /// the function will return while notifying the stream with -1.
-  ///
   Future<void> startListening() async {
-    log("Can start listening? ${!_positionStreamStarted}");
+    log("Checking if position stream can start...");
     if (!_positionStreamStarted && await handlePermission()) {
-      log("Starting");
+      log("Starting position stream.");
 
       _positionStreamStarted = true;
-
       _mesureToWait = 3;
       _startTime = DateTime.now();
 
-      // Start the time timer to update the time stream every second
       _timeTimer = Timer.periodic(const Duration(seconds: 1), (Timer t) {
         Duration diff = DateTime.now().difference(_startTime);
         _streamController.sink
             .add({"time": diff.inSeconds, "distance": _distance});
       });
 
+      _oldPos = await geo.Geolocator.getCurrentPosition();
+
       _positionStream =
           geo.Geolocator.getPositionStream(locationSettings: _settings)
               .listen((geo.Position position) async {
-        // Wait for the first measures to avoid strange values
         if (_mesureToWait > 0) {
-          log("Position: $position");
+          log("Initializing position stream. Waiting for stable readings...");
           _oldPos = position;
           _distance = 0;
           _mesureToWait--;
         } else {
-          log("Position: $position");
-          log("Entered position stream");
-          var distSinceLast = geo.Geolocator.distanceBetween(_oldPos.latitude,
-                  _oldPos.longitude, position.latitude, position.longitude)
+          var distSinceLast = geo.Geolocator.distanceBetween(
+                  _oldPos.latitude,
+                  _oldPos.longitude,
+                  position.latitude,
+                  position.longitude)
               .round();
 
-          log("Distance: $distSinceLast");
-          LogHelper.writeLog("Position,$position,Dist,$distSinceLast");
+          LogHelper.writeLog("Position: $position, Distance: $distSinceLast");
 
-          // Update the old position
           _oldPos = position;
-
-          // Update the distance
           _distance += distSinceLast;
 
-          // Check if the current location is in the zone
-          if (!isLocationInZone(position)) {
-            log("Out zone");
-            if (_outsideCounter < 5) {
-              _outsideCounter++;
+          if (distSinceLast > 0) {
+            int diff = _distance - _lastSentDistance; // Calculate the difference
+            log("Distance difference to send: $diff meters");
+
+            if (!isLocationInZone(position)) {
+              log("User is outside the zone.");
+              if (_outsideCounter < 5) {
+                _outsideCounter++;
+              } else {
+                log("User has been outside the zone for too long. Stopping measurement.");
+                _distance = -1;
+                _streamController.sink.add({
+                  "time": DateTime.now().difference(_startTime).inSeconds,
+                  "distance": _distance
+                });
+              }
             } else {
-              _distance = -1;
-              _streamController.sink.add({
-                "time": DateTime.now().difference(_startTime).inSeconds,
-                "distance": _distance
+              log("User is inside the zone.");
+              await TimeData.saveSessionTime(
+                  DateTime.now().difference(_startTime).inSeconds); // Save as int
+
+              // Attempt to send the difference to the server
+              NewMeasureController.editMeters(diff).then((value) async {
+                if (value.error != null) {
+                  log("Error updating distance on server: ${value.error}");
+                  // Accumulate the difference if sending fails
+                  _lastSentDistance += diff;
+                } else {
+                  log("Distance updated on server successfully.");
+                  // Save the new total distance only after successful sending
+                  _lastSentDistance = _distance;
+                  await DistToSendData.saveDistToSend(_lastSentDistance);
+                }
+                _streamController.sink.add({
+                  "time": DateTime.now().difference(_startTime).inSeconds,
+                  "distance": _distance
+                });
               });
             }
-          } else {
-            log("In zone");
-            await TimeData.saveSessionTime(
-                DateTime.now().difference(_startTime).inSeconds);
-            await DistToSendData.saveDistToSend(_distance);
-            _outsideCounter = 0;
-            NewMeasureController.editMeters(_distance).then((value) {
-              if (value.error != null) {
-                log("Error: ${value.error}");
-              } else {
-                log("Value: ${value.value}");
-              }
-              _streamController.sink.add({
-                "time": DateTime.now().difference(_startTime).inSeconds,
-                "distance": _distance
-              });
-            });
           }
         }
       });
-      log("Entered current position");
     } else {
-      log("Position stream already started or no rights");
+      log("Position stream already started or location permissions not granted.");
       _streamController.sink.add({"time": -1, "distance": -1});
     }
   }
 
-  /// Stop measuring the distance traveled by the user
-  /// If the measure is not started, the function will return without doing anything.
   void stopListening() {
     if (_positionStreamStarted) {
       _positionStream.cancel().then((value) {
@@ -213,33 +185,24 @@ class Geolocation {
     }
   }
 
-  /// Check if [point] is in the zone defin in the [config.dart] file.
-  /// Returns true if the point is in the zone
-  /// Returns false if the point is not in the zone
   bool isLocationInZone(geo.Position point) {
     var tmp = mp.LatLng(point.latitude, point.longitude);
     var test = mp.PolygonUtil.containsLocation(tmp, Config.ZONE_EVENT, false);
     return test;
   }
 
-  /// Check if the current location is in the zone
-  /// Returns true if the current location is in the zone
-  /// Returns false if the current location is not in the zone
   Future<bool> isInZone() async {
     final tmp = await determinePosition();
     var test = isLocationInZone(tmp);
     return test;
   }
 
-  /// Calculate the distance to the nearest point of the event zone if outside.
-  /// Returns the distance in kilometers (1 decimal) or -1 if the user is inside the zone.
   Future<double> distanceToZone() async {
     final currentPosition = await determinePosition();
     if (isLocationInZone(currentPosition)) {
       return -1; // User is inside the zone
     }
 
-    // Calculate the minimum distance to the zone's boundary
     final currentPoint =
         mp.LatLng(currentPosition.latitude, currentPosition.longitude);
     double minDistance = double.infinity;
@@ -255,7 +218,6 @@ class Geolocation {
       }
     }
 
-    // Convert distance to kilometers and round to 1 decimal place
     return double.parse((minDistance / 1000).toStringAsFixed(1));
   }
 }
