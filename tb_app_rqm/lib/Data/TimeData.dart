@@ -11,8 +11,9 @@ class TimeData {
   }
 
   /// Get the session time from the shared preferences
-  static Future<int?> getSessionTime() async {
-    return _dataManagement.getInt('sessionTime');
+  static Future<int> getSessionTime() async {
+    final result = await _dataManagement.getInt('sessionTime');
+    return result is int ? result : 0; // Ensure it always returns an int
   }
 
   /// Remove the time spent on the track from the shared preferences

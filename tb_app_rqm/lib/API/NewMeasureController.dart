@@ -23,31 +23,27 @@ class NewMeasureController {
 
     log("Request: POST $uri\nBody: ${jsonEncode(body)}");
 
-    return http.post(uri,
-        body: jsonEncode(body),
-        headers: {"Content-Type": "application/json"}).then((response) async {
-      log("Response: ${response.statusCode}\nBody: ${response.body}");
+    return http
+        .post(uri,
+            body: jsonEncode(body),
+            headers: {"Content-Type": "application/json"})
+        .timeout(const Duration(seconds: 10))
+        .then((response) async {
       if (response.statusCode == 200) {
         final responseData = jsonDecode(response.body);
-        log("Debug: Response data: $responseData");
 
-        // Use the correct key to retrieve the measure ID
+        // Only log critical information
         int? measureId = responseData['id'];
         if (measureId == null) {
-          log("Error: id is null in the response.");
           throw Exception("id is null in the response.");
         }
 
-        await MeasureData.saveMeasureId(
-            measureId.toString()); // Save the measure ID
-        log("Debug: Measure ID saved: $measureId");
+        await MeasureData.saveMeasureId(measureId.toString());
         return Result<int>(value: measureId);
       } else {
-        log("Error: Failed to start measure with status code: ${response.statusCode}");
         throw Exception('Failed to start measure: ${response.statusCode}');
       }
     }).onError((error, stackTrace) {
-      log("Error: $error\nStackTrace: $stackTrace");
       return Result<int>(error: error.toString());
     });
   }
@@ -101,7 +97,7 @@ class NewMeasureController {
     return http.put(uri).then((response) async {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
-        await MeasureData.clearMeasureId(); // Clear the measure ID
+        await MeasureData.clearMeasureData(); // Clear the measure ID
         log("Debug: Measure ID cleared.");
         return Result<bool>(value: true);
       } else {

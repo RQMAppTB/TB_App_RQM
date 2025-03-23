@@ -44,7 +44,7 @@ class _TopAppBarState extends State<TopAppBar> {
 
   void _startDotAnimation() {
     _dotAnimationTimer =
-        Timer.periodic(const Duration(milliseconds: 500), (timer) {
+        Timer.periodic(const Duration(seconds: 3), (timer) {
       setState(() {
         _isDotExpanded = !_isDotExpanded; // Toggle the opacity state
       });
@@ -102,8 +102,8 @@ class _TopAppBarState extends State<TopAppBar> {
               children: [
                 if (widget.isRecording) ...[
                   AnimatedOpacity(
-                    duration: const Duration(milliseconds: 2000),
-                    opacity: _isDotExpanded ? 1.0 : 0.3, // Animate opacity
+                    duration: const Duration(seconds: 1),
+                    opacity: _isDotExpanded ? 1.0 : 0.0, // Animate opacity
                     child: Container(
                       width: 18.0,
                       height: 18.0,
@@ -115,9 +115,9 @@ class _TopAppBarState extends State<TopAppBar> {
                   ),
                   const SizedBox(width: 8), // Space between dot and text
                   const Text(
-                    "ENREGISTREMENT",
+                    "Session en cours...",
                     style: TextStyle(
-                      color: Colors.redAccent,
+                      color: Color(Config.COLOR_APP_BAR),
                       fontWeight: FontWeight.bold,
                       fontSize: 16,
                     ),

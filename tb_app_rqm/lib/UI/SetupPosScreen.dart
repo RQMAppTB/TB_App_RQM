@@ -34,53 +34,14 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
   @override
   void initState() {
     super.initState();
-    _getCurrentLocation();
+    _requestPermissionOnPageLoad();
   }
 
-  void _getCurrentLocation() async {
-    try {
-      var status = await Permission.location.status;
-      if (status.isDenied || status.isPermanentlyDenied) {
-        showTextModal(
-          context,
-          "Accès à la localisation refusé",
-          "On dirait que l'accès à la localisation est bloqué. Va dans les paramètres de ton téléphone et autorise l'application à utiliser la localisation. Appuie sur OK pour être redirigé.",
-          showConfirmButton: true,
-          onConfirm: () async {
-            await openAppSettings(); // Open app settings for the user to allow permissions
-          },
-        );
-        return;
-      }
-
-      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-      if (!serviceEnabled) {
-        await Geolocator.openLocationSettings();
-        return;
-      }
-
-      LocationPermission permission = await Geolocator.checkPermission();
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          return;
-        }
-      }
-
-      if (permission == LocationPermission.deniedForever) {
-        return;
-      }
-
-      _currentPosition = await Geolocator.getCurrentPosition();
-      setState(() {});
-    } catch (e) {
-      showTextModal(
-        context,
-        "Erreur d'accès à la localisation",
-        "Une erreur inattendue s'est produite. Vérifie les paramètres de ton téléphone pour autoriser l'application à utiliser la localisation. Appuie sur OK pour réessayer.",
-        showConfirmButton: true,
-        onConfirm: _getCurrentLocation, // Retry getting the location
-      );
+  void _requestPermissionOnPageLoad() async {
+    var status = await Permission.location.status;
+    if (status.isDenied || status.isPermanentlyDenied) {
+      // Request permission using the default Android permission dialog with precise location
+      await Permission.location.request();
     }
   }
 
@@ -192,55 +153,97 @@ class _SetupPosScreenState extends State<SetupPosScreen> {
       _isLoading = true; // Set loading state to true
     });
 
-    bool canStartNewMeasure = true;
-    if (await MeasureData.isMeasureOngoing()) {
-      String? measureId = await MeasureData.getMeasureId();
-      log("Ongoing measure ID: $measureId");
-      final stopResult = await NewMeasureController.stopMeasure();
-      canStartNewMeasure = !stopResult.hasError;
-      if (stopResult.hasError) {
-        showInSnackBar("Failed to stop ongoing measure: ${stopResult.error}");
-        log("Failed to stop measure: ${stopResult.error}");
-      }
-    }
-
-    log("Can start new measure: $canStartNewMeasure");
-
-    if (await Geolocation.handlePermission()) {
-      log("1");
-      if (await Geolocation().isInZone()) {
-        log("2");
-        if (canStartNewMeasure) {
-          log("3");
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    const SetupTeamScreen()), // Navigate to the next screen
-          );
-        }
-      } else {
-        final distance = await Geolocation().distanceToZone();
-        final distanceText = distance > 0
-            ? "Tu es actuellement à ${distance.toStringAsFixed(1)} km de la zone."
-            : "";
-
+    try {
+      var status = await Permission.location.status;
+      if (status.isDenied || status.isPermanentlyDenied) {
+        // Show modal to redirect to location settings if permission is not granted
         showTextModal(
           context,
-          "Attention",
-          "Tu es hors de la zone de l'évènement. Déplace-toi dans la zone pour continuer.\n\n$distanceText",
+          "Accès à la localisation refusé",
+          "On dirait que l'accès à la localisation est bloqué. Va dans les paramètres de ton téléphone et active la localisation. Appuie sur OK pour être redirigé.",
+          showConfirmButton: true,
+          onConfirm: () async {
+            await Geolocator.openLocationSettings(); // Redirect to location settings
+          },
+        );
+        setState(() {
+          _isLoading = false; // Set loading state to false
+        });
+        return;
+      }
+
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
+        await Geolocator.openLocationSettings(); // Open location settings
+        setState(() {
+          _isLoading = false; // Set loading state to false
+        });
+        return;
+      }
+
+      // Force precise location
+      _currentPosition = await Geolocator.getCurrentPosition(
+        desiredAccuracy: LocationAccuracy.high,
+      );
+
+      bool canStartNewMeasure = true;
+      if (await MeasureData.isMeasureOngoing()) {
+        String? measureId = await MeasureData.getMeasureId();
+        log("Ongoing measure ID: $measureId");
+        final stopResult = await NewMeasureController.stopMeasure();
+        canStartNewMeasure = !stopResult.hasError;
+        if (stopResult.hasError) {
+          showInSnackBar("Failed to stop ongoing measure: ${stopResult.error}");
+          log("Failed to stop measure: ${stopResult.error}");
+        }
+      }
+
+      log("Can start new measure: $canStartNewMeasure");
+
+      if (await Geolocation.handlePermission()) {
+        log("1");
+        if (await Geolocation().isInZone()) {
+          log("2");
+          if (canStartNewMeasure) {
+            log("3");
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                  builder: (context) =>
+                      const SetupTeamScreen()), // Navigate to the next screen
+            );
+          }
+        } else {
+          final distance = await Geolocation().distanceToZone();
+          final distanceText = distance > 0
+              ? "Tu es actuellement à ${distance.toStringAsFixed(1)} km de la zone."
+              : "";
+
+          showTextModal(
+            context,
+            "Attention",
+            "Tu es hors de la zone de l'évènement. Déplace-toi dans la zone pour continuer.\n\n$distanceText",
+            showConfirmButton: true, // Add OK button
+          );
+          log("User is not in the zone");
+        }
+      } else {
+        showTextModal(
+          context,
+          "Autorisation requise",
+          "La localisation est désactivée. Active-la dans tes paramètres pour continuer.",
           showConfirmButton: true, // Add OK button
         );
-        log("User is not in the zone");
+        log("Location permission not granted");
       }
-    } else {
+    } catch (e) {
       showTextModal(
         context,
-        "Autorisation requise",
-        "La localisation est désactivée. Active-la dans tes paramètres pour continuer.",
-        showConfirmButton: true, // Add OK button
+        "Erreur d'accès à la localisation",
+        "Une erreur inattendue s'est produite. Vérifie les paramètres de ton téléphone pour autoriser l'application à utiliser la localisation. Appuie sur OK pour réessayer.",
+        showConfirmButton: true,
+        onConfirm: _navigateToSetupTeamScreen, // Retry on error
       );
-      log("Location permission not granted");
     }
 
     setState(() {

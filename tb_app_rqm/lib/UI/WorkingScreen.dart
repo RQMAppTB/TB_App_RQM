@@ -14,6 +14,7 @@ import 'Components/InfoDialog.dart';
 
 import 'SetupPosScreen.dart';
 import 'LoadingScreen.dart';
+import 'SummaryScreen.dart';
 
 import '../Utils/Result.dart';
 import '../Utils/config.dart';
@@ -458,7 +459,11 @@ class _WorkingScreenState extends State<WorkingScreen>
       builder: (BuildContext context) {
         return InfoDialog(
           title: 'Confirmation',
-          content: 'Arrêter la mesure en cours ?',
+          content: 'Tu es sûr de vouloir arrêter la mesure en cours ?\n\n'
+              'Cela mettra fin à l\'enregistrement de ta distance et de ton temps. '
+              'Si tu veux continuer plus tard, tu devras redémarrer une nouvelle mesure.\n\n'
+              'Prends une pause si nécessaire, mais n\'oublie pas de revenir pour continuer '
+              'à contribuer à l\'événement !',
           onYes: () async {
             Navigator.of(context).push(
               MaterialPageRoute(
@@ -467,8 +472,7 @@ class _WorkingScreenState extends State<WorkingScreen>
               ),
             );
             try {
-              _geolocation
-                  .stopListening(); // Ensure geolocation stops listening
+              _geolocation.stopListening();
               await NewMeasureController.stopMeasure();
             } catch (e) {
               log("Failed to stop measure: $e");
@@ -476,15 +480,30 @@ class _WorkingScreenState extends State<WorkingScreen>
             setState(() {
               _isMeasureActive = false;
             });
-            _refreshValues(); // Refresh values after stopping the measure
+            _refreshValues();
             Navigator.of(context).pop(); // Close the loading screen
             Navigator.of(context).pop(); // Close the confirmation dialog
+
+            // Calculate percentage of total event progress
+            int totalDistanceAdded = _distance * (_contributors ?? 1);
+            double eventPercentageAdded =
+                (totalDistanceAdded / (_metersGoal ?? 1)) * 100;
+
+            // Navigate to the SummaryScreen
+            Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => SummaryScreen(
+                  distanceAdded: _distance,
+                  timeAdded: _sessionTimePerso ?? 0,
+                  percentageAdded: eventPercentageAdded,
+                  contributors: _contributors ?? 1, // Pass contributors count
+                ),
+              ),
+            );
           },
           onNo: () {
             Navigator.of(context).pop();
           },
-          logo: const Icon(Icons.warning_outlined,
-              color: Color(Config.COLOR_APP_BAR)), // Add optional logo
         );
       },
     );
@@ -604,7 +623,7 @@ class _WorkingScreenState extends State<WorkingScreen>
                               logo: const Icon(Icons.groups_2),
                               title: 'L\'équipe',
                               data:
-                                  '${_contributors ?? 0}', // Use contributors data
+                                  '${_contributors ?? 0} ${(_contributors ?? 0) == 1 ? "participant" : "participants"}', // Handle singular/plural
                             )
                           else if (!_isMeasureActive)
                             const Padding(

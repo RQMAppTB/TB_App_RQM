@@ -16,7 +16,7 @@ class MeasureData {
   }
 
   /// Clear the measure ID from the shared preferences.
-  static Future<bool> clearMeasureId() async {
+  static Future<bool> clearMeasureData() async {
     return _dataManagement.removeData('measure_id');
   }
 
