@@ -1,0 +1,38 @@
+name: Android Release
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-release:
+    name: Build and Release Android App
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v3
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+
+      - name: Install Dependencies§
+        run: npm install
+
+      - name: Build Android App
+        run: |
+          cd android
+          ./gradlew bundleRelease
+
+      - name: Sign AAB
+        run: |
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore ${{ secrets.ANDROID_KEYSTORE }} -storepass ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -keypass ${{ secrets.ANDROID_KEY_PASSWORD }} app/build/outputs/bundle/release/app-release.aab ${{ secrets.ANDROID_KEY_ALIAS }}
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: TB_App_RQM-Android
+          path: android/app/build/outputs/bundle/release/app-release.aab
