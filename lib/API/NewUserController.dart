@@ -5,6 +5,8 @@ import '../Utils/Result.dart';
 import '../Utils/config.dart';
 
 class NewUserController {
+  static final http.Client _client = http.Client(); // Reusable HTTP client
+
   /// Create a new user.
   static Future<Result<bool>> createUser(
       String username, String bibId, int eventId) async {
@@ -17,7 +19,7 @@ class NewUserController {
 
     log("Request: POST $uri\nBody: ${jsonEncode(body)}");
 
-    return http.post(uri,
+    return _client.post(uri,
         body: jsonEncode(body),
         headers: {"Content-Type": "application/json"}).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
@@ -38,7 +40,7 @@ class NewUserController {
 
     log("Request: GET $uri");
 
-    return http.get(uri).then((response) {
+    return _client.get(uri).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<Map<String, dynamic>>(value: jsonDecode(response.body));
@@ -57,7 +59,7 @@ class NewUserController {
 
     log("Request: GET $uri");
 
-    return http.get(uri).then((response) {
+    return _client.get(uri).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<List<dynamic>>(value: jsonDecode(response.body));
@@ -78,7 +80,7 @@ class NewUserController {
 
     log("Request: PATCH $uri\nBody: $body");
 
-    return http.patch(uri,
+    return _client.patch(uri,
         body: body,
         headers: {"Content-Type": "application/json"}).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
@@ -99,7 +101,7 @@ class NewUserController {
 
     log("Request: GET $uri");
 
-    return http.get(uri).then((response) {
+    return _client.get(uri).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<int>(value: jsonDecode(response.body)['meters']);
@@ -118,7 +120,7 @@ class NewUserController {
 
     log("Request: GET $uri");
 
-    return http.get(uri).then((response) {
+    return _client.get(uri).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         final timeString = jsonDecode(response.body)['time'];

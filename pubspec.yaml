@@ -16,7 +16,7 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 # https://developer.apple.com/library/archive/documentation/General/Reference/InfoPlistKeyReference/Articles/CoreFoundationKeys.html
 # In Windows, build-name is used as the major, minor, and patch parts
 # of the product and file versions while build-number is used as the build suffix.
-version: 2.1.0+16
+version: 2.1.1+17
 
 environment:
   sdk: '>=3.4.3 <4.0.0'
@@ -30,6 +30,7 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  flutter_svg: ^2.0.7 # Add this dependency for SVG support
   flutter_map: ^7.0.2
   shared_preferences: ^2.2.3      # For storing data locally
   mobile_scanner: ^5.1.1          # For scanning QR codes
@@ -42,8 +43,7 @@ dependencies:
   package_info_plus: ^4.2.0       # Update this dependency version
   url_launcher: ^6.3.1
   latlong2: ^0.9.1
-  path_provider: ^2.0.11
-  share: ^2.0.4
+# Removed path_provider and share dependencies
 
 dev_dependencies:
   flutter_test:
@@ -89,6 +89,7 @@ flutter:
     - assets/pictures/DrawTeam-removebg.png
     - assets/pictures/DrawScan-removebg.png
     - assets/pictures/HEIG_VD.jpg
+    - assets/pictures/background.svg
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

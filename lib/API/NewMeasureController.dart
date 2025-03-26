@@ -6,6 +6,8 @@ import '../Utils/config.dart';
 import '../Data/MeasureData.dart';
 
 class NewMeasureController {
+  static final http.Client _client = http.Client(); // Reusable HTTP client
+
   /// Start a new measure for a user.
   static Future<Result<int>> startMeasure(int userId,
       {int? contributorsNumber}) async {
@@ -23,7 +25,7 @@ class NewMeasureController {
 
     log("Request: POST $uri\nBody: ${jsonEncode(body)}");
 
-    return http
+    return _client
         .post(uri,
             body: jsonEncode(body),
             headers: {"Content-Type": "application/json"})
@@ -63,7 +65,7 @@ class NewMeasureController {
 
     log("Request: PUT $uri\nBody: ${jsonEncode(body)}");
 
-    return http.put(uri,
+    return _client.put(uri,
         body: jsonEncode(body),
         headers: {"Content-Type": "application/json"}).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
@@ -94,7 +96,7 @@ class NewMeasureController {
 
     log("Request: PUT $uri");
 
-    return http.put(uri).then((response) async {
+    return _client.put(uri).then((response) async {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         await MeasureData.clearMeasureData(); // Clear the measure ID
