@@ -19,7 +19,7 @@ jobs:
         with:
           node-version: 16
 
-      - name: Install Dependencies§
+      - name: Install Dependencies
         run: npm install
 
       - name: Build Android App
@@ -27,12 +27,16 @@ jobs:
           cd android
           ./gradlew bundleRelease
 
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.ANDROID_SIGNING_KEY_B64 }}" | base64 -d > android-signing-key.jks
+
       - name: Sign AAB
         run: |
-          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore ${{ secrets.ANDROID_KEYSTORE }} -storepass ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -keypass ${{ secrets.ANDROID_KEY_PASSWORD }} app/build/outputs/bundle/release/app-release.aab ${{ secrets.ANDROID_KEY_ALIAS }}
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore android-signing-key.jks -storepass ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -keypass ${{ secrets.ANDROID_KEY_PASSWORD }} app/build/outputs/bundle/release/app-release.aab ${{ secrets.ANDROID_KEY_ALIAS }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
-          name: TB_App_RQM-Android
+          name: LRQM-app-Android
           path: android/app/build/outputs/bundle/release/app-release.aab
