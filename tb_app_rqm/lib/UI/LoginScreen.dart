@@ -3,6 +3,7 @@ import 'dart:async'; // Import Timer from dart:async
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_svg/flutter_svg.dart'; // Import flutter_svg package
 
 import '../API/NewEventController.dart';
 import '../API/NewUserController.dart';
@@ -119,6 +120,18 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
 
   void _onTextChanged() {}
 
+  /// Show a modal when the user ID is not found.
+  void _showUserNotFoundModal() {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      showTextModal(
+        context,
+        "Utilisateur introuvable",
+        "Cet utilisateur n'existe pas. Veuillez vérifier le numéro de dossard et réessayer.",
+        showConfirmButton: true,
+      );
+    });
+  }
+
   /// Function to show a snackbar with the message [value].
   void showInSnackBar(String value) {
     ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(value)));
@@ -148,6 +161,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
       if (dosNumResult.error != null) {
         // Show error message in snackbar
         showInSnackBar(dosNumResult.error!);
+        _showUserNotFoundModal(); // Display modal for user not found
         setState(() {});
         Navigator.pop(context); // Close the loading page
       } else {
@@ -181,10 +195,20 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
 
     return Scaffold(
       backgroundColor: Colors.white, // Set background color to white
+      resizeToAvoidBottomInset: true, // Allow resizing for other widgets
       body: Stack(
         children: [
+          Positioned.fill(
+            child: IgnorePointer(
+              child: SvgPicture.asset(
+                'assets/pictures/background.svg',
+                fit: BoxFit.cover, // Ensure the image covers the available space
+              ),
+            ),
+          ),
           Center(
             child: Padding(
+              // ...existing code...
               padding:
                   const EdgeInsets.symmetric(horizontal: 20.0), // Add margin
               child: Column(
@@ -194,7 +218,7 @@ class _LoginState extends State<Login> with SingleTickerProviderStateMixin {
                 children: <Widget>[
                   Flexible(
                     flex: 2,
-                    child: SizedBox(height: isKeyboardVisible ? 80 : 100),
+                    child: SizedBox(height: isKeyboardVisible ? 60 : 100),
                   ),
                   const Visibility(
                     //visible: !isKeyboardVisible,

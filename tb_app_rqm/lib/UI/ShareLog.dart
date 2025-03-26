@@ -1,33 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:lrqm/Utils/LogHelper.dart';
+import '../../Utils/LogHelper.dart';
 
-class LogScreen extends StatelessWidget {
+class ShareLog extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: Text('Logs'),
+        backgroundColor: Colors.white,
+        foregroundColor: Colors.black,
+        elevation: 0,
       ),
-      body: Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            ElevatedButton(
-              onPressed: () async {
-                await LogHelper.moveLogFileToDownloads();
-                ScaffoldMessenger.of(context).showSnackBar(
-                  SnackBar(content: Text('Log file moved to Downloads')),
-                );
-              },
-              child: Text('Move Log File to Downloads'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                await LogHelper.shareLogFile();
-              },
-              child: Text('Share Log File via Email'),
-            ),
-          ],
+      body: Container(
+        color: Colors.white,
+        child: StreamBuilder<String>(
+          stream: LogHelper.logStream,
+          builder: (context, snapshot) {
+            if (!snapshot.hasData) {
+              return Center(child: Text('No logs yet.'));
+            }
+            return Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SingleChildScrollView(
+                child: Text(
+                  snapshot.data!,
+                  style: TextStyle(fontSize: 14, fontFamily: 'monospace'),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );

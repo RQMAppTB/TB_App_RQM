@@ -1,46 +1,18 @@
-import 'dart:io';
-import 'package:path_provider/path_provider.dart';
-import 'package:share/share.dart';
+import 'dart:async';
 
 class LogHelper {
-  static Future<File> _getLogFile() async {
-    final directory = await getApplicationDocumentsDirectory();
-    final path = directory.path;
-    return File('$path/logs.txt');
-  }
+  static final StreamController<String> _logStreamController =
+      StreamController<String>.broadcast();
 
-  static Future<void> writeLog(String msg) async {
-    final file = await _getLogFile();
+  static Stream<String> get logStream => _logStreamController.stream;
+
+  static void writeLog(String msg) {
     final timestamp = DateTime.now().toIso8601String();
-    final logEntry = '$timestamp,$msg';
-    
-    // Write the log to the file
-    await file.writeAsString('$logEntry\n', mode: FileMode.append);
+    final logEntry = '$timestamp: $msg';
+    _logStreamController.add(logEntry); // Add log to the stream
   }
 
-  static Future<String> readLogs() async {
-    try {
-      final file = await _getLogFile();
-      return await file.readAsString();
-    } catch (e) {
-      return 'Error reading logs: $e';
-    }
-  }
-
-  static Future<File> getLogFile() async {
-    return await _getLogFile();
-  }
-
-  static Future<File> moveLogFileToDownloads() async {
-    final logFile = await _getLogFile();
-    final downloadsDirectory = await getExternalStorageDirectory();
-    final newFilePath = '${downloadsDirectory!.path}/logs.txt';
-    final newFile = await logFile.copy(newFilePath);
-    return newFile;
-  }
-
-  static Future<void> shareLogFile() async {
-    final logFile = await _getLogFile();
-    await Share.shareFiles([logFile.path], text: 'Here are the logs.');
+  static void dispose() {
+    _logStreamController.close(); // Close the stream when no longer needed
   }
 }

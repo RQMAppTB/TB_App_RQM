@@ -5,6 +5,8 @@ import '../Utils/Result.dart';
 import '../Utils/config.dart';
 
 class NewEventController {
+  static final http.Client _client = http.Client(); // Reusable HTTP client
+
   /// Create a new event with the provided details.
   static Future<Result<bool>> createEvent(String name, String startDate, String endDate, int metersGoal) async {
     final uri = Uri.https(Config.API_URL, '/events');
@@ -17,7 +19,7 @@ class NewEventController {
 
     log("Request: POST $uri\nBody: ${jsonEncode(body)}");
 
-    return http.post(uri, body: jsonEncode(body), headers: {"Content-Type": "application/json"}).then((response) {
+    return _client.post(uri, body: jsonEncode(body), headers: {"Content-Type": "application/json"}).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<bool>(value: true);
@@ -36,7 +38,7 @@ class NewEventController {
 
     log("Request: GET $uri");
 
-    return http.get(uri).then((response) {
+    return _client.get(uri).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<List<dynamic>>(value: jsonDecode(response.body));
@@ -55,7 +57,7 @@ class NewEventController {
 
     log("Request: GET $uri");
 
-    return http.get(uri).then((response) {
+    return _client.get(uri).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<Map<String, dynamic>>(value: jsonDecode(response.body));
@@ -74,7 +76,7 @@ class NewEventController {
 
     log("Request: GET $uri");
 
-    return http.get(uri).then((response) {
+    return _client.get(uri).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<int>(value: jsonDecode(response.body)['active_users_number']);
@@ -93,7 +95,7 @@ class NewEventController {
 
     log("Request: GET $uri");
 
-    return http.get(uri).then((response) {
+    return _client.get(uri).then((response) {
       log("Response: ${response.statusCode}\nBody: ${response.body}");
       if (response.statusCode == 200) {
         return Result<int>(value: jsonDecode(response.body)['total_meters']);
