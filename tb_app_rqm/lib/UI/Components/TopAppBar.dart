@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'dart:async'; // Ensure this import is present for Timer
 import '../../Utils/config.dart';
-import '../../Utils/LogHelper.dart';
+import '../ShareLog.dart';
 import '../LoginScreen.dart';
 import '../InfoScreen.dart';
 import '../../Data/DataUtils.dart';
@@ -139,8 +139,12 @@ class _TopAppBarState extends State<TopAppBar> {
                     IconButton(
                       icon: const Icon(Icons.share,
                           size: 24, color: Color(Config.COLOR_APP_BAR)),
-                      onPressed: () async {
-                        await LogHelper.shareLogFile();
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => ShareLog()), // Navigate to ShareLog screen
+                        );
                       },
                     ),
                   IconButton(
