@@ -1,4 +1,4 @@
-package iict.heig.vd.ch.rqm.tb_app_rqm
+package ch.larouequimarche.app
 
 import io.flutter.embedding.android.FlutterActivity
 
