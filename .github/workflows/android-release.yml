@@ -40,6 +40,17 @@ jobs:
           echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
           echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
 
+      - name: Extract Version from pubspec.yaml
+        id: extract_version
+        run: |
+          VERSION=$(grep '^version:' pubspec.yaml | sed 's/version: //g' | cut -d '+' -f1)
+          echo "VERSION=$VERSION" >> $GITHUB_ENV
+
+      - name: Set Build Number
+        run: |
+          echo "flutter.versionCode=${{ github.run_number }}" >> android/local.properties
+          echo "flutter.versionName=${{ env.VERSION }}-${{ github.run_number }}" >> android/local.properties
+
       - name: Build Android App
         run: flutter build appbundle --release
 
