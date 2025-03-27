@@ -49,7 +49,7 @@ jobs:
       - name: Set Build Number
         run: |
           echo "flutter.versionCode=${{ github.run_number }}" >> android/local.properties
-          echo "flutter.versionName=${{ env.VERSION }}-${{ github.run_number }}" >> android/local.properties
+          echo "flutter.versionName=${{ env.VERSION }}+${{ github.run_number }}" >> android/local.properties
 
       - name: Build Android App
         run: flutter build appbundle --release
