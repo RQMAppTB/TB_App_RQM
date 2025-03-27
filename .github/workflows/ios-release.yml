@@ -19,26 +19,23 @@ jobs:
       - name: Checkout Code
         uses: actions/checkout@v3
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v3
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
         with:
-          node-version: 16
+          flutter-version: '3.24.3'
 
       - name: Install Dependencies
-        run: npm install
+        run: flutter pub get
 
       - name: Install CocoaPods
         run: pod install --repo-update
         working-directory: ios
 
       - name: Build iOS App
-        run: xcodebuild -workspace ios/TB_App_RQM.xcworkspace -scheme TB_App_RQM -sdk iphoneos -configuration Release archive -archivePath ${{ github.workspace }}/build/TB_App_RQM.xcarchive
-
-      - name: Export IPA
-        run: xcodebuild -exportArchive -archivePath ${{ github.workspace }}/build/TB_App_RQM.xcarchive -exportOptionsPlist ios/exportOptions.plist -exportPath ${{ github.workspace }}/build
+        run: flutter build ipa --release
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v3
         with:
           name: TB_App_RQM-iOS
-          path: ${{ github.workspace }}/build/TB_App_RQM.ipa
+          path: build/ios/ipa/*.ipa
