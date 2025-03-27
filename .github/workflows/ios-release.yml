@@ -35,7 +35,7 @@ jobs:
         run: flutter build ipa --release
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
-          name: TB_App_RQM-iOS
+          name: LRQM-app--iOS
           path: build/ios/ipa/*.ipa
