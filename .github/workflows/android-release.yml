@@ -52,10 +52,15 @@ jobs:
           echo "flutter.versionName=${{ env.VERSION }}+${{ github.run_number }}" >> android/local.properties
 
       - name: Build Android App
+        run: flutter build apk --release
+
+      - name: Build Android App
         run: flutter build appbundle --release
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: LRQM-app-Android
-          path: build/app/outputs/bundle/release/app-release.aab
+          path: |
+            build/app/outputs/bundle/release/app-release.aab
+            build/app/outputs/apk/release/app-release.apk
