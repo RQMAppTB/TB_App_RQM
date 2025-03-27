@@ -31,14 +31,14 @@ jobs:
 
       - name: Decode Keystore
         run: |
-          echo "${{ secrets.ANDROID_SIGNING_KEY_B64 }}" | base64 -d > android/key.jks
+          echo "${{ secrets.ANDROID_SIGNING_KEY_B64 }}" | base64 -d > android/app/key.jks
 
       - name: Configure Key Properties
         run: |
-          echo "storeFile=android/key.jks" > android/key.properties
-          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/key.properties
-          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/key.properties
-          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/key.properties
+          echo "storeFile=key.jks" > android/app/key.properties
+          echo "storePassword=${{ secrets.ANDROID_KEYSTORE_PASSWORD }}" >> android/app/key.properties
+          echo "keyAlias=${{ secrets.ANDROID_KEY_ALIAS }}" >> android/app/key.properties
+          echo "keyPassword=${{ secrets.ANDROID_KEY_PASSWORD }}" >> android/app/key.properties
 
       - name: Build Android App
         run: flutter build appbundle --release
