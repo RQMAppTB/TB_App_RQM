@@ -21,10 +21,16 @@ jobs:
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
 
+      - name: Set up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
       - name: Build Android App
-        run: |
-          cd android
-          ./gradlew bundleRelease
+        run: flutter build appbundle --release
 
       - name: Decode Keystore
         run: |
@@ -32,10 +38,10 @@ jobs:
 
       - name: Sign AAB
         run: |
-          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore android-signing-key.jks -storepass ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -keypass ${{ secrets.ANDROID_KEY_PASSWORD }} app/build/outputs/bundle/release/app-release.aab ${{ secrets.ANDROID_KEY_ALIAS }}
+          jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore android-signing-key.jks -storepass ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -keypass ${{ secrets.ANDROID_KEY_PASSWORD }} build/app/outputs/bundle/release/app-release.aab ${{ secrets.ANDROID_KEY_ALIAS }}
 
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
           name: LRQM-app-Android
-          path: android/app/build/outputs/bundle/release/app-release.aab
+          path: build/app/outputs/bundle/release/app-release.aab
