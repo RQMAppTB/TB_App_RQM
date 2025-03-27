@@ -43,7 +43,7 @@ jobs:
           jarsigner -verbose -sigalg SHA256withRSA -digestalg SHA-256 -keystore android-signing-key.jks -storepass ${{ secrets.ANDROID_KEYSTORE_PASSWORD }} -keypass ${{ secrets.ANDROID_KEY_PASSWORD }} app/build/outputs/bundle/release/app-release.aab ${{ secrets.ANDROID_KEY_ALIAS }}
 
       - name: Upload Artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: LRQM-app-Android
           path: android/app/build/outputs/bundle/release/app-release.aab
